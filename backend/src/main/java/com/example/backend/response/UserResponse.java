@@ -8,7 +8,8 @@ public record UserResponse(
        String nome,
        Integer idade,
        String peculiaridades,
-       TipoPerfil tipoPerfil
+       TipoPerfil tipoPerfil,
+         Long profissionalId
 ) {
     public UserResponse(User u){
         this(
@@ -16,7 +17,8 @@ public record UserResponse(
                 u.getNome(),
                 u.getIdade(),
                 u.getPeculiaridades(),
-                u.getTipoPerfil()
+                u.getTipoPerfil(),
+                u.getProfissionalId()
         );
     }
 }

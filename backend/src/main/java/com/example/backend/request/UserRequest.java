@@ -13,6 +13,7 @@ public record UserRequest(
          @Positive(message = "A idade não pode ser negativa")
          Integer idade,
          String peculiaridades,
-        TipoPerfil tipoPerfil
+        TipoPerfil tipoPerfil,
+          Long profissionalId
 ) {
 }

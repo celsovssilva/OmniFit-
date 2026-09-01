@@ -22,4 +22,5 @@ public class User {
     private Integer idade;
     private String peculiaridades;
     private TipoPerfil tipoPerfil;
+    private Long profissionalId;
 }
