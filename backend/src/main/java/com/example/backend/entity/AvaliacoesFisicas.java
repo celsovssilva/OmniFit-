@@ -17,7 +17,9 @@ public class AvaliacoesFisicas {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
+    @ManyToOne
     private User alunoId;
+    @ManyToOne
     private User profissionalId;
     private LocalDate data;
     private Double pesoTotal;

@@ -1,7 +1,7 @@
 package com.example.backend.response;
 
 import com.example.backend.entity.Dieta;
-import com.example.backend.entity.User;
+
 
 public record DietaResponse(
         Long alunoId,

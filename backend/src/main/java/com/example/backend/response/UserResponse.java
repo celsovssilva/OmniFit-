@@ -18,7 +18,7 @@ public record UserResponse(
                 u.getIdade(),
                 u.getPeculiaridades(),
                 u.getTipoPerfil(),
-                u.getProfissionalId()
+                u.getPersonalId()
         );
     }
 }

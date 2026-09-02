@@ -1,7 +1,7 @@
 package com.example.backend.response;
 
 import com.example.backend.entity.Treinos;
-import com.example.backend.entity.User;
+
 
 public record TreinoResponse (
         Long alunoId,

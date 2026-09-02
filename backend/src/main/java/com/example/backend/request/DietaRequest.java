@@ -1,6 +1,6 @@
 package com.example.backend.request;
 
-import com.example.backend.entity.User;
+
 
 public record DietaRequest(
          Long Id,
