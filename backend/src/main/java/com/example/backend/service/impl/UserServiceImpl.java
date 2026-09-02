@@ -3,10 +3,15 @@ package com.example.backend.service.impl;
 import com.example.backend.entity.TipoPerfil;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
+import com.example.backend.request.LoginRequest;
 import com.example.backend.request.UserRequest;
+import com.example.backend.response.LoginResponse;
 import com.example.backend.response.UserResponse;
+import com.example.backend.service.TokenService;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +23,10 @@ public class UserServiceImpl implements UserService {
     private UserRepository userRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private AuthenticationManager authenticationManager;
+    @Autowired
+    private TokenService tokenService;
     @Override
     public UserResponse createUser(UserRequest user) {
         User u = new User();
@@ -62,5 +71,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new RuntimeException("user não encontrado"));
         userRepository.deleteById(user.getId());
+    }
+
+    @Override
+    public LoginResponse login(LoginRequest loginRequest) {
+        var usernamePassword = new UsernamePasswordAuthenticationToken(loginRequest.email(),loginRequest.senha());
+        var auth = this.authenticationManager.authenticate(usernamePassword);
+        User user = (User) auth.getPrincipal();
+        var Token = tokenService.generateToken(user);
+        return new LoginResponse(Token);
     }
 }

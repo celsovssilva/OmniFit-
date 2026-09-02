@@ -1,7 +1,9 @@
 package com.example.backend.controller;
 
 import com.example.backend.entity.User;
+import com.example.backend.request.LoginRequest;
 import com.example.backend.request.UserRequest;
+import com.example.backend.response.LoginResponse;
 import com.example.backend.response.UserResponse;
 import com.example.backend.service.UserService;
 import jakarta.validation.Valid;
@@ -16,6 +18,12 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @PostMapping("/login")
+    public LoginResponse loginUser(@Valid @RequestBody LoginRequest loginRequest){
+
+        return userService.login(loginRequest);
+    }
 
     @PostMapping("/create")
     public UserResponse create(@Valid @RequestBody UserRequest userRequest){
