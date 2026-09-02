@@ -7,6 +7,7 @@ import com.example.backend.request.UserRequest;
 import com.example.backend.response.UserResponse;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,12 +16,15 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @Override
     public UserResponse createUser(UserRequest user) {
         User u = new User();
         u.setNome(user.nome());
         u.setEmail(user.email());
-        u.setSenha(user.senha());
+        String senhaHash = passwordEncoder.encode(u.getSenha());
+        u.setSenha(senhaHash);
         u.setIdade(user.idade());
         u.setTipoPerfil(user.tipoPerfil());
         if(user.tipoPerfil() == TipoPerfil.ALUNO){
