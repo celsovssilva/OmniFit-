@@ -4,6 +4,7 @@ import com.example.backend.entity.TipoPerfil;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.request.LoginRequest;
+import com.example.backend.request.ResetSenhaRequest;
 import com.example.backend.request.UserRequest;
 import com.example.backend.response.LoginResponse;
 import com.example.backend.response.UserResponse;
@@ -12,9 +13,12 @@ import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -32,12 +36,15 @@ public class UserServiceImpl implements UserService {
         User u = new User();
         u.setNome(user.nome());
         u.setEmail(user.email());
-        String senhaHash = passwordEncoder.encode(u.getSenha());
+        String senhaHash = passwordEncoder.encode(user.senha());
         u.setSenha(senhaHash);
         u.setIdade(user.idade());
         u.setTipoPerfil(user.tipoPerfil());
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        User usuarioLogado = (User) authentication.getPrincipal();
         if(user.tipoPerfil() == TipoPerfil.ALUNO){
             u.setPeculiaridades(user.peculiaridades());
+            u.setPersonalId(usuarioLogado.getId());
         }
 
         return new UserResponse(userRepository.save(u));
@@ -53,8 +60,11 @@ public class UserServiceImpl implements UserService {
         }
         user.setEmail(userRequest.email());
         user.setIdade(userRequest.idade());
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        User usuarioLogado = (User) authentication.getPrincipal();
         if(userRequest.tipoPerfil() == TipoPerfil.ALUNO){
             user.setPeculiaridades(userRequest.peculiaridades());
+            user.setPersonalId(usuarioLogado.getId());
         }
 
         return new UserResponse(userRepository.save(user));
@@ -80,5 +90,18 @@ public class UserServiceImpl implements UserService {
         User user = (User) auth.getPrincipal();
         var Token = tokenService.generateToken(user);
         return new LoginResponse(Token);
+    }
+
+    @Override
+    public User forgotPassword(ResetSenhaRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(()-> new RuntimeException("email não encontrado"));
+        SecureRandom random = new SecureRandom();
+        int numero = random.nextInt(1000000);
+        String codigoRecuperacao = String.format("%06d", numero);
+         LocalDateTime expiracaoCodigo =LocalDateTime.now().plusMinutes(15);
+        user.setCodigoRedefinicao(codigoRecuperacao);
+        user.setExpiracaoCodigo(expiracaoCodigo);
+        return userRepository.save(user);
     }
 }

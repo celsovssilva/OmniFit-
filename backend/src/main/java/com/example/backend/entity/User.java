@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +34,8 @@ public class User implements UserDetails {
     private String peculiaridades;
     private TipoPerfil tipoPerfil;
     private Long personalId;
+    private String codigoRedefinicao;
+    private LocalDateTime expiracaoCodigo;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -68,4 +71,5 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+
 }

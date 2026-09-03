@@ -1,6 +1,8 @@
 package com.example.backend.service;
 
+import com.example.backend.entity.User;
 import com.example.backend.request.LoginRequest;
+import com.example.backend.request.ResetSenhaRequest;
 import com.example.backend.request.UserRequest;
 import com.example.backend.response.LoginResponse;
 import com.example.backend.response.UserResponse;
@@ -13,4 +15,5 @@ public interface UserService {
     List<UserResponse> getUserForPersonal(Long personalId);
     void deleteUser(Long userId);
     LoginResponse login(LoginRequest loginRequest);
+     User forgotPassword(ResetSenhaRequest request);
 }
