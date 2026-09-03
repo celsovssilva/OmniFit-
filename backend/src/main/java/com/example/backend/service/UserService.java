@@ -5,6 +5,7 @@ import com.example.backend.request.LoginRequest;
 import com.example.backend.request.ResetSenhaRequest;
 import com.example.backend.request.UserRequest;
 import com.example.backend.response.LoginResponse;
+import com.example.backend.response.ResetSenhaResponse;
 import com.example.backend.response.UserResponse;
 
 import java.util.List;
@@ -15,5 +16,6 @@ public interface UserService {
     List<UserResponse> getUserForPersonal(Long personalId);
     void deleteUser(Long userId);
     LoginResponse login(LoginRequest loginRequest);
-     User forgotPassword(ResetSenhaRequest request);
+     ResetSenhaResponse forgotPassword(ResetSenhaRequest request);
+     ResetSenhaResponse resetPassword(ResetSenhaRequest request);
 }

@@ -7,6 +7,7 @@ import com.example.backend.request.LoginRequest;
 import com.example.backend.request.ResetSenhaRequest;
 import com.example.backend.request.UserRequest;
 import com.example.backend.response.LoginResponse;
+import com.example.backend.response.ResetSenhaResponse;
 import com.example.backend.response.UserResponse;
 import com.example.backend.service.TokenService;
 import com.example.backend.service.UserService;
@@ -93,7 +94,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User forgotPassword(ResetSenhaRequest request) {
+    public ResetSenhaResponse forgotPassword(ResetSenhaRequest request) {
         User user = userRepository.findByEmail(request.email())
                 .orElseThrow(()-> new RuntimeException("email não encontrado"));
         SecureRandom random = new SecureRandom();
@@ -102,6 +103,25 @@ public class UserServiceImpl implements UserService {
          LocalDateTime expiracaoCodigo =LocalDateTime.now().plusMinutes(15);
         user.setCodigoRedefinicao(codigoRecuperacao);
         user.setExpiracaoCodigo(expiracaoCodigo);
-        return userRepository.save(user);
+        userRepository.save(user);
+        return new ResetSenhaResponse("solicitação de mudança enviada");
+    }
+
+    @Override
+    public ResetSenhaResponse resetPassword(ResetSenhaRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElseThrow(()-> new RuntimeException("email não encontrado"));
+
+        if (!request.pin().equals(user.getCodigoRedefinicao()) || user.getExpiracaoCodigo().isBefore(LocalDateTime.now())){
+                throw new RuntimeException("codigo errado ou  tempo expirado");
+        }
+
+        String senhaHash = passwordEncoder.encode(request.novaSenha());
+        user.setSenha(senhaHash);
+        user.setCodigoRedefinicao(null);
+        user.setExpiracaoCodigo(null);
+        userRepository.save(user);
+
+        return new ResetSenhaResponse("senha  alterada");
     }
 }

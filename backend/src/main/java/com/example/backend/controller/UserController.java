@@ -2,8 +2,10 @@ package com.example.backend.controller;
 
 import com.example.backend.entity.User;
 import com.example.backend.request.LoginRequest;
+import com.example.backend.request.ResetSenhaRequest;
 import com.example.backend.request.UserRequest;
 import com.example.backend.response.LoginResponse;
+import com.example.backend.response.ResetSenhaResponse;
 import com.example.backend.response.UserResponse;
 import com.example.backend.service.UserService;
 import jakarta.validation.Valid;
@@ -23,6 +25,15 @@ public class UserController {
     public LoginResponse loginUser(@Valid @RequestBody LoginRequest loginRequest){
 
         return userService.login(loginRequest);
+    }
+
+    @PostMapping("/forgot")
+    public ResetSenhaResponse forgoutSenhaResponse(@RequestBody ResetSenhaRequest request){
+        return userService.forgotPassword(request);
+    }
+    @PostMapping("/reset")
+    public ResetSenhaResponse resetSenhaResponse(@RequestBody ResetSenhaRequest request){
+        return userService.resetPassword(request);
     }
 
     @PostMapping("/create")
