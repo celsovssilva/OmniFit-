@@ -11,7 +11,6 @@ public record UserRequest(
         String email,
          @NotBlank @Size(min = 6)
          String senha,
-         @NotBlank
          @Positive(message = "A idade não pode ser negativa")
          Integer idade,
          String peculiaridades,

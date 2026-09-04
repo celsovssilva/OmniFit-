@@ -47,7 +47,6 @@ public class UserServiceImpl implements UserService {
             u.setPeculiaridades(user.peculiaridades());
             u.setPersonalId(usuarioLogado.getId());
         }
-
         return new UserResponse(userRepository.save(u));
     }
 
@@ -56,7 +55,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new RuntimeException("user não encontrado"));
         user.setNome(userRequest.nome());
-        if(!user.getEmail().isBlank()){
+        if(userRequest.email().isBlank()){
             throw new RuntimeException("email já existe");
         }
         user.setEmail(userRequest.email());
