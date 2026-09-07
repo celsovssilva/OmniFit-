@@ -86,10 +86,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(loginRequest.email(),loginRequest.senha());
-        var auth = this.authenticationManager.authenticate(usernamePassword);
-        User user = (User) auth.getPrincipal();
-        var Token = tokenService.generateToken(user);
-        return new LoginResponse(Token);
+        try {
+            var auth = this.authenticationManager.authenticate(usernamePassword);
+            User user = (User) auth.getPrincipal();
+            var token = tokenService.generateToken(user);
+            return new LoginResponse(token);
+        } catch (Exception e) {
+            System.out.println("🔥 O motivo da falha foi: " + e.getMessage());
+            throw e;
+        }
     }
 
     @Override
