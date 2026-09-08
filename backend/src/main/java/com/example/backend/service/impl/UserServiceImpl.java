@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -36,16 +37,21 @@ public class UserServiceImpl implements UserService {
     public UserResponse createUser(UserRequest user) {
         User u = new User();
         u.setNome(user.nome());
+        if(this.userRepository.findByEmail(user.email()).isPresent()){
+            throw new RuntimeException("email já existe");
+        }
         u.setEmail(user.email());
         String senhaHash = passwordEncoder.encode(user.senha());
         u.setSenha(senhaHash);
         u.setIdade(user.idade());
         u.setTipoPerfil(user.tipoPerfil());
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        User usuarioLogado = (User) authentication.getPrincipal();
+        String email = (String) authentication.getPrincipal();
+        User usuarioLogado = userRepository.findByEmail(email)
+                .orElseThrow(()-> new RuntimeException("user não encontrado"));
         if(user.tipoPerfil() == TipoPerfil.ALUNO){
             u.setPeculiaridades(user.peculiaridades());
-            u.setPersonalId(usuarioLogado.getId());
+            u.setPersonalId(usuarioLogado.getPersonalId());
         }
         return new UserResponse(userRepository.save(u));
     }
@@ -54,20 +60,24 @@ public class UserServiceImpl implements UserService {
     public UserResponse updateUser(UserRequest userRequest, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new RuntimeException("user não encontrado"));
-        user.setNome(userRequest.nome());
-        if(userRequest.email().isBlank()){
-            throw new RuntimeException("email já existe");
-        }
-        user.setEmail(userRequest.email());
-        user.setIdade(userRequest.idade());
-        var authentication = SecurityContextHolder.getContext().getAuthentication();
-        User usuarioLogado = (User) authentication.getPrincipal();
-        if(userRequest.tipoPerfil() == TipoPerfil.ALUNO){
-            user.setPeculiaridades(userRequest.peculiaridades());
-            user.setPersonalId(usuarioLogado.getId());
-        }
 
-        return new UserResponse(userRepository.save(user));
+            user.setNome(userRequest.nome());
+        Optional<User> emailExist = userRepository.findByEmail(userRequest.email());
+            if(emailExist.isPresent() || !emailExist.get().getId().equals(user.getId())){
+                throw new RuntimeException("email já existe");
+            }
+            user.setEmail(userRequest.email());
+            user.setIdade(userRequest.idade());
+            var authentication = SecurityContextHolder.getContext().getAuthentication();
+            User usuarioLogado = (User) authentication.getPrincipal();
+            if(userRequest.tipoPerfil() == TipoPerfil.ALUNO){
+                user.setPeculiaridades(userRequest.peculiaridades());
+                user.setPersonalId(usuarioLogado.getId());
+            }
+
+            return new UserResponse(userRepository.save(user));
+
+
     }
 
     @Override
@@ -86,15 +96,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(loginRequest.email(),loginRequest.senha());
-        try {
-            var auth = this.authenticationManager.authenticate(usernamePassword);
-            User user = (User) auth.getPrincipal();
-            var token = tokenService.generateToken(user);
-            return new LoginResponse(token);
-        } catch (Exception e) {
-            System.out.println("🔥 O motivo da falha foi: " + e.getMessage());
-            throw e;
-        }
+            try {
+                var auth = this.authenticationManager.authenticate(usernamePassword);
+                User user = (User) auth.getPrincipal();
+                var token = tokenService.generateToken(user);
+                return new LoginResponse(token);
+            } catch (Exception e) {
+                throw new RuntimeException("o erro é: " + e);
+            }
+
     }
 
     @Override
