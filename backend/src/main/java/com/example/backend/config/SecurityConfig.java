@@ -26,7 +26,8 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.POST,"/api/user/login").permitAll();
                     req.requestMatchers(HttpMethod.POST,"/api/user/create").permitAll();
                     req.requestMatchers(HttpMethod.PUT,"/api/user/update").authenticated();
-
+                    req.requestMatchers(HttpMethod.POST,"/api/user/forgot").permitAll();
+                    req.requestMatchers(HttpMethod.POST,"/api/user/reset").permitAll();
                 });
                 return security.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

@@ -12,6 +12,8 @@ import com.example.backend.response.UserResponse;
 import com.example.backend.service.TokenService;
 import com.example.backend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +35,8 @@ public class UserServiceImpl implements UserService {
     private AuthenticationManager authenticationManager;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private JavaMailSender javaMailSender;
     @Override
     public UserResponse createUser(UserRequest user) {
         User u = new User();
@@ -118,6 +122,11 @@ public class UserServiceImpl implements UserService {
         user.setCodigoRedefinicao(codigoRecuperacao);
         user.setExpiracaoCodigo(expiracaoCodigo);
         userRepository.save(user);
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setTo(user.getEmail());
+        simpleMailMessage.setSubject("Código de recuperação");
+        simpleMailMessage.setText("o código de recuperação é:" + " " + codigoRecuperacao + "o codigo expira em:" + " "+ expiracaoCodigo);
+        javaMailSender.send(simpleMailMessage);
         return new ResetSenhaResponse("solicitação de mudança enviada");
     }
 
