@@ -22,10 +22,9 @@ public class TreinoController {
         return treinoService.create(treinoRequest);
     }
 
-    @PutMapping("/update")
-    public TreinoResponse up(@Valid @RequestBody TreinoRequest request, Authentication authentication){
-        User user = (User) authentication.getPrincipal();
-        return treinoService.update(request, user.getId());
+    @PutMapping("/update/{id}")
+    public TreinoResponse up(@Valid @RequestBody TreinoRequest request, Long id){
+        return treinoService.update(request, id);
     }
 
     @GetMapping("/getTreinoForUsers")
@@ -34,9 +33,8 @@ public class TreinoController {
         return treinoService.getTreinoForUsers(user.getId());
     }
 
-    @DeleteMapping("/delete")
-    public void delete(Authentication authentication){
-        User user = (User) authentication.getPrincipal();
-        treinoService.delete(user.getId());
+    @DeleteMapping("/delete/{id}")
+    public void delete(Long id){
+        treinoService.delete(id);
     }
 }
