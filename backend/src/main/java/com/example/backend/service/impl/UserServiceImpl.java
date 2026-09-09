@@ -55,7 +55,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(()-> new RuntimeException("user não encontrado"));
         if(user.tipoPerfil() == TipoPerfil.ALUNO){
             u.setPeculiaridades(user.peculiaridades());
-            u.setPersonalId(usuarioLogado.getPersonalId());
+            u.setPersonalId(usuarioLogado.getId());
+
         }
         return new UserResponse(userRepository.save(u));
     }
