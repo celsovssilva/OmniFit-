@@ -55,7 +55,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(()-> new RuntimeException("user não encontrado"));
         if(user.tipoPerfil() == TipoPerfil.ALUNO){
             u.setPeculiaridades(user.peculiaridades());
-            u.setPersonalId(usuarioLogado.getId());
+            u.setPersonalId(usuarioLogado.getPersonalId());
 
         }
         return new UserResponse(userRepository.save(u));
@@ -77,7 +77,7 @@ public class UserServiceImpl implements UserService {
             User usuarioLogado = (User) authentication.getPrincipal();
             if(userRequest.tipoPerfil() == TipoPerfil.ALUNO){
                 user.setPeculiaridades(userRequest.peculiaridades());
-                user.setPersonalId(usuarioLogado.getId());
+                user.setPersonalId(usuarioLogado.getPersonalId());
             }
 
             return new UserResponse(userRepository.save(user));
@@ -126,7 +126,7 @@ public class UserServiceImpl implements UserService {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setTo(user.getEmail());
         simpleMailMessage.setSubject("Código de recuperação");
-        simpleMailMessage.setText("o código de recuperação é:" + " " + codigoRecuperacao + "o codigo expira em:" + " "+ expiracaoCodigo);
+        simpleMailMessage.setText("o código de recuperação é:" + " " + codigoRecuperacao + " " + "o codigo expira em:" + " "+ expiracaoCodigo);
         javaMailSender.send(simpleMailMessage);
         return new ResetSenhaResponse("solicitação de mudança enviada");
     }
