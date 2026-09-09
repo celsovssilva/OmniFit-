@@ -23,11 +23,18 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req ->{
+                    //users
                     req.requestMatchers(HttpMethod.POST,"/api/user/login").permitAll();
                     req.requestMatchers(HttpMethod.POST,"/api/user/create").permitAll();
                     req.requestMatchers(HttpMethod.PUT,"/api/user/update").authenticated();
                     req.requestMatchers(HttpMethod.POST,"/api/user/forgot").permitAll();
                     req.requestMatchers(HttpMethod.POST,"/api/user/reset").permitAll();
+                    //treino
+                    req.requestMatchers(HttpMethod.POST,"/api/treino/create").hasAnyRole("PERSONAL","ADMIN");
+                    req.requestMatchers(HttpMethod.PUT,"/api/treino/update").hasAnyRole("PERSONAL","NUTRI","ADMIN");
+                    req.requestMatchers(HttpMethod.GET,"/api/treino/getTreinoForUsers").hasAnyRole("PERSONAL","ADMIN");
+                    req.requestMatchers(HttpMethod.DELETE,"/api/treino/delete").hasAnyRole("PERSONAL","ADMIN");
+
                 });
                 return security.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
