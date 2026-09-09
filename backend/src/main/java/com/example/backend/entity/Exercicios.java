@@ -6,22 +6,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-public class Treinos {
+public class Exercicios {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
+    private String series;
+    private String repeticoes;
+    private String exercicio;
     @ManyToOne
-    private User alunoId;
-    @ManyToOne
-    private User profissionalId;
-    private byte[] arquivoPdf;
-    @OneToMany(mappedBy = "treino", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Exercicios> exercicios;
+    @JoinColumn(name = "treino_id")
+    private Treinos treino;
 }
