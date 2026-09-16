@@ -8,7 +8,9 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -23,7 +25,7 @@ public class TreinoController {
     }
 
     @PutMapping("/update/{id}")
-    public TreinoResponse up(@Valid @RequestBody TreinoRequest request, Long id){
+    public TreinoResponse up(@Valid  @RequestBody TreinoRequest request, @PathVariable Long id){
         return treinoService.update(request, id);
     }
 
@@ -36,5 +38,10 @@ public class TreinoController {
     @DeleteMapping("/delete/{id}")
     public void delete(Long id){
         treinoService.delete(id);
+    }
+
+    @PostMapping("/upload/{treinoId}")
+    public TreinoResponse upload(@PathVariable Long treinoId){
+        return treinoService.updloadTreino(treinoId);
     }
 }

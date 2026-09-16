@@ -30,10 +30,11 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.POST,"/api/user/forgot").permitAll();
                     req.requestMatchers(HttpMethod.POST,"/api/user/reset").permitAll();
                     //treino
-                    req.requestMatchers(HttpMethod.POST,"/api/treino/create").hasAnyRole("PERSONAL","ADMIN");
+                    req.requestMatchers(HttpMethod.POST,"/api/treino/create").authenticated();
                     req.requestMatchers(HttpMethod.PUT,"/api/treino/update/{id}").hasAnyRole("PERSONAL","NUTRI","ADMIN");
-                    req.requestMatchers(HttpMethod.GET,"/api/treino/getTreinoForUsers").hasAnyRole("PERSONAL","ADMIN");
+                    req.requestMatchers(HttpMethod.GET,"/api/treino/getTreinoForUsers").authenticated();
                     req.requestMatchers(HttpMethod.DELETE,"/api/treino/delete/{id}").hasAnyRole("PERSONAL","ADMIN");
+                    req.requestMatchers(HttpMethod.POST,"/api/treino/upload/{treinoId}").authenticated();
 
                 });
                 return security.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

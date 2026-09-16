@@ -8,9 +8,15 @@ import com.example.backend.repository.UserRepository;
 import com.example.backend.request.TreinoRequest;
 import com.example.backend.response.TreinoResponse;
 import com.example.backend.service.TreinoService;
+import org.openpdf.text.Document;
+import org.openpdf.text.Phrase;
+import org.openpdf.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -79,5 +85,29 @@ public class TreinoServiceImpl implements TreinoService {
         Treinos treinos = treinoRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("treino não encontrado"));
         treinoRepository.deleteById(treinos.getId());
+    }
+
+    @Override
+    public TreinoResponse updloadTreino(Long treinoId)  {
+        Treinos treinos = treinoRepository.findById(treinoId)
+                .orElseThrow(()-> new RuntimeException("treino inexistente"));
+        Document document = new Document();
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PdfWriter.getInstance(document,outputStream);
+        document.open();
+        document.add(new Phrase(" Aluno:" + treinos.getAlunoId()));
+        document.add(new Phrase("\nTreino:" + treinos.getId()));
+        document.add(new Phrase("\nPersonal:" + treinos.getProfissionalId() + "\n\n"));
+        List<Exercicios> treinoResponses = treinos.getExercicios();
+        for(Exercicios exercicios : treinoResponses){
+            document.add(new Phrase(" Exercicío:" + exercicios.getExercicio()));
+            document.add(new Phrase("\nRepetições:" + exercicios.getRepeticoes()));
+            document.add(new Phrase("\nSéries:" + exercicios.getSeries() + "\n\n"));
+        }
+        document.close();
+        treinos.setArquivoPdf(outputStream.toByteArray());
+
+
+        return new TreinoResponse(treinoRepository.save(treinos));
     }
 }
