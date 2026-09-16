@@ -35,6 +35,7 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.GET,"/api/treino/getTreinoForUsers").authenticated();
                     req.requestMatchers(HttpMethod.DELETE,"/api/treino/delete/{id}").hasAnyRole("PERSONAL","ADMIN");
                     req.requestMatchers(HttpMethod.POST,"/api/treino/upload/{treinoId}").authenticated();
+                    req.requestMatchers(HttpMethod.GET,"/api/treino/download/{treinoId}").authenticated();
 
                 });
                 return security.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

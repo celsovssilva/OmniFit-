@@ -6,6 +6,10 @@ import com.example.backend.response.TreinoResponse;
 import com.example.backend.service.TreinoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -44,4 +48,15 @@ public class TreinoController {
     public TreinoResponse upload(@PathVariable Long treinoId){
         return treinoService.updloadTreino(treinoId);
     }
+    @GetMapping("download/{treinoId}")
+    public ResponseEntity<byte[]> download(@PathVariable Long treinoId) {
+        byte[] pdfBytes = treinoService.downloadTreino(treinoId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDispositionFormData("attachment", "treino-" + treinoId + ".pdf");
+
+        return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
 }
+

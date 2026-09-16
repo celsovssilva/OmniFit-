@@ -95,9 +95,7 @@ public class TreinoServiceImpl implements TreinoService {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PdfWriter.getInstance(document,outputStream);
         document.open();
-        document.add(new Phrase(" Aluno:" + treinos.getAlunoId()));
         document.add(new Phrase("\nTreino:" + treinos.getId()));
-        document.add(new Phrase("\nPersonal:" + treinos.getProfissionalId() + "\n\n"));
         List<Exercicios> treinoResponses = treinos.getExercicios();
         for(Exercicios exercicios : treinoResponses){
             document.add(new Phrase(" Exercicío:" + exercicios.getExercicio()));
@@ -109,5 +107,13 @@ public class TreinoServiceImpl implements TreinoService {
 
 
         return new TreinoResponse(treinoRepository.save(treinos));
+    }
+
+    @Override
+    public byte[] downloadTreino(Long treinoId) {
+        Treinos treinos = treinoRepository.findById(treinoId)
+                .orElseThrow(()-> new RuntimeException("treino inexistente"));
+     return  treinos.getArquivoPdf();
+
     }
 }
