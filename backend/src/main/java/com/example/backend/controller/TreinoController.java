@@ -48,7 +48,8 @@ public class TreinoController {
     public TreinoResponse upload(@PathVariable Long treinoId){
         return treinoService.updloadTreino(treinoId);
     }
-    @GetMapping("download/{treinoId}")
+
+    @GetMapping("/download/{treinoId}")
     public ResponseEntity<byte[]> download(@PathVariable Long treinoId) {
         byte[] pdfBytes = treinoService.downloadTreino(treinoId);
 

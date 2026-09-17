@@ -20,5 +20,6 @@ public class Dieta {
     @ManyToOne
     private User profissionalId;
     private String descricao;
+    private byte[] arquivoPdf;
 
 }

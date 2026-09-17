@@ -36,6 +36,13 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.DELETE,"/api/treino/delete/{id}").hasAnyRole("PERSONAL","ADMIN");
                     req.requestMatchers(HttpMethod.POST,"/api/treino/upload/{treinoId}").authenticated();
                     req.requestMatchers(HttpMethod.GET,"/api/treino/download/{treinoId}").authenticated();
+                    //dieta
+                    req.requestMatchers(HttpMethod.POST,"/api/dieta/create").authenticated();
+                    req.requestMatchers(HttpMethod.PUT,"/api/dieta/update/{id}").authenticated();
+                    req.requestMatchers(HttpMethod.GET,"/api/dieta/getTreinoForUsers").authenticated();
+                    req.requestMatchers(HttpMethod.DELETE,"/api/dieta/delete/{id}").authenticated();
+                    req.requestMatchers(HttpMethod.POST,"/api/dieta/upload/{dietaId}").authenticated();
+                    req.requestMatchers(HttpMethod.GET,"/api/dieta/download/{dietaId}").authenticated();
 
                 });
                 return security.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
