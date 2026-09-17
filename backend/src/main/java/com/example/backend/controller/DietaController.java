@@ -25,7 +25,7 @@ public class DietaController {
             return dietaService.create(dietaRequest);
     }
 
-    @PutMapping("/upload/{id}")
+    @PutMapping("/update/{id}")
     public DietaResponse updateDieta(@RequestBody DietaRequest dietaRequest,@PathVariable Long id){
         return dietaService.update(dietaRequest,id);
     }
