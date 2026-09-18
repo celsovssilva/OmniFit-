@@ -8,13 +8,15 @@ public record AvaliacoesFisicasResponse(
         LocalDate data,
         Double pesoTotal,
         Double percentualGordura,
-        MedidasResponse medidas
+        MedidasResponse medidas,
+        Double comparacao
 ) {
     public AvaliacoesFisicasResponse(AvaliacoesFisicas a){
         this(
                 a.getData(),
                 a.getPesoTotal(),
                 a.getPercentualGordura(),
-               new MedidasResponse(a.getMedidas()));
+               new MedidasResponse(a.getMedidas()),
+                a.getComparacao());
     }
 }
