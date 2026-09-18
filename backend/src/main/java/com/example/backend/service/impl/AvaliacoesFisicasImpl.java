@@ -7,6 +7,7 @@ import com.example.backend.repository.AvaliacoesFisicasRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.request.AvaliacoesFisicasRequest;
 import com.example.backend.response.AvaliacoesFisicasResponse;
+import com.example.backend.response.ComparacaoResponse;
 import com.example.backend.service.AvaliacoesFisicasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
     @Override
     public AvaliacoesFisicasResponse create(AvaliacoesFisicasRequest request, Long alunoId) {
         List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAlunoIdOrderByDataDesc(alunoId);
-        AvaliacoesFisicas avaliacoesAnteriores = null;
+        AvaliacoesFisicas avaliacoesAnteriores = null ;
         if (!avaliacoesFisicas.isEmpty()){
             avaliacoesAnteriores = avaliacoesFisicas.get(0);
         }
@@ -56,7 +57,7 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
         medidas.setTricipital(request.medidas().tricipital());
         av.setMedidas(medidas);
         AvaliacoesFisicas avaliacaoSalva = avaliacoesFisicasRepository.save(av);
-        return new AvaliacoesFisicasResponse(avaliacaoSalva);
+        return new AvaliacoesFisicasResponse(avaliacaoSalva, avaliacoesAnteriores);
     }
 
     @Override
