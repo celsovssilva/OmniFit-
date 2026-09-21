@@ -43,6 +43,10 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.DELETE,"/api/dieta/delete/{id}").authenticated();
                     req.requestMatchers(HttpMethod.POST,"/api/dieta/upload/{dietaId}").authenticated();
                     req.requestMatchers(HttpMethod.GET,"/api/dieta/download/{dietaId}").authenticated();
+                    //avaliações
+                    req.requestMatchers("/api/avaliacoesfisicas/create/{alunoId}").authenticated();
+                    req.requestMatchers("/api/avaliacoesfisicas/update/{alunoId}").authenticated();
+                    req.requestMatchers("/api/avaliacoesfisicas/getUsersAvaliacoes").authenticated();
 
                 });
                 return security.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

@@ -1,6 +1,7 @@
 package com.example.backend.repository;
 
 import com.example.backend.entity.AvaliacoesFisicas;
+import com.example.backend.entity.Treinos;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,4 +11,5 @@ import java.util.List;
 @Repository
 public interface AvaliacoesFisicasRepository extends JpaRepository<AvaliacoesFisicas,Long> {
     List<AvaliacoesFisicas> findByAlunoIdOrderByDataDesc(Long alunoId);
+    List<AvaliacoesFisicas> findByAlunoIdId(Long alunoId);
 }

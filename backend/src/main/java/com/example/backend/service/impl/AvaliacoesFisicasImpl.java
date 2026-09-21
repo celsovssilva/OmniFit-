@@ -68,6 +68,11 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
                 .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
         User profissional = userRepository.findById(request.profissionalId())
                 .orElseThrow(()-> new RuntimeException("profissional não encontrado"));
+        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAlunoIdOrderByDataDesc(request.alunoId());
+        AvaliacoesFisicas avaliacaoAnterior = null;
+        if (avaliacoesFisicas.size() > 1 ){
+            avaliacaoAnterior = avaliacoesFisicas.get(1);
+        }
         Medidas medidas= new Medidas();
         fisicas.setAlunoId(aluno);
         fisicas.setData(request.data());
@@ -93,8 +98,16 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
         medidas.setTricipital(request.medidas().tricipital());
         fisicas.setMedidas(medidas);
         AvaliacoesFisicas avaliacaoSalva = avaliacoesFisicasRepository.save(fisicas);
-        return new AvaliacoesFisicasResponse(avaliacaoSalva);
+        return new AvaliacoesFisicasResponse(avaliacaoSalva,avaliacaoAnterior);
     }
 
+    @Override
+    public List<AvaliacoesFisicasResponse> getForUserAvaliacao(Long alunoId) {
+        List<AvaliacoesFisicasResponse> av = avaliacoesFisicasRepository.findByAlunoIdId(alunoId)
+                .stream().map(AvaliacoesFisicasResponse::new).toList();
+        return av;
     }
+
+
+}
 

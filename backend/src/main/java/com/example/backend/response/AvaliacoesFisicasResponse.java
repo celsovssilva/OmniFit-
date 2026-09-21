@@ -36,4 +36,8 @@ public record AvaliacoesFisicasResponse(
         ): null
         );
     }
+
+    public AvaliacoesFisicasResponse(AvaliacoesFisicas avaliacaoSalva) {
+
+    }
 }
