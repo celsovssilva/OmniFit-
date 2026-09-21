@@ -7,11 +7,11 @@ import com.example.backend.repository.AvaliacoesFisicasRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.request.AvaliacoesFisicasRequest;
 import com.example.backend.response.AvaliacoesFisicasResponse;
-import com.example.backend.response.ComparacaoResponse;
 import com.example.backend.service.AvaliacoesFisicasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,7 +22,7 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
     private UserRepository userRepository;
     @Override
     public AvaliacoesFisicasResponse create(AvaliacoesFisicasRequest request, Long alunoId) {
-        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAlunoIdOrderByDataDesc(alunoId);
+        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAlunoId_IdOrderByDataDesc(alunoId);
         AvaliacoesFisicas avaliacoesAnteriores = null ;
         if (!avaliacoesFisicas.isEmpty()){
             avaliacoesAnteriores = avaliacoesFisicas.get(0);
@@ -68,7 +68,7 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
                 .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
         User profissional = userRepository.findById(request.profissionalId())
                 .orElseThrow(()-> new RuntimeException("profissional não encontrado"));
-        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAlunoIdOrderByDataDesc(request.alunoId());
+        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAlunoId_IdOrderByDataDesc(request.alunoId());
         AvaliacoesFisicas avaliacaoAnterior = null;
         if (avaliacoesFisicas.size() > 1 ){
             avaliacaoAnterior = avaliacoesFisicas.get(1);
@@ -103,9 +103,18 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
 
     @Override
     public List<AvaliacoesFisicasResponse> getForUserAvaliacao(Long alunoId) {
-        List<AvaliacoesFisicasResponse> av = avaliacoesFisicasRepository.findByAlunoIdId(alunoId)
-                .stream().map(AvaliacoesFisicasResponse::new).toList();
-        return av;
+        List<AvaliacoesFisicas> av = avaliacoesFisicasRepository.findByAlunoId_IdOrderByDataDesc(alunoId);
+        List<AvaliacoesFisicasResponse> listaDeRespostas = new ArrayList<>();
+        for(int i = 0;i < av.size();i++){
+            AvaliacoesFisicas atual = av.get(i);
+            AvaliacoesFisicas anterior = null;
+            if(i < av.size() - 1){
+                anterior = av.get(i + 1);
+            }
+            listaDeRespostas.add(new AvaliacoesFisicasResponse(atual, anterior));
+
+        }
+            return listaDeRespostas;
     }
 
 

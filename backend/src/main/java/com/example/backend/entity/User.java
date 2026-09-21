@@ -34,6 +34,7 @@ public class User implements UserDetails {
     private String peculiaridades;
     private TipoPerfil tipoPerfil;
     private Long personalId;
+    private Long alunoId;
     private String codigoRedefinicao;
     private LocalDateTime expiracaoCodigo;
 

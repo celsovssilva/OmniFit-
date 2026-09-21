@@ -37,7 +37,5 @@ public record AvaliacoesFisicasResponse(
         );
     }
 
-    public AvaliacoesFisicasResponse(AvaliacoesFisicas avaliacaoSalva) {
 
-    }
 }
