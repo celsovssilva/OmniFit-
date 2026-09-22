@@ -14,7 +14,7 @@ public record MedidasResponse(
         Double bracoDireito,
         Double bracoEsquerdo,
         Double coxaDireita,
-        Double coxaEsqueda,
+        Double CoxaEsqueda,
         Double panturilhaDireita,
         Double panturrilhaEsquerda,
         Double tricipital,
