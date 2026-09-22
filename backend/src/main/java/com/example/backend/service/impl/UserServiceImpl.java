@@ -1,5 +1,6 @@
 package com.example.backend.service.impl;
 
+import com.example.backend.entity.StatusConta;
 import com.example.backend.entity.TipoPerfil;
 import com.example.backend.entity.User;
 import com.example.backend.repository.UserRepository;
@@ -49,14 +50,18 @@ public class UserServiceImpl implements UserService {
         u.setSenha(senhaHash);
         u.setIdade(user.idade());
         u.setTipoPerfil(user.tipoPerfil());
+        u.setStatusConta(StatusConta.ATIVO);
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = (String) authentication.getPrincipal();
         User usuarioLogado = userRepository.findByEmail(email)
                 .orElseThrow(()-> new RuntimeException("user não encontrado"));
         if(user.tipoPerfil() == TipoPerfil.ALUNO){
             u.setPeculiaridades(user.peculiaridades());
-            u.setPersonalId(usuarioLogado.getPersonalId());
+            u.setPersonalId(usuarioLogado.getId());
 
+        }
+        if(user.tipoPerfil() == TipoPerfil.ADMIN|| user.tipoPerfil() ==TipoPerfil.PERSONAL || user.tipoPerfil() == TipoPerfil.NUTRI){
+            throw new RuntimeException("só pode cadastrar aluno");
         }
         return new UserResponse(userRepository.save(u));
     }
@@ -75,7 +80,7 @@ public class UserServiceImpl implements UserService {
             user.setIdade(userRequest.idade());
             var authentication = SecurityContextHolder.getContext().getAuthentication();
             User usuarioLogado = (User) authentication.getPrincipal();
-            if(userRequest.tipoPerfil() == TipoPerfil.ALUNO){
+            if(userRequest.tipoPerfil() == TipoPerfil.ALUNO || userRequest.tipoPerfil() ==TipoPerfil.ADMIN){
                 user.setPeculiaridades(userRequest.peculiaridades());
                 user.setPersonalId(usuarioLogado.getPersonalId());
             }
@@ -147,5 +152,24 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return new ResetSenhaResponse("senha  alterada");
+    }
+
+    @Override
+    public UserResponse createProfissionalUser(UserRequest user) {
+        User u = new User();
+        u.setNome(user.nome());
+        if(this.userRepository.findByEmail(user.email()).isPresent()){
+            throw new RuntimeException("email já existe");
+        }
+        u.setEmail(user.email());
+        String senhaHash = passwordEncoder.encode(user.senha());
+        u.setSenha(senhaHash);
+        u.setIdade(user.idade());
+        u.setTipoPerfil(user.tipoPerfil());
+        u.setStatusConta(StatusConta.PENDENTE);
+        if(user.tipoPerfil() == TipoPerfil.ALUNO|| user.tipoPerfil() ==TipoPerfil.ADMIN){
+            throw new RuntimeException("só profissionais podem se cadastrar");
+        }
+        return new UserResponse(userRepository.save(u));
     }
 }
