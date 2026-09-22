@@ -33,6 +33,7 @@ public class User implements UserDetails {
     private Integer idade;
     private String peculiaridades;
     private TipoPerfil tipoPerfil;
+    private StatusConta statusConta;
     private Long personalId;
     private Long alunoId;
     private String codigoRedefinicao;
@@ -70,7 +71,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return this.statusConta == StatusConta.ATIVO;
     }
 
 }

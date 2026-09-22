@@ -1,5 +1,6 @@
 package com.example.backend.repository;
 
+import com.example.backend.entity.TipoPerfil;
 import com.example.backend.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,4 +12,5 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User,Long> {
     List<User> findByPersonalId(Long personalId);
     Optional<User> findByEmail(String email);
+    Boolean existsByTipoPerfil(TipoPerfil tipoPerfil);
 }
