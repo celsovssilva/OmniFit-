@@ -15,6 +15,7 @@
              Integer idade,
              String peculiaridades,
             TipoPerfil tipoPerfil,
-              Long profissionalId
+              Long profissionalId,
+             String sexo
     ) {
     }

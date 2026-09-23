@@ -9,7 +9,8 @@ public record UserResponse(
        Integer idade,
        String peculiaridades,
        TipoPerfil tipoPerfil,
-         Long profissionalId
+         Long profissionalId,
+        String sexo
 ) {
     public UserResponse(User u){
         this(
@@ -18,7 +19,8 @@ public record UserResponse(
                 u.getIdade(),
                 u.getPeculiaridades(),
                 u.getTipoPerfil(),
-                u.getPersonalId()
+                u.getPersonalId(),
+                u.getSexo()
         );
     }
 }

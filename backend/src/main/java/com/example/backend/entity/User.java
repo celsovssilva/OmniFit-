@@ -38,6 +38,7 @@ public class User implements UserDetails {
     private Long alunoId;
     private String codigoRedefinicao;
     private LocalDateTime expiracaoCodigo;
+    private String sexo;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

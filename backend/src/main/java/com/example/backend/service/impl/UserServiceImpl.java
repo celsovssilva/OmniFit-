@@ -51,6 +51,7 @@ public class UserServiceImpl implements UserService {
         u.setIdade(user.idade());
         u.setTipoPerfil(user.tipoPerfil());
         u.setStatusConta(StatusConta.ATIVO);
+        u.setSexo(user.sexo());
         var authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = (String) authentication.getPrincipal();
         User usuarioLogado = userRepository.findByEmail(email)
@@ -78,6 +79,7 @@ public class UserServiceImpl implements UserService {
             }
             user.setEmail(userRequest.email());
             user.setIdade(userRequest.idade());
+            user.setSexo(userRequest.sexo());
             var authentication = SecurityContextHolder.getContext().getAuthentication();
             User usuarioLogado = (User) authentication.getPrincipal();
             if(userRequest.tipoPerfil() == TipoPerfil.ALUNO || userRequest.tipoPerfil() ==TipoPerfil.ADMIN){
@@ -167,6 +169,7 @@ public class UserServiceImpl implements UserService {
         u.setIdade(user.idade());
         u.setTipoPerfil(user.tipoPerfil());
         u.setStatusConta(StatusConta.PENDENTE);
+        u.setSexo(user.sexo());
         if(user.tipoPerfil() == TipoPerfil.ALUNO|| user.tipoPerfil() ==TipoPerfil.ADMIN){
             throw new RuntimeException("só profissionais podem se cadastrar");
         }

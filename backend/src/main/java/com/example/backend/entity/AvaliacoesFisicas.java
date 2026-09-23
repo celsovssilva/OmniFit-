@@ -16,16 +16,20 @@ import java.time.LocalDate;
 public class AvaliacoesFisicas {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
+
     @ManyToOne
-    private User alunoId;
+    @JoinColumn(name = "aluno_id")
+    private User aluno;
+
     @ManyToOne
-    private User profissionalId;
+    @JoinColumn(name = "profissional_id")
+    private User profissional;
+
     private LocalDate data;
     private Double pesoTotal;
     private Double percentualGordura;
+
     @Embedded
     private Medidas medidas;
-    private Double comparacao;
-
 }

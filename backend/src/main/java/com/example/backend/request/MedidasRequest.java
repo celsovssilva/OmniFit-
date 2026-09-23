@@ -1,21 +1,23 @@
 package com.example.backend.request;
 
 public record MedidasRequest (
-         Double altura,
-         Double massaMagra,
-         Double massaGorda,
-         Double imc,
-         Double torax,
+        Double altura,
+        Double torax,
         Double cintura,
-         Double abdomen,
+        Double abdomen,
         Double quadril,
-         Double bracoDireito,
+        Double bracoDireito,
         Double bracoEsquerdo,
-         Double coxaDireita,
-         Double CoxaEsqueda,
-         Double panturilhaDireita,
-         Double panturrilhaEsquerda,
-         Double tricipital,
-         Double suprailiaca,
-         Double abdominal
-        ) {}
+        Double coxaDireita,
+        Double coxaEsquerda,
+        Double panturrilhaDireita,
+        Double panturrilhaEsquerda,
+
+        Double dobraPeitoral,
+        Double dobraAxilarMedia,
+        Double dobraTriceps,
+        Double dobraSubescapular,
+        Double dobraAbdominal,
+        Double dobraSuprailiaca,
+        Double dobraCoxa
+) {}

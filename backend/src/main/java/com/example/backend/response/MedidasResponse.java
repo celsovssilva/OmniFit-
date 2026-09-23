@@ -14,12 +14,16 @@ public record MedidasResponse(
         Double bracoDireito,
         Double bracoEsquerdo,
         Double coxaDireita,
-        Double CoxaEsqueda,
-        Double panturilhaDireita,
+        Double coxaEsquerda,
+        Double panturrilhaDireita,
         Double panturrilhaEsquerda,
-        Double tricipital,
-        Double suprailiaca,
-        Double abdominal
+        Double dobraPeitoral,
+        Double dobraAxilarMedia,
+        Double dobraTriceps,
+        Double dobraSubescapular,
+        Double dobraAbdominal,
+        Double dobraSuprailiaca,
+        Double dobraCoxa
 ){
     public MedidasResponse(Medidas m){
         this(
@@ -34,12 +38,16 @@ public record MedidasResponse(
                 m.getBracoDireito(),
                 m.getBracoEsquerdo(),
                 m.getCoxaDireita(),
-                m.getCoxaEsqueda(),
-                m.getPanturilhaDireita(),
+                m.getCoxaEsquerda(),
+                m.getPanturrilhaDireita(),
                 m.getPanturrilhaEsquerda(),
-                m.getTricipital(),
-                m.getSuprailiaca(),
-                m.getAbdominal()
+                m.getDobraPeitoral(),
+                m.getDobraAxilarMedia(),
+                m.getDobraTriceps(),
+                m.getDobraSubescapular(),
+                m.getDobraAbdominal(),
+                m.getDobraSuprailiaca(),
+                m.getDobraCoxa()
         );
     }
 }

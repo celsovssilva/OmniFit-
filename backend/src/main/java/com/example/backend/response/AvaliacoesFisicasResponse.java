@@ -1,7 +1,6 @@
 package com.example.backend.response;
 
 import com.example.backend.entity.AvaliacoesFisicas;
-
 import java.time.LocalDate;
 
 public record AvaliacoesFisicasResponse(
@@ -16,10 +15,14 @@ public record AvaliacoesFisicasResponse(
                 atual.getData(),
                 atual.getPesoTotal(),
                 atual.getPercentualGordura(),
-               new MedidasResponse(atual.getMedidas()),
-               anterior != null ? new ComparacaoResponse(
+                new MedidasResponse(atual.getMedidas()),
+                anterior != null ? new ComparacaoResponse(
                         atual.getPesoTotal() - anterior.getPesoTotal(),
-                        atual.getPercentualGordura() - anterior.getPercentualGordura() ,
+                        atual.getMedidas().getAltura() - anterior.getMedidas().getAltura(),
+                        atual.getPercentualGordura() - anterior.getPercentualGordura(),
+                        atual.getMedidas().getMassaMagra() - anterior.getMedidas().getMassaMagra(),
+                        atual.getMedidas().getMassaGorda() - anterior.getMedidas().getMassaGorda(),
+                        atual.getMedidas().getImc() - anterior.getMedidas().getImc(),
                         atual.getMedidas().getTorax() - anterior.getMedidas().getTorax(),
                         atual.getMedidas().getCintura() - anterior.getMedidas().getCintura(),
                         atual.getMedidas().getAbdomen() - anterior.getMedidas().getAbdomen(),
@@ -27,15 +30,10 @@ public record AvaliacoesFisicasResponse(
                         atual.getMedidas().getBracoDireito() - anterior.getMedidas().getBracoDireito(),
                         atual.getMedidas().getBracoEsquerdo() - anterior.getMedidas().getBracoEsquerdo(),
                         atual.getMedidas().getCoxaDireita() - anterior.getMedidas().getCoxaDireita(),
-                        atual.getMedidas().getCoxaEsqueda() - anterior.getMedidas().getCoxaEsqueda(),
-                        atual.getMedidas().getPanturilhaDireita() - anterior.getMedidas().getPanturilhaDireita(),
-                        atual.getMedidas().getPanturrilhaEsquerda() - anterior.getMedidas().getPanturrilhaEsquerda(),
-                        atual.getMedidas().getTricipital() - anterior.getMedidas().getTricipital(),
-                        atual.getMedidas().getSuprailiaca() - anterior.getMedidas().getSuprailiaca(),
-                        atual.getMedidas().getAbdominal() - anterior.getMedidas().getAbdominal()
-        ): null
+                        atual.getMedidas().getCoxaEsquerda() - anterior.getMedidas().getCoxaEsquerda(),
+                        atual.getMedidas().getPanturrilhaDireita() - anterior.getMedidas().getPanturrilhaDireita(),
+                        atual.getMedidas().getPanturrilhaEsquerda() - anterior.getMedidas().getPanturrilhaEsquerda()
+                ) : null
         );
     }
-
-
 }

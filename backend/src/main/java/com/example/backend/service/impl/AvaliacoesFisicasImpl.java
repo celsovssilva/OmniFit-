@@ -29,32 +29,36 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
         }
         User aluno = userRepository.findById(request.alunoId())
                 .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
-        User profissional = userRepository.findById(request.profissionalId())
-                .orElseThrow(()-> new RuntimeException("profissional não encontrado"));
+
+
         AvaliacoesFisicas av = new AvaliacoesFisicas();
         Medidas medidas= new Medidas();
-        av.setAlunoId(aluno);
+
+        av.setAluno(aluno);
         av.setData(request.data());
-        av.setProfissionalId(profissional);
-        av.setPercentualGordura(request.percentualGordura());
         av.setPesoTotal(request.pesoTotal());
+
         medidas.setAbdomen(request.medidas().abdomen());
-        medidas.setAbdominal(request.medidas().abdominal());
         medidas.setAltura(request.medidas().altura());
         medidas.setCintura(request.medidas().cintura());
         medidas.setTorax(request.medidas().torax());
         medidas.setBracoDireito(request.medidas().bracoDireito());
         medidas.setBracoEsquerdo(request.medidas().bracoEsquerdo());
         medidas.setCoxaDireita(request.medidas().coxaDireita());
-        medidas.setCoxaEsqueda(request.medidas().CoxaEsqueda());
-        medidas.setImc(request.medidas().imc());
-        medidas.setMassaGorda(request.medidas().massaGorda());
-        medidas.setMassaMagra(request.medidas().massaMagra());
-        medidas.setPanturilhaDireita(request.medidas().panturilhaDireita());
+        medidas.setCoxaEsquerda(request.medidas().coxaEsquerda());
+        medidas.setPanturrilhaDireita(request.medidas().panturrilhaDireita());
         medidas.setPanturrilhaEsquerda(request.medidas().panturrilhaEsquerda());
         medidas.setQuadril(request.medidas().quadril());
-        medidas.setSuprailiaca(request.medidas().suprailiaca());
-        medidas.setTricipital(request.medidas().tricipital());
+
+
+        medidas.setDobraPeitoral(request.medidas().dobraPeitoral());
+        medidas.setDobraAxilarMedia(request.medidas().dobraAxilarMedia());
+        medidas.setDobraTriceps(request.medidas().dobraTriceps());
+        medidas.setDobraSubescapular(request.medidas().dobraSubescapular());
+        medidas.setDobraAbdominal(request.medidas().dobraAbdominal());
+        medidas.setDobraSuprailiaca(request.medidas().dobraSuprailiaca());
+        medidas.setDobraCoxa(request.medidas().dobraCoxa());
+        calcularComposicaoCorporal7Dobras(avaliacoesFisicas,aluno.getIdade(),aluno.getSexo());
         av.setMedidas(medidas);
         AvaliacoesFisicas avaliacaoSalva = avaliacoesFisicasRepository.save(av);
         return new AvaliacoesFisicasResponse(avaliacaoSalva, avaliacoesAnteriores);
@@ -66,41 +70,42 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
                 .orElseThrow(()-> new RuntimeException("avaliação não encontrada"));
         User aluno = userRepository.findById(request.alunoId())
                 .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
-        User profissional = userRepository.findById(request.profissionalId())
-                .orElseThrow(()-> new RuntimeException("profissional não encontrado"));
+
         List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAlunoId_IdOrderByDataDesc(request.alunoId());
         AvaliacoesFisicas avaliacaoAnterior = null;
         if (avaliacoesFisicas.size() > 1 ){
             avaliacaoAnterior = avaliacoesFisicas.get(1);
         }
+
         Medidas medidas= new Medidas();
-        fisicas.setAlunoId(aluno);
+        fisicas.setAluno(aluno);
         fisicas.setData(request.data());
-        fisicas.setProfissionalId(profissional);
-        fisicas.setPercentualGordura(request.percentualGordura());
         fisicas.setPesoTotal(request.pesoTotal());
+
         medidas.setAbdomen(request.medidas().abdomen());
-        medidas.setAbdominal(request.medidas().abdominal());
         medidas.setAltura(request.medidas().altura());
         medidas.setCintura(request.medidas().cintura());
         medidas.setTorax(request.medidas().torax());
         medidas.setBracoDireito(request.medidas().bracoDireito());
         medidas.setBracoEsquerdo(request.medidas().bracoEsquerdo());
         medidas.setCoxaDireita(request.medidas().coxaDireita());
-        medidas.setCoxaEsqueda(request.medidas().CoxaEsqueda());
-        medidas.setImc(request.medidas().imc());
-        medidas.setMassaGorda(request.medidas().massaGorda());
-        medidas.setMassaMagra(request.medidas().massaMagra());
-        medidas.setPanturilhaDireita(request.medidas().panturilhaDireita());
+        medidas.setCoxaEsquerda(request.medidas().coxaEsquerda());
+        medidas.setPanturrilhaDireita(request.medidas().panturrilhaDireita());
         medidas.setPanturrilhaEsquerda(request.medidas().panturrilhaEsquerda());
         medidas.setQuadril(request.medidas().quadril());
-        medidas.setSuprailiaca(request.medidas().suprailiaca());
-        medidas.setTricipital(request.medidas().tricipital());
+
+        medidas.setDobraPeitoral(request.medidas().dobraPeitoral());
+        medidas.setDobraAxilarMedia(request.medidas().dobraAxilarMedia());
+        medidas.setDobraTriceps(request.medidas().dobraTriceps());
+        medidas.setDobraSubescapular(request.medidas().dobraSubescapular());
+        medidas.setDobraAbdominal(request.medidas().dobraAbdominal());
+        medidas.setDobraSuprailiaca(request.medidas().dobraSuprailiaca());
+        medidas.setDobraCoxa(request.medidas().dobraCoxa());
+        calcularComposicaoCorporal7Dobras(,aluno.getIdade(),aluno.getSexo());
         fisicas.setMedidas(medidas);
         AvaliacoesFisicas avaliacaoSalva = avaliacoesFisicasRepository.save(fisicas);
         return new AvaliacoesFisicasResponse(avaliacaoSalva,avaliacaoAnterior);
     }
-
     @Override
     public List<AvaliacoesFisicasResponse> getForUserAvaliacao(Long alunoId) {
         List<AvaliacoesFisicas> av = avaliacoesFisicasRepository.findByAlunoId_IdOrderByDataDesc(alunoId);
@@ -117,6 +122,46 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
             return listaDeRespostas;
     }
 
+    private void calcularComposicaoCorporal7Dobras(AvaliacoesFisicas avaliacao, int idade, String sexo) {
+        double somaDobras = avaliacao.getMedidas().getDobraPeitoral() +
+                avaliacao.getMedidas().getDobraAxilarMedia() +
+                avaliacao.getMedidas().getDobraTriceps() +
+                avaliacao.getMedidas().getDobraSubescapular() +
+                avaliacao.getMedidas().getDobraAbdominal() +
+                avaliacao.getMedidas().getDobraSuprailiaca() +
+                avaliacao.getMedidas().getDobraCoxa();
+
+        double densidadeCorporal = 0.0;
+
+
+        if (sexo.equalsIgnoreCase("MASCULINO")) {
+            densidadeCorporal = 1.1120000
+                    - (0.00043499 * somaDobras)
+                    + (0.00000055 * Math.pow(somaDobras, 2))
+                    - (0.00028826 * idade);
+
+        } else if (sexo.equalsIgnoreCase("FEMININO")) {
+            densidadeCorporal = 1.0970000
+                    - (0.00046971 * somaDobras)
+                    + (0.00000056 * Math.pow(somaDobras, 2))
+                    - (0.00012828 * idade);
+
+        } else {
+            throw new IllegalArgumentException("Sexo inválido para o cálculo de Pollock.");
+        }
+
+
+        double percentualGordura = ((4.95 / densidadeCorporal) - 4.50) * 100;
+
+        double pesoTotal = avaliacao.getPesoTotal();
+        double massaGorda = pesoTotal * (percentualGordura / 100);
+        double massaMagra = pesoTotal - massaGorda;
+
+
+        avaliacao.setPercentualGordura(percentualGordura);
+        avaliacao.getMedidas().setMassaGorda(massaGorda);
+        avaliacao.getMedidas().setMassaMagra(massaMagra);
+    }
 
 }
 
