@@ -15,51 +15,63 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
+
     @Autowired
     private SecurityFilter securityFilter;
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity security){
+    public SecurityFilterChain securityFilterChain(HttpSecurity security) throws Exception {
         security
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(req ->{
-                    //users
-                    req.requestMatchers(HttpMethod.POST,"/api/user/login").permitAll();
-                    req.requestMatchers(HttpMethod.POST,"/api/user/create").permitAll();
-                    req.requestMatchers(HttpMethod.PUT,"/api/user/update").authenticated();
-                    req.requestMatchers(HttpMethod.POST,"/api/user/forgot").permitAll();
-                    req.requestMatchers(HttpMethod.POST,"/api/user/reset").permitAll();
-                    //treino
-                    req.requestMatchers(HttpMethod.POST,"/api/treino/create").authenticated();
-                    req.requestMatchers(HttpMethod.PUT,"/api/treino/update/{id}").hasAnyRole("PERSONAL","NUTRI","ADMIN");
-                    req.requestMatchers(HttpMethod.GET,"/api/treino/getTreinoForUsers").authenticated();
-                    req.requestMatchers(HttpMethod.DELETE,"/api/treino/delete/{id}").hasAnyRole("PERSONAL","ADMIN");
-                    req.requestMatchers(HttpMethod.POST,"/api/treino/upload/{treinoId}").authenticated();
-                    req.requestMatchers(HttpMethod.GET,"/api/treino/download/{treinoId}").authenticated();
-                    //dieta
-                    req.requestMatchers(HttpMethod.POST,"/api/dieta/create").authenticated();
-                    req.requestMatchers(HttpMethod.PUT,"/api/dieta/update/{id}").authenticated();
-                    req.requestMatchers(HttpMethod.GET,"/api/dieta/getTreinoForUsers").authenticated();
-                    req.requestMatchers(HttpMethod.DELETE,"/api/dieta/delete/{id}").authenticated();
-                    req.requestMatchers(HttpMethod.POST,"/api/dieta/upload/{dietaId}").authenticated();
-                    req.requestMatchers(HttpMethod.GET,"/api/dieta/download/{dietaId}").authenticated();
-                    //avaliações
-                    req.requestMatchers("/api/avaliacoesfisicas/create/{alunoId}").authenticated();
-                    req.requestMatchers("/api/avaliacoesfisicas/update/{alunoId}").authenticated();
+                .authorizeHttpRequests(req -> {
+                    // Users
+                    req.requestMatchers(HttpMethod.POST, "/api/user/login").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/api/user/createProfissional").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/api/user/forgot").permitAll();
+                    req.requestMatchers(HttpMethod.POST, "/api/user/reset").permitAll();
+
+                    // Users
+                    req.requestMatchers(HttpMethod.POST, "/api/user/create").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
+                    req.requestMatchers(HttpMethod.PUT, "/api/user/update").authenticated();
+                    req.requestMatchers(HttpMethod.GET, "/api/user/getUsersForPersonal").hasAnyRole("PERSONAL", "ADMIN");
+                    req.requestMatchers(HttpMethod.DELETE, "/api/user/delete").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
+
+                    // Treino
+                    req.requestMatchers(HttpMethod.POST, "/api/treino/create").hasAnyRole("PERSONAL", "ADMIN");
+                    req.requestMatchers(HttpMethod.PUT, "/api/treino/update/{id}").hasAnyRole("PERSONAL", "ADMIN");
+                    req.requestMatchers(HttpMethod.DELETE, "/api/treino/delete/{id}").hasAnyRole("PERSONAL", "ADMIN");
+                    req.requestMatchers(HttpMethod.POST, "/api/treino/upload/{treinoId}").hasAnyRole("PERSONAL", "ADMIN");
+                    req.requestMatchers(HttpMethod.GET, "/api/treino/getTreinoForUsers").authenticated();
+                    req.requestMatchers(HttpMethod.GET, "/api/treino/download/{treinoId}").authenticated();
+
+                    // Dieta
+                    req.requestMatchers(HttpMethod.POST, "/api/dieta/create").hasAnyRole("NUTRI", "ADMIN");
+                    req.requestMatchers(HttpMethod.PUT, "/api/dieta/update/{id}").hasAnyRole("NUTRI", "ADMIN");
+                    req.requestMatchers(HttpMethod.DELETE, "/api/dieta/delete/{id}").hasAnyRole("NUTRI", "ADMIN");
+                    req.requestMatchers(HttpMethod.POST, "/api/dieta/upload/{dietaId}").hasAnyRole("NUTRI", "ADMIN");
+                    req.requestMatchers(HttpMethod.GET, "/api/dieta/getTreinoForUsers").authenticated();
+                    req.requestMatchers(HttpMethod.GET, "/api/dieta/download/{dietaId}").authenticated();
+
+                    // Avaliações Físicas
+                    req.requestMatchers("/api/avaliacoesfisicas/create/{alunoId}").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
+                    req.requestMatchers("/api/avaliacoesfisicas/update/{alunoId}").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
                     req.requestMatchers("/api/avaliacoesfisicas/getUsersAvaliacoes").authenticated();
 
-                });
-                return security.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
 
+                    req.anyRequest().authenticated();
+                });
+
+        return security.addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder(){
-        return  new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration){
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }

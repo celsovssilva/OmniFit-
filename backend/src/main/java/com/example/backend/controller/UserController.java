@@ -59,4 +59,9 @@ public class UserController {
         User user = (User) authentication.getPrincipal();
         userService.deleteUser(user.getId());
     }
+
+    @PostMapping("/createProfissional")
+    public UserResponse createProf(@Valid @RequestBody UserRequest userRequest){
+        return userService.createProfissionalUser(userRequest);
+    }
 }
