@@ -1,9 +1,6 @@
 package com.example.backend.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,7 +29,9 @@ public class User implements UserDetails {
     private String senha;
     private Integer idade;
     private String peculiaridades;
+    @Enumerated(EnumType.STRING)
     private TipoPerfil tipoPerfil;
+    @Enumerated(EnumType.STRING)
     private StatusConta statusConta;
     private Long personalId;
     private Long alunoId;

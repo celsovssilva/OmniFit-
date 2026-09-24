@@ -38,6 +38,7 @@ public class UserServiceImpl implements UserService {
     private TokenService tokenService;
     @Autowired
     private JavaMailSender javaMailSender;
+
     @Override
     public UserResponse createUser(UserRequest user) {
         User u = new User();
@@ -53,12 +54,11 @@ public class UserServiceImpl implements UserService {
         u.setStatusConta(StatusConta.ATIVO);
         u.setSexo(user.sexo());
         var authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = (String) authentication.getPrincipal();
-        User usuarioLogado = userRepository.findByEmail(email)
-                .orElseThrow(()-> new RuntimeException("user não encontrado"));
+        User email = (User) authentication.getPrincipal();
+
         if(user.tipoPerfil() == TipoPerfil.ALUNO){
             u.setPeculiaridades(user.peculiaridades());
-            u.setPersonalId(usuarioLogado.getId());
+            u.setPersonalId(email.getId());
 
         }
         if(user.tipoPerfil() == TipoPerfil.ADMIN|| user.tipoPerfil() ==TipoPerfil.PERSONAL || user.tipoPerfil() == TipoPerfil.NUTRI){

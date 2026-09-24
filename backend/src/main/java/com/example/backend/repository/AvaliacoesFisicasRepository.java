@@ -10,6 +10,6 @@ import java.util.List;
 
 @Repository
 public interface AvaliacoesFisicasRepository extends JpaRepository<AvaliacoesFisicas,Long> {
-    List<AvaliacoesFisicas> findByAlunoId_IdOrderByDataDesc(Long alunoId);
-    List<AvaliacoesFisicas> findByAlunoIdId(Long alunoId);
+    List<AvaliacoesFisicas> findByAluno_IdOrderByDataDesc(Long alunoId);
+
 }

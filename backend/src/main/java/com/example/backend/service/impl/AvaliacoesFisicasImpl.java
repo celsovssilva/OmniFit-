@@ -22,7 +22,7 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
     private UserRepository userRepository;
     @Override
     public AvaliacoesFisicasResponse create(AvaliacoesFisicasRequest request, Long alunoId) {
-        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAlunoId_IdOrderByDataDesc(alunoId);
+        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAluno_IdOrderByDataDesc(alunoId);
         AvaliacoesFisicas avaliacoesAnteriores = null ;
         if (!avaliacoesFisicas.isEmpty()){
             avaliacoesAnteriores = avaliacoesFisicas.get(0);
@@ -58,8 +58,9 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
         medidas.setDobraAbdominal(request.medidas().dobraAbdominal());
         medidas.setDobraSuprailiaca(request.medidas().dobraSuprailiaca());
         medidas.setDobraCoxa(request.medidas().dobraCoxa());
-        calcularComposicaoCorporal7Dobras(avaliacoesFisicas,aluno.getIdade(),aluno.getSexo());
         av.setMedidas(medidas);
+        calcularComposicaoCorporal7Dobras(av,aluno.getIdade(),aluno.getSexo());
+
         AvaliacoesFisicas avaliacaoSalva = avaliacoesFisicasRepository.save(av);
         return new AvaliacoesFisicasResponse(avaliacaoSalva, avaliacoesAnteriores);
     }
@@ -71,7 +72,7 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
         User aluno = userRepository.findById(request.alunoId())
                 .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
 
-        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAlunoId_IdOrderByDataDesc(request.alunoId());
+        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAluno_IdOrderByDataDesc(request.alunoId());
         AvaliacoesFisicas avaliacaoAnterior = null;
         if (avaliacoesFisicas.size() > 1 ){
             avaliacaoAnterior = avaliacoesFisicas.get(1);
@@ -101,14 +102,15 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
         medidas.setDobraAbdominal(request.medidas().dobraAbdominal());
         medidas.setDobraSuprailiaca(request.medidas().dobraSuprailiaca());
         medidas.setDobraCoxa(request.medidas().dobraCoxa());
-        calcularComposicaoCorporal7Dobras(,aluno.getIdade(),aluno.getSexo());
         fisicas.setMedidas(medidas);
+        calcularComposicaoCorporal7Dobras(fisicas,aluno.getIdade(),aluno.getSexo());
+
         AvaliacoesFisicas avaliacaoSalva = avaliacoesFisicasRepository.save(fisicas);
         return new AvaliacoesFisicasResponse(avaliacaoSalva,avaliacaoAnterior);
     }
     @Override
     public List<AvaliacoesFisicasResponse> getForUserAvaliacao(Long alunoId) {
-        List<AvaliacoesFisicas> av = avaliacoesFisicasRepository.findByAlunoId_IdOrderByDataDesc(alunoId);
+        List<AvaliacoesFisicas> av = avaliacoesFisicasRepository.findByAluno_IdOrderByDataDesc(alunoId);
         List<AvaliacoesFisicasResponse> listaDeRespostas = new ArrayList<>();
         for(int i = 0;i < av.size();i++){
             AvaliacoesFisicas atual = av.get(i);
@@ -157,10 +159,11 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
         double massaGorda = pesoTotal * (percentualGordura / 100);
         double massaMagra = pesoTotal - massaGorda;
 
-
+        double imc = avaliacao.getPesoTotal() / Math.pow(avaliacao.getMedidas().getAltura(),2);
         avaliacao.setPercentualGordura(percentualGordura);
         avaliacao.getMedidas().setMassaGorda(massaGorda);
         avaliacao.getMedidas().setMassaMagra(massaMagra);
+        avaliacao.getMedidas().setImc(imc);
     }
 
 }
