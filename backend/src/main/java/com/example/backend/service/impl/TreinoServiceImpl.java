@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class TreinoServiceImpl implements TreinoService {
@@ -64,8 +65,9 @@ public class TreinoServiceImpl implements TreinoService {
             exercicios.setTreino(treinos);
             return exercicios;
 
-        }).toList();
-        treinos.setExercicios(e);
+        }).collect(Collectors.toList());
+        treinos.getExercicios().clear();
+        treinos.getExercicios().addAll(e);
         return new TreinoResponse(treinoRepository.save(treinos));
     }
 
