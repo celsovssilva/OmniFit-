@@ -22,7 +22,7 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
     private UserRepository userRepository;
     @Override
     public AvaliacoesFisicasResponse create(AvaliacoesFisicasRequest request, Long alunoId) {
-        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAluno_IdOrderByDataDesc(alunoId);
+        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAluno_IdOrderByDataDesc(request.alunoId());
         AvaliacoesFisicas avaliacoesAnteriores = null ;
         if (!avaliacoesFisicas.isEmpty()){
             avaliacoesAnteriores = avaliacoesFisicas.get(0);
