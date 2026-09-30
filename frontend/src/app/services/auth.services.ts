@@ -1,16 +1,31 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
-import {LoginRequest,LoginResponse} from '../models/auth.models';
 
 @Injectable({
   providedIn:"root"
 })
 export class AuthServices {
-  private apiUrl = 'http://localhost:8080/api/user/login';
+  private apiUrl = 'http://localhost:8080/api/user/';
 
   constructor(private http:HttpClient) {}
-  login(dados:LoginRequest): Observable<LoginResponse>{
-    return this.http.post<LoginResponse>(this.apiUrl, dados);
+
+  login(credentials: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/login`, credentials);
   }
+
+  register(userData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/create`, userData);
+  }
+
+  update(profileData: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/update`, profileData);
+  }
+  forgot(credentials: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/forgot`, credentials);
+  }
+  reset(credentials: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/reset`, credentials);
+  }
+
 }

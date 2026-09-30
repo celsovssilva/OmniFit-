@@ -27,7 +27,7 @@ export class Login {
         if (resposta.token) {
           localStorage.setItem('token_jwt', resposta.token);
           alert('Login bem-sucedido! Token guardado.');
-          this.router.navigate(['http://localhost:4200/dashboard/personal'])
+          this.router.navigate(['/personal'])
 
 
         }
