@@ -1,6 +1,7 @@
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Observable} from 'rxjs';
+import {UserRequest, UserResponse} from '../models/auth.models';
 
 @Injectable({
   providedIn:"root"
@@ -26,6 +27,18 @@ export class AuthServices {
   }
   reset(credentials: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/reset`, credentials);
+  }
+
+  createProfissional(userData: {
+    id: number;
+    nome: string;
+    email: string;
+    senha: string;
+    idade: number;
+    sexo: string;
+    tipoPerfil: string
+  }): Observable<UserResponse> {
+    return this.http.post<UserResponse>(`${this.apiUrl}/createProfissional`, userData);
   }
 
 }

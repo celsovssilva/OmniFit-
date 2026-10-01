@@ -1,0 +1,43 @@
+<div class="container">
+  <div class="form-card">
+    <h2>Registo de Profissional</h2>
+
+    <div class="input-group">
+      <label>Nome:</label>
+      <input type="text" [(ngModel)]="nome" placeholder="O seu nome">
+    </div>
+
+    <div class="input-group">
+      <label>E-mail:</label>
+      <input type="email" [(ngModel)]="email" placeholder="email@exemplo.com">
+    </div>
+
+    <div class="input-group">
+      <label>Palavra-passe:</label>
+      <input type="password" [(ngModel)]="senha" placeholder="Crie uma palavra-passe">
+    </div>
+
+    <div class="input-group">
+      <label>Idade:</label>
+      <input type="number" [(ngModel)]="idade" placeholder="Idade">
+    </div>
+
+    <div class="input-group">
+      <label>Sexo:</label>
+      <select [(ngModel)]="sexo">
+        <option value="MASCULINO">Masculino</option>
+        <option value="FEMININO">Feminino</option>
+      </select>
+    </div>
+
+    <div class="input-group">
+      <label>Tipo de Profissional:</label>
+      <select [(ngModel)]="tipoPerfil">
+        <option value="PERSONAL">Personal Trainer</option>
+        <option value="NUTRI">Nutricionista</option>
+      </select>
+    </div>
+
+    <button (click)="registar()">Criar Conta</button>
+  </div>
+</div>

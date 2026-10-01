@@ -25,9 +25,17 @@ export class Login {
     this.authService.login(dados).subscribe({
       next: (resposta) => {
         if (resposta.token) {
+          localStorage.getItem('token-jwt')
           localStorage.setItem('token_jwt', resposta.token);
           alert('Login bem-sucedido! Token guardado.');
-          this.router.navigate(['/personal'])
+          if(resposta.tipoPerfil === "PERSONAL"){
+            this.router.navigate(['/personal'])
+          } else if (resposta.tipoPerfil === "NUTRI"){
+            this.router.navigate(['/nutri'])
+          } else {
+            this.router.navigate(['/aluno'])
+          }
+
 
 
         }
