@@ -1,0 +1,106 @@
+<div class="dashboard-container">
+
+  <!-- BARRA LATERAL: LISTA DE ALUNOS -->
+  <aside class="sidebar">
+    <h2>Meus Alunos</h2>
+
+    <button class="btn-primary" (click)="abrirModalNovoAluno()">+ Adicionar Aluno</button>
+
+    @if (carregando) {
+    <p>A carregar alunos...</p>
+    }
+
+    <ul class="aluno-list">
+      @for (aluno of meusAlunos; track aluno.id) {
+      <li
+        [class.selecionado]="alunoSelecionado?.id === aluno.id"
+        (click)="selecionarAluno(aluno)">
+        <div class="aluno-info">
+          <strong>{{ aluno.nome }}</strong>
+          <span>{{ aluno.email }}</span>
+        </div>
+      </li>
+      } @empty {
+      <p class="empty-state">Ainda não tem alunos registados.</p>
+      }
+    </ul>
+  </aside>
+
+  <!-- PAINEL PRINCIPAL: DETALHES DO ALUNO SELECIONADO -->
+  <main class="main-content">
+    @if (alunoSelecionado) {
+    <header class="aluno-header">
+      <div class="perfil">
+        <h1>{{ alunoSelecionado.nome }}</h1>
+        <p>Idade: {{ alunoSelecionado.idade }} anos | Sexo: {{ alunoSelecionado.sexo }}</p>
+      </div>
+      <div class="acoes-aluno">
+        <button class="btn-danger" (click)="removerAluno(alunoSelecionado.id)">Remover Aluno</button>
+      </div>
+    </header>
+
+    <div class="conteudo-tabs">
+      <!-- SEÇÃO: TREINOS -->
+      <section class="card-section">
+        <div class="section-header">
+          <h3>Treinos Prescritos</h3>
+          <button class="btn-secondary" (click)="abrirModalNovoTreino()">Criar Treino</button>
+        </div>
+
+        <div class="grid-cards">
+          @for (treino of treinosDoAluno; track treino.id) {
+          <div class="card-treino">
+            <h4>Treino #{{ treino.id }}</h4>
+            <p>{{ treino.exerciciosRequests?.length || 0 }} Exercícios</p>
+            <div class="card-actions">
+              <button (click)="gerarPdfTreino(treino.id)">Gerar PDF</button>
+              <button class="text-danger" (click)="excluirTreino(treino.id)">Excluir</button>
+            </div>
+          </div>
+          } @empty {
+          <p>Nenhum treino registado para este aluno.</p>
+          }
+        </div>
+      </section>
+
+      <!-- SEÇÃO: AVALIAÇÕES FÍSICAS -->
+      <section class="card-section">
+        <div class="section-header">
+          <h3>Histórico de Avaliações (Protocolo Pollock)</h3>
+          <button class="btn-secondary" (click)="abrirModalNovaAvaliacao()">Nova Avaliação</button>
+        </div>
+
+        <div class="tabela-avaliacoes">
+          @for (av of avaliacoesDoAluno; track av.atual.id) {
+          <div class="avaliacao-item">
+            <div class="av-data">
+              <strong>Data:</strong> {{ av.atual.data | date:'dd/MM/yyyy' }}
+            </div>
+            <div class="av-dados">
+              <p><strong>Peso:</strong> {{ av.atual.pesoTotal }} kg</p>
+              <p><strong>IMC:</strong> {{ av.atual.medidas?.imc | number:'1.1-2' }}</p>
+              <p><strong>% Gordura:</strong> {{ av.atual.percentualGordura | number:'1.1-2' }}%</p>
+              <p><strong>Massa Magra:</strong> {{ av.atual.medidas?.massaMagra | number:'1.1-2' }} kg</p>
+            </div>
+            @if (av.anterior) {
+            <div class="av-comparacao">
+              <small>Comparação com {{ av.anterior.data | date:'dd/MM/yyyy' }}:
+                {{ (av.atual.pesoTotal - av.anterior.pesoTotal) > 0 ? '+' : '' }}{{ av.atual.pesoTotal - av.anterior.pesoTotal | number:'1.1-2' }} kg
+              </small>
+            </div>
+            }
+          </div>
+          } @empty {
+          <p>Nenhuma avaliação física encontrada.</p>
+          }
+        </div>
+      </section>
+    </div>
+    } @else {
+    <div class="tela-vazia">
+      <h2>Selecione um aluno</h2>
+      <p>Escolha um aluno no menu lateral para gerir os seus treinos e avaliações.</p>
+    </div>
+    }
+  </main>
+</div>
