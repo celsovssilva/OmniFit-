@@ -107,12 +107,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public LoginResponse login(LoginRequest loginRequest) {
+
         var usernamePassword = new UsernamePasswordAuthenticationToken(loginRequest.email(),loginRequest.senha());
             try {
                 var auth = this.authenticationManager.authenticate(usernamePassword);
                 User user = (User) auth.getPrincipal();
                 var token = tokenService.generateToken(user);
-                return new LoginResponse(token);
+                var perfil= user.getTipoPerfil().name();
+                return new LoginResponse(token,perfil);
             } catch (Exception e) {
                 throw new RuntimeException("o erro é: " + e);
             }
