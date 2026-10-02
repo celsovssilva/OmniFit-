@@ -40,7 +40,6 @@ export class Register {
       idade: this.idade,
       sexo: this.sexo,
       tipoPerfil: this.tipoPerfil,
-      // Se o seu UserRequest tiver outros campos, adicione-os aqui (ex: peculiaridades: '')
     };
 
     this.authService.createProfissional(dados).subscribe({
@@ -49,7 +48,6 @@ export class Register {
         this.router.navigate(['/login']);
       },
       error: (erro) => {
-        // Se o email já existir, o backend dispara o throw new RuntimeException e cai aqui
         console.error(erro);
         alert('Erro ao criar conta. O e-mail já pode estar em uso.');
       }
