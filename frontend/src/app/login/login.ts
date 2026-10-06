@@ -20,6 +20,7 @@ export class Login {
   ) {}
 
   fazerLogin() {
+    localStorage.removeItem('token_jwt');
     const dados: LoginRequest = { email: this.email, senha: this.senha };
 
     this.authService.login(dados).subscribe({

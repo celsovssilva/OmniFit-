@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { PersonalServices } from '../../services/personal.services'; // Verifique se o caminho está correto
+import { PersonalServices } from '../../services/personal.services';
 
 @Component({
   selector: 'app-personal',
@@ -15,7 +15,25 @@ export class PersonalComponent implements OnInit {
   alunoSelecionado: any = null;
   treinosDoAluno: any[] = [];
   avaliacoesDoAluno: any[] = [];
+
   carregando = false;
+  mostrarModalAluno = false;
+  mostrarModalTreino = false;
+  mostrarModalAvaliacao = false;
+
+  // Variáveis exigidas pelo HTML
+  aGuardar = false;
+  mensagem = { tipo: '', texto: '' };
+
+  novoAluno = {
+    nome: '', email: '', senha: '', idade: null, sexo: 'MASCULINO',
+    tipoPerfil: 'ALUNO', peculiaridades: ''
+  };
+
+  novoTreino = { exerciciosRequests: [] as any[] };
+  exercicioTemp = { exercicio: '', series: null, repeticoes: null };
+
+  novaAvaliacao: any = this.resetarFormAvaliacao();
 
   constructor(private personalService: PersonalServices) {}
 
@@ -23,96 +41,164 @@ export class PersonalComponent implements OnInit {
     this.carregarAlunos();
   }
 
-  // ==========================================
-  // GESTÃO DE ALUNOS
-  // ==========================================
+  mostrarMensagem(tipo: 'sucesso' | 'erro', texto: string) {
+    this.mensagem = { tipo, texto };
+    setTimeout(() => this.mensagem = { tipo: '', texto: '' }, 4000);
+  }
+
   carregarAlunos() {
     this.carregando = true;
     this.personalService.getMeusAlunos().subscribe({
       next: (dados) => {
-        this.meusAlunos = dados; // Recebe diretamente do banco
+        this.meusAlunos = dados;
         this.carregando = false;
       },
-      error: (erro) => {
-        console.error('Erro ao buscar alunos:', erro);
+      error: () => {
         this.carregando = false;
       }
     });
   }
 
+  abrirModalAluno() {
+    this.mostrarModalAluno = true;
+    this.novoAluno = { nome: '', email: '', senha: '', idade: null, sexo: 'MASCULINO', tipoPerfil: 'ALUNO', peculiaridades: '' };
+  }
+
   selecionarAluno(aluno: any) {
     this.alunoSelecionado = aluno;
+    this.carregarTreinos(aluno.id);
     this.carregarAvaliacoes(aluno.id);
+  }
 
-    // Nota: Nos endpoints que me passou, não havia a rota GET de treinos.
-    // Quando criar o endpoint GET /api/treino/aluno/{id}, chamaremos aqui.
+  salvarNovoAluno() {
+    if (!this.novoAluno.email.includes('@')) {
+      this.mostrarMensagem('erro', 'Por favor, insira um endereço de e-mail válido.');
+      return;
+    }
+
+    this.aGuardar = true;
+    this.personalService.criarAluno(this.novoAluno).subscribe({
+      next: () => {
+        this.mostrarMensagem('sucesso', 'Aluno adicionado com sucesso!');
+        this.mostrarModalAluno = false;
+        this.carregarAlunos();
+        this.aGuardar = false;
+      },
+      error: () => {
+        this.aGuardar = false;
+        this.mostrarMensagem('erro', 'Não foi possível guardar. O e-mail já pode estar em uso.');
+      }
+    });
   }
 
   removerAluno(id: number) {
-    if (confirm('Tem a certeza que deseja remover este aluno?')) {
+    if (confirm('Remover este aluno definitivamente?')) {
       this.personalService.removerAluno(id).subscribe({
         next: () => {
-          alert('Aluno removido com sucesso!');
           this.alunoSelecionado = null;
-          this.carregarAlunos(); // Recarrega a lista do banco
-        },
-        error: (err) => {
-          console.error('Erro ao remover aluno:', err);
-          alert('Erro ao remover aluno.');
+          this.mostrarMensagem('sucesso', 'Aluno removido.');
+          this.carregarAlunos();
         }
       });
     }
   }
 
-  // ==========================================
-  // GESTÃO DE TREINOS
-  // ==========================================
+  carregarTreinos(alunoId: number) {
+    this.personalService.getTreinosDoAluno(alunoId).subscribe({
+      next: (dados) => this.treinosDoAluno = dados,
+      error: () => this.mostrarMensagem('erro', 'Erro ao carregar treinos.')
+    });
+  }
+
+  adicionarExercicioAoTreino() {
+    if(this.exercicioTemp.exercicio && this.exercicioTemp.series && this.exercicioTemp.repeticoes) {
+      this.novoTreino.exerciciosRequests.push({ ...this.exercicioTemp });
+      this.exercicioTemp = { exercicio: '', series: null, repeticoes: null };
+    }
+  }
+
+  removerExercicioDoTreino(index: number) {
+    this.novoTreino.exerciciosRequests.splice(index, 1);
+  }
+
+  salvarNovoTreino() {
+    this.aGuardar = true;
+    const payload = {
+      alunoId: this.alunoSelecionado.id,
+      profissionalId: this.getProfissionalIdLogado(),
+      exerciciosRequests: this.novoTreino.exerciciosRequests
+    };
+
+    this.personalService.criarTreino(payload).subscribe({
+      next: () => {
+        this.mostrarMensagem('sucesso', 'Treino prescrito e guardado!');
+        this.mostrarModalTreino = false;
+        this.novoTreino.exerciciosRequests = [];
+        this.carregarTreinos(this.alunoSelecionado.id);
+        this.aGuardar = false;
+      },
+      error: () => {
+        this.aGuardar = false;
+        this.mostrarMensagem('erro', 'Falha ao prescrever treino.');
+      }
+    });
+  }
+
   excluirTreino(treinoId: number) {
     if (confirm('Excluir este treino?')) {
       this.personalService.removerTreino(treinoId).subscribe({
-        next: () => {
-          alert('Treino excluído!');
-          // this.carregarTreinos(); // Recarregar após o delete
-        },
-        error: (err) => console.error('Erro ao excluir treino:', err)
+        next: () => this.carregarTreinos(this.alunoSelecionado.id)
       });
     }
   }
 
   gerarPdfTreino(treinoId: number) {
-    const formData = new FormData(); // O Spring espera um request de upload
+    const formData = new FormData();
     this.personalService.uploadFicheiroTreino(treinoId, formData).subscribe({
-      next: (res) => alert('PDF gerado e salvo no banco com sucesso!'),
-      error: (err) => console.error('Erro ao gerar PDF', err)
+      next: () => this.mostrarMensagem('sucesso', 'PDF gerado e guardado na base de dados com sucesso!'),
+      error: () => this.mostrarMensagem('erro', 'Erro ao gerar PDF no servidor.')
     });
   }
 
-  // ==========================================
-  // GESTÃO DE AVALIAÇÕES FÍSICAS
-  // ==========================================
   carregarAvaliacoes(alunoId: number) {
-    this.personalService.getAvaliacoes().subscribe({
-      next: (dados) => {
-        // O backend devolve a lista com "atual" e "anterior".
-        // Filtramos para mostrar apenas as do aluno selecionado.
-        this.avaliacoesDoAluno = dados.filter((av: any) => av.atual.aluno.id === alunoId);
-      },
-      error: (err) => console.error('Erro ao buscar avaliações:', err)
+    this.personalService.getAvaliacoes(alunoId).subscribe({
+      next: (dados) => this.avaliacoesDoAluno = dados,
+      error: () => this.mostrarMensagem('erro', 'Erro ao carregar avaliações.')
     });
   }
 
-  // ==========================================
-  // FUNÇÕES VAZIAS (Apenas para o HTML compilar)
-  // ==========================================
-  abrirModalNovoAluno() {
-    console.log('A tela de formulário de aluno será implementada aqui.');
+  salvarNovaAvaliacao() {
+    this.aGuardar = true;
+    this.personalService.criarAvaliacao(this.alunoSelecionado.id, this.novaAvaliacao).subscribe({
+      next: () => {
+        this.mostrarMensagem('sucesso', 'Avaliação Física registada e calculada!');
+        this.mostrarModalAvaliacao = false;
+        this.novaAvaliacao = this.resetarFormAvaliacao();
+        this.carregarAvaliacoes(this.alunoSelecionado.id);
+        this.aGuardar = false;
+      },
+      error: () => {
+        this.aGuardar = false;
+        this.mostrarMensagem('erro', 'Erro ao salvar avaliação.');
+      }
+    });
   }
 
-  abrirModalNovoTreino() {
-    console.log('A tela de formulário de treino será implementada aqui.');
+  private resetarFormAvaliacao() {
+    return {
+      data: new Date().toISOString().split('T')[0],
+      pesoTotal: null,
+      medidas: {
+        altura: null, torax: null, abdomen: null, cintura: null, quadril: null,
+        bracoDireito: null, bracoEsquerdo: null, coxaDireita: null, coxaEsquerda: null,
+        panturrilhaDireita: null, panturrilhaEsquerda: null,
+        dobraPeitoral: null, dobraAxilarMedia: null, dobraTriceps: null,
+        dobraSubescapular: null, dobraAbdominal: null, dobraSuprailiaca: null, dobraCoxa: null
+      }
+    };
   }
 
-  abrirModalNovaAvaliacao() {
-    console.log('A tela de formulário de avaliação será implementada aqui.');
+  private getProfissionalIdLogado(): number {
+    return 1;
   }
 }

@@ -10,7 +10,6 @@ export class PersonalServices {
 
   constructor(private http: HttpClient) {}
 
-
   getMeusAlunos(): Observable<any[]> {
     return this.http.get<any[]>(`${this.apiUrl}/user/getUsersForPersonal`);
   }
@@ -24,11 +23,13 @@ export class PersonalServices {
   }
 
   removerAluno(id: number): Observable<any> {
-    // Nota: O seu endpoint de delete no Java não especifica /{id} na rota,
-    // valide se o ID vai na URL ou no corpo da requisição.
     return this.http.delete<any>(`${this.apiUrl}/user/delete`, { body: { id } });
   }
 
+
+  getTreinosDoAluno(alunoId: number): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/treino/getTreinoForUsers/${alunoId}`);
+  }
 
   criarTreino(treinoData: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/treino/create`, treinoData);
@@ -46,8 +47,9 @@ export class PersonalServices {
     return this.http.post<any>(`${this.apiUrl}/treino/upload/${treinoId}`, formData);
   }
 
-  getAvaliacoes(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/avaliacoesfisicas/getUsersAvaliacoes`);
+  getAvaliacoes(alunoId: number): Observable<any[]> {
+
+    return this.http.get<any[]>(`${this.apiUrl}/avaliacoesfisicas/getUsersAvaliacoes/${alunoId}`);
   }
 
   criarAvaliacao(alunoId: number, dadosAvaliacao: any): Observable<any> {

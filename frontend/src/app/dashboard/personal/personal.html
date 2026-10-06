@@ -1,106 +1,241 @@
+<!-- SISTEMA DE NOTIFICAÇÕES (TOASTS) -->
+@if (mensagem.texto) {
+<div class="toast-container" [ngClass]="mensagem.tipo">
+  <div class="toast-content">
+    <span class="toast-icon">{{ mensagem.tipo === 'sucesso' ? '✅' : '⚠️' }}</span>
+    <p>{{ mensagem.texto }}</p>
+  </div>
+</div>
+}
+
 <div class="dashboard-container">
-
-  <!-- BARRA LATERAL: LISTA DE ALUNOS -->
+  <!-- BARRA LATERAL: ALUNOS -->
   <aside class="sidebar">
-    <h2>Meus Alunos</h2>
-
-    <button class="btn-primary" (click)="abrirModalNovoAluno()">+ Adicionar Aluno</button>
+    <div class="sidebar-header">
+      <h2>Os Meus Alunos</h2>
+      <button class="btn-primary" (click)="abrirModalAluno()">+ Novo Aluno</button>
+    </div>
 
     @if (carregando) {
-    <p>A carregar alunos...</p>
+    <div class="loading-state">A carregar dados...</div>
     }
 
     <ul class="aluno-list">
       @for (aluno of meusAlunos; track aluno.id) {
-      <li
-        [class.selecionado]="alunoSelecionado?.id === aluno.id"
-        (click)="selecionarAluno(aluno)">
+      <li [class.selecionado]="alunoSelecionado?.id === aluno.id" (click)="selecionarAluno(aluno)">
+        <div class="aluno-avatar">{{ aluno.nome.charAt(0) | uppercase }}</div>
         <div class="aluno-info">
           <strong>{{ aluno.nome }}</strong>
-          <span>{{ aluno.email }}</span>
+          <span>{{ aluno.idade }} anos • {{ aluno.sexo === 'MASCULINO' ? 'Masc' : 'Fem' }}</span>
         </div>
       </li>
       } @empty {
-      <p class="empty-state">Ainda não tem alunos registados.</p>
+      <div class="empty-state">Ainda não tem alunos registados.</div>
       }
     </ul>
   </aside>
 
-  <!-- PAINEL PRINCIPAL: DETALHES DO ALUNO SELECIONADO -->
+  <!-- PAINEL PRINCIPAL -->
   <main class="main-content">
     @if (alunoSelecionado) {
     <header class="aluno-header">
-      <div class="perfil">
+      <div class="perfil-info">
         <h1>{{ alunoSelecionado.nome }}</h1>
-        <p>Idade: {{ alunoSelecionado.idade }} anos | Sexo: {{ alunoSelecionado.sexo }}</p>
+        <p>{{ alunoSelecionado.email }}</p>
+        @if (alunoSelecionado.peculiaridades) {
+        <div class="badge-peculiaridade">Nota: {{ alunoSelecionado.peculiaridades }}</div>
+        }
       </div>
-      <div class="acoes-aluno">
-        <button class="btn-danger" (click)="removerAluno(alunoSelecionado.id)">Remover Aluno</button>
-      </div>
+      <button class="btn-danger-outline" (click)="removerAluno(alunoSelecionado.id)">Remover Aluno</button>
     </header>
 
-    <div class="conteudo-tabs">
+    <div class="dashboard-grid">
+
       <!-- SEÇÃO: TREINOS -->
-      <section class="card-section">
-        <div class="section-header">
+      <section class="dashboard-card">
+        <div class="card-header">
           <h3>Treinos Prescritos</h3>
-          <button class="btn-secondary" (click)="abrirModalNovoTreino()">Criar Treino</button>
+          <button class="btn-secondary" (click)="mostrarModalTreino = true">+ Criar Treino</button>
         </div>
 
-        <div class="grid-cards">
+        <div class="grid-items">
           @for (treino of treinosDoAluno; track treino.id) {
-          <div class="card-treino">
-            <h4>Treino #{{ treino.id }}</h4>
-            <p>{{ treino.exerciciosRequests?.length || 0 }} Exercícios</p>
-            <div class="card-actions">
-              <button (click)="gerarPdfTreino(treino.id)">Gerar PDF</button>
-              <button class="text-danger" (click)="excluirTreino(treino.id)">Excluir</button>
+          <div class="item-box">
+            <div class="item-detalhe">
+              <h4>Treino #{{ treino.id }}</h4>
+              <p>{{ treino.exercicios?.length || treino.exerciciosRequests?.length || 0 }} Exercícios</p>
+            </div>
+            <div class="item-acoes">
+              <button class="btn-icon" title="Gerar PDF na Base de Dados" (click)="gerarPdfTreino(treino.id)">⚙️ Gerar PDF</button>
+              <button class="btn-icon text-danger" title="Excluir" (click)="excluirTreino(treino.id)">🗑️</button>
             </div>
           </div>
           } @empty {
-          <p>Nenhum treino registado para este aluno.</p>
+          <p class="text-muted">Nenhum treino prescrito.</p>
           }
         </div>
       </section>
 
-      <!-- SEÇÃO: AVALIAÇÕES FÍSICAS -->
-      <section class="card-section">
-        <div class="section-header">
-          <h3>Histórico de Avaliações (Protocolo Pollock)</h3>
-          <button class="btn-secondary" (click)="abrirModalNovaAvaliacao()">Nova Avaliação</button>
+      <!-- SEÇÃO: AVALIAÇÕES -->
+      <section class="dashboard-card">
+        <div class="card-header">
+          <h3>Avaliações Físicas (Pollock 7)</h3>
+          <button class="btn-secondary" (click)="mostrarModalAvaliacao = true">+ Nova Avaliação</button>
         </div>
 
-        <div class="tabela-avaliacoes">
+        <div class="grid-items">
           @for (av of avaliacoesDoAluno; track av.atual.id) {
-          <div class="avaliacao-item">
-            <div class="av-data">
-              <strong>Data:</strong> {{ av.atual.data | date:'dd/MM/yyyy' }}
+          <div class="item-box avaliacao-box">
+            <div class="av-cabecalho">
+              <h4>{{ av.atual.data | date:'dd/MM/yyyy' }}</h4>
+              <span class="av-peso">{{ av.atual.pesoTotal }} kg</span>
             </div>
-            <div class="av-dados">
-              <p><strong>Peso:</strong> {{ av.atual.pesoTotal }} kg</p>
-              <p><strong>IMC:</strong> {{ av.atual.medidas?.imc | number:'1.1-2' }}</p>
-              <p><strong>% Gordura:</strong> {{ av.atual.percentualGordura | number:'1.1-2' }}%</p>
-              <p><strong>Massa Magra:</strong> {{ av.atual.medidas?.massaMagra | number:'1.1-2' }} kg</p>
+            <div class="av-metricas">
+              <div class="metrica"><span>IMC</span><strong>{{ av.atual.medidas?.imc | number:'1.1-2' }}</strong></div>
+              <div class="metrica"><span>Gordura</span><strong>{{ av.atual.percentualGordura | number:'1.1-2' }}%</strong></div>
+              <div class="metrica"><span>M. Magra</span><strong>{{ av.atual.medidas?.massaMagra | number:'1.1-2' }} kg</strong></div>
+              <div class="metrica"><span>M. Gorda</span><strong>{{ av.atual.medidas?.massaGorda | number:'1.1-2' }} kg</strong></div>
             </div>
-            @if (av.anterior) {
-            <div class="av-comparacao">
-              <small>Comparação com {{ av.anterior.data | date:'dd/MM/yyyy' }}:
-                {{ (av.atual.pesoTotal - av.anterior.pesoTotal) > 0 ? '+' : '' }}{{ av.atual.pesoTotal - av.anterior.pesoTotal | number:'1.1-2' }} kg
-              </small>
-            </div>
-            }
           </div>
           } @empty {
-          <p>Nenhuma avaliação física encontrada.</p>
+          <p class="text-muted">Nenhuma avaliação registada.</p>
           }
         </div>
       </section>
+
     </div>
     } @else {
-    <div class="tela-vazia">
-      <h2>Selecione um aluno</h2>
-      <p>Escolha um aluno no menu lateral para gerir os seus treinos e avaliações.</p>
+    <div class="tela-boas-vindas">
+      <div class="icone-gigante">🏋️‍♂️</div>
+      <h2>Selecione um Aluno</h2>
+      <p>Escolha um aluno na lista lateral para gerir as suas métricas e treinos.</p>
     </div>
     }
   </main>
 </div>
+
+<!-- ================= MODAIS ================= -->
+
+<!-- MODAL ALUNO -->
+@if (mostrarModalAluno) {
+<div class="modal-backdrop">
+  <div class="modal-box">
+    <h3>Registar Novo Aluno</h3>
+    <form (ngSubmit)="salvarNovoAluno()" #alunoForm="ngForm">
+      <div class="form-group">
+        <label>Nome Completo</label>
+        <input type="text" name="nome" [(ngModel)]="novoAluno.nome" required placeholder="Ex: João Silva">
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" name="email" [(ngModel)]="novoAluno.email" required placeholder="joao@email.com">
+      </div>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Palavra-passe</label>
+          <input type="password" name="senha" [(ngModel)]="novoAluno.senha" required minlength="6">
+        </div>
+        <div class="form-group">
+          <label>Idade</label>
+          <input type="number" name="idade" [(ngModel)]="novoAluno.idade" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Sexo</label>
+        <select name="sexo" [(ngModel)]="novoAluno.sexo">
+          <option value="MASCULINO">Masculino</option>
+          <option value="FEMININO">Feminino</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Peculiaridades / Lesões (Opcional)</label>
+        <textarea name="peculiaridades" [(ngModel)]="novoAluno.peculiaridades" rows="2" placeholder="Ex: Dor no joelho direito"></textarea>
+      </div>
+      <div class="modal-acoes">
+        <button type="button" class="btn-ghost" (click)="mostrarModalAluno = false">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="alunoForm.invalid || aGuardar">Guardar Aluno</button>
+      </div>
+    </form>
+  </div>
+</div>
+}
+
+<!-- MODAL TREINO -->
+@if (mostrarModalTreino) {
+<div class="modal-backdrop">
+  <div class="modal-box modal-lg">
+    <h3>Novo Treino para {{ alunoSelecionado?.nome }}</h3>
+
+    <div class="exercicio-builder">
+      <input type="text" placeholder="Ex: Supino Reto" [(ngModel)]="exercicioTemp.exercicio">
+      <input type="number" placeholder="Séries" [(ngModel)]="exercicioTemp.series">
+      <input type="number" placeholder="Reps" [(ngModel)]="exercicioTemp.repeticoes">
+      <button class="btn-secondary" (click)="adicionarExercicioAoTreino()">Adicionar</button>
+    </div>
+
+    <div class="lista-exercicios-temp">
+      @for (ex of novoTreino.exerciciosRequests; track $index) {
+      <div class="exercicio-row">
+        <span><strong>{{ ex.exercicio }}</strong> ({{ ex.series }}x{{ ex.repeticoes }})</span>
+        <button class="btn-icon text-danger" (click)="removerExercicioDoTreino($index)">Remover</button>
+      </div>
+      } @empty {
+      <p class="text-muted text-center" style="padding: 20px;">Nenhum exercício adicionado.</p>
+      }
+    </div>
+
+    <div class="modal-acoes">
+      <button class="btn-ghost" (click)="mostrarModalTreino = false">Cancelar</button>
+      <button class="btn-primary" [disabled]="novoTreino.exerciciosRequests.length === 0 || aGuardar" (click)="salvarNovoTreino()">Guardar Treino</button>
+    </div>
+  </div>
+</div>
+}
+
+<!-- MODAL AVALIAÇÃO -->
+@if (mostrarModalAvaliacao) {
+<div class="modal-backdrop">
+  <div class="modal-box modal-xl">
+    <h3>Avaliação Física (Pollock 7)</h3>
+    <div class="form-scroll-area">
+
+      <div class="form-section">
+        <h4>Dados Gerais</h4>
+        <div class="form-grid-3">
+          <div class="form-group"><label>Data</label><input type="date" [(ngModel)]="novaAvaliacao.data"></div>
+          <div class="form-group"><label>Peso (kg)</label><input type="number" [(ngModel)]="novaAvaliacao.pesoTotal"></div>
+          <div class="form-group"><label>Altura (m)</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.altura"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4>Dobras Cutâneas (mm)</h4>
+        <div class="form-grid-4">
+          <div class="form-group"><label>Peitoral</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraPeitoral"></div>
+          <div class="form-group"><label>Axilar Média</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraAxilarMedia"></div>
+          <div class="form-group"><label>Tríceps</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraTriceps"></div>
+          <div class="form-group"><label>Subescapular</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraSubescapular"></div>
+          <div class="form-group"><label>Abdominal</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraAbdominal"></div>
+          <div class="form-group"><label>Suprailíaca</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraSuprailiaca"></div>
+          <div class="form-group"><label>Coxa</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraCoxa"></div>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <h4>Perímetros / Circunferências (cm) - Opcional</h4>
+        <div class="form-grid-4">
+          <div class="form-group"><label>Tórax</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.torax"></div>
+          <div class="form-group"><label>Cintura</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.cintura"></div>
+          <div class="form-group"><label>Abdómen</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.abdomen"></div>
+          <div class="form-group"><label>Quadril</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.quadril"></div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-acoes">
+      <button class="btn-ghost" (click)="mostrarModalAvaliacao = false">Cancelar</button>
+      <button class="btn-primary" [disabled]="aGuardar" (click)="salvarNovaAvaliacao()">Calcular & Guardar</button>
+    </div>
+  </div>
+</div>
+}
