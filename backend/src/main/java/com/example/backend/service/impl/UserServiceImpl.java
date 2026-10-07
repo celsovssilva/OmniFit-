@@ -94,7 +94,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponse> getUserForPersonal(Long personalId) {
-     List<User> alunos = userRepository.findByPersonalId(personalId);
+        User user = userRepository.findById(personalId).orElseThrow(()-> new RuntimeException("personal não encontrado"));
+     List<User> alunos = userRepository.findByPersonalId(user.getId());
         return alunos.stream().map(UserResponse::new).toList();
     }
 

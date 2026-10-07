@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("api/user")
@@ -37,11 +38,10 @@ public class UserController {
     }
 
     @PostMapping("/create")
-    public UserResponse create(@Valid @RequestBody UserRequest userRequest){
 
+    public UserResponse create(@Valid @RequestBody UserRequest userRequest){
         return userService.createUser(userRequest);
     }
-
     @PutMapping("/update")
     public UserResponse update(@Valid @RequestBody UserRequest userRequest, Authentication authentication){
         User user = (User) authentication.getPrincipal();
@@ -51,15 +51,14 @@ public class UserController {
     @GetMapping("/getUsersForPersonal")
     public List<UserResponse> getUser(Authentication authentication){
         User user = (User) authentication.getPrincipal();
-        return userService.getUserForPersonal(user.getPersonalId());
+        return userService.getUserForPersonal(user.getId());
     }
 
     @DeleteMapping("/delete")
-    public void deleteUsers( Authentication authentication){
-        User user = (User) authentication.getPrincipal();
-        userService.deleteUser(user.getId());
+    public void deleteUsers(@RequestBody Map<String, Long> payload){
+        Long alunoId = payload.get("id");
+        userService.deleteUser(alunoId);
     }
-
     @PostMapping("/createProfissional")
     public UserResponse createProf(@Valid @RequestBody UserRequest userRequest){
         return userService.createProfissionalUser(userRequest);
