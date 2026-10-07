@@ -15,15 +15,15 @@ export class PersonalServices {
   }
 
   criarAluno(alunoData: any): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/user/create`, alunoData);
+    return this.http.post<any>(`${this.apiUrl}/user/create`, alunoData, {responseType: 'text'});
   }
 
   atualizarAluno(alunoData: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/user/update`, alunoData);
+    return this.http.put<any>(`${this.apiUrl}/user/update`, alunoData,{responseType: 'text'});
   }
 
   removerAluno(id: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/user/delete`, { body: { id } });
+    return this.http.delete<any>(`${this.apiUrl}/user/delete`,{ body: { id } });
   }
 
 

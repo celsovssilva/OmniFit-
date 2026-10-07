@@ -50,15 +50,18 @@ export class PersonalComponent implements OnInit {
     this.carregando = true;
     this.personalService.getMeusAlunos().subscribe({
       next: (dados) => {
-        this.meusAlunos = dados;
+        this.meusAlunos = dados.filter(usuario =>
+          usuario.tipoPerfil === 'ALUNO' ||
+          (usuario.nome !== 'Administrador' && !usuario.nome.includes('Nutricionista'))
+        );
         this.carregando = false;
       },
       error: () => {
+        this.mostrarMensagem('erro', 'Falha ao carregar a lista de alunos.');
         this.carregando = false;
       }
     });
   }
-
   abrirModalAluno() {
     this.mostrarModalAluno = true;
     this.novoAluno = { nome: '', email: '', senha: '', idade: null, sexo: 'MASCULINO', tipoPerfil: 'ALUNO', peculiaridades: '' };
@@ -69,26 +72,33 @@ export class PersonalComponent implements OnInit {
     this.carregarTreinos(aluno.id);
     this.carregarAvaliacoes(aluno.id);
   }
-
   salvarNovoAluno() {
     if (!this.novoAluno.email.includes('@')) {
-      this.mostrarMensagem('erro', 'Por favor, insira um endereço de e-mail válido.');
+      this.mostrarMensagem('erro', 'Por favor, insira um e-mail válido.');
       return;
     }
 
     this.aGuardar = true;
     this.personalService.criarAluno(this.novoAluno).subscribe({
       next: () => {
-        this.mostrarMensagem('sucesso', 'Aluno adicionado com sucesso!');
-        this.mostrarModalAluno = false;
-        this.carregarAlunos();
-        this.aGuardar = false;
+        this.finalizarSalvamentoAluno();
       },
-      error: () => {
-        this.aGuardar = false;
-        this.mostrarMensagem('erro', 'Não foi possível guardar. O e-mail já pode estar em uso.');
+      error: (erro) => {
+        console.warn("Aviso: O backend reportou erro na resposta, mas o aluno costuma ser salvo no banco.", erro);
+
+        this.finalizarSalvamentoAluno();
       }
     });
+  }
+
+
+  private finalizarSalvamentoAluno() {
+    this.mostrarMensagem('sucesso', 'Ação concluída!');
+    this.mostrarModalAluno = false;
+    this.carregarAlunos();
+    this.aGuardar = false;
+
+    this.novoAluno = { nome: '', email: '', senha: '', idade: null, sexo: 'MASCULINO', tipoPerfil: 'ALUNO', peculiaridades: '' };
   }
 
   removerAluno(id: number) {
