@@ -33,10 +33,9 @@ public class TreinoController {
         return treinoService.update(request, id);
     }
 
-    @GetMapping("/getTreinoForUsers")
-    public List<TreinoResponse> get(Authentication authentication){
-        User user = (User) authentication.getPrincipal();
-        return treinoService.getTreinoForUsers(user.getId());
+    @GetMapping("/getTreinoForUsers/{userId}")
+    public List<TreinoResponse> getTreinosDoAluno(@PathVariable Long userId) {
+        return treinoService.getTreinoForUsers(userId);
     }
 
     @DeleteMapping("/delete/{id}")

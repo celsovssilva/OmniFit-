@@ -50,10 +50,7 @@ export class PersonalComponent implements OnInit {
     this.carregando = true;
     this.personalService.getMeusAlunos().subscribe({
       next: (dados) => {
-        this.meusAlunos = dados.filter(usuario =>
-          usuario.tipoPerfil === 'ALUNO' ||
-          (usuario.nome !== 'Administrador' && !usuario.nome.includes('Nutricionista'))
-        );
+        this.meusAlunos = dados;
         this.carregando = false;
       },
       error: () => {
@@ -135,7 +132,6 @@ export class PersonalComponent implements OnInit {
     this.aGuardar = true;
     const payload = {
       alunoId: this.alunoSelecionado.id,
-      profissionalId: this.getProfissionalIdLogado(),
       exerciciosRequests: this.novoTreino.exerciciosRequests
     };
 

@@ -48,7 +48,7 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.PUT, "/api/treino/update/{id}").hasAnyRole("PERSONAL", "ADMIN");
                     req.requestMatchers(HttpMethod.DELETE, "/api/treino/delete/{id}").hasAnyRole("PERSONAL", "ADMIN");
                     req.requestMatchers(HttpMethod.POST, "/api/treino/upload/{treinoId}").hasAnyRole("PERSONAL", "ADMIN");
-                    req.requestMatchers(HttpMethod.GET, "/api/treino/getTreinoForUsers").authenticated();
+                    req.requestMatchers(HttpMethod.GET, "/api/treino/getTreinoForUsers/{userId}").authenticated();
                     req.requestMatchers(HttpMethod.GET, "/api/treino/download/{treinoId}").authenticated();
 
                     // Dieta
@@ -62,7 +62,7 @@ public class SecurityConfig {
                     // Avaliações Físicas
                     req.requestMatchers("/api/avaliacoesfisicas/create/{alunoId}").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
                     req.requestMatchers("/api/avaliacoesfisicas/update/{alunoId}").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
-                    req.requestMatchers("/api/avaliacoesfisicas/getUsersAvaliacoes").authenticated();
+                    req.requestMatchers("/api/avaliacoesfisicas/getUsersAvaliacoes/{alunoId}").authenticated();
 
 
                     req.anyRequest().authenticated();

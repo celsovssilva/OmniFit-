@@ -12,6 +12,7 @@ import org.openpdf.text.Document;
 import org.openpdf.text.Phrase;
 import org.openpdf.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -27,8 +28,12 @@ public class TreinoServiceImpl implements TreinoService {
     public TreinoResponse create(TreinoRequest request) {
         User aluno = userRepository.findById(request.alunoId())
                 .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
-        User personal = userRepository.findById(request.profissionalId())
-                .orElseThrow(()-> new RuntimeException("personal não encontrado"));
+
+
+        User personalLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User personal = userRepository.findById(personalLogado.getId())
+                .orElseThrow(()-> new RuntimeException("personal não encontrado no banco"));
+
         Treinos treinos = new Treinos();
         treinos.setAlunoId(aluno);
         treinos.setProfissionalId(personal);
@@ -40,23 +45,29 @@ public class TreinoServiceImpl implements TreinoService {
             exercicios.setSeries(exerciciosRequest.series());
             exercicios.setTreino(treinos);
             return exercicios;
-
         }).toList();
+
         treinos.setExercicios(e);
         Treinos treinoSalvo = treinoRepository.save(treinos);
-        return  new TreinoResponse(treinoSalvo);
+        return new TreinoResponse(treinoSalvo);
     }
 
     @Override
     public TreinoResponse update(TreinoRequest request, Long id) {
         Treinos treinos = treinoRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("treino inexistente"));
+
         User aluno = userRepository.findById(request.alunoId())
                 .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
-        User personal = userRepository.findById(request.profissionalId())
-                .orElseThrow(()-> new RuntimeException("personal não encontrado"));
+
+
+        User personalLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User personal = userRepository.findById(personalLogado.getId())
+                .orElseThrow(()-> new RuntimeException("personal não encontrado no banco"));
+
         treinos.setAlunoId(aluno);
-        treinos.setProfissionalId(personal);
+        treinos.setProfissionalId(personal); // Usa o personal real
+
         List<Exercicios> e = request.exerciciosRequests().stream().map(exerciciosRequest ->{
             Exercicios exercicios = new Exercicios();
             exercicios.setExercicio(exerciciosRequest.exercicio());
@@ -64,13 +75,13 @@ public class TreinoServiceImpl implements TreinoService {
             exercicios.setSeries(exerciciosRequest.series());
             exercicios.setTreino(treinos);
             return exercicios;
-
         }).collect(Collectors.toList());
+
         treinos.getExercicios().clear();
         treinos.getExercicios().addAll(e);
+
         return new TreinoResponse(treinoRepository.save(treinos));
     }
-
     @Override
     public List<TreinoResponse> getTreinoForUsers(Long userId) {
         List<TreinoResponse> treinoResponses  =treinoRepository.findByAlunoIdId(userId)

@@ -21,7 +21,8 @@
     }
 
     <ul class="aluno-list">
-      @for (aluno of meusAlunos; track aluno.id) {
+      <!-- Usar $index previne erros caso o aluno não tenha ID no momento -->
+      @for (aluno of meusAlunos; track $index) {
       <li [class.selecionado]="alunoSelecionado?.id === aluno.id" (click)="selecionarAluno(aluno)">
         <div class="aluno-avatar">{{ aluno.nome.charAt(0) | uppercase }}</div>
         <div class="aluno-info">
@@ -59,10 +60,11 @@
         </div>
 
         <div class="grid-items">
-          @for (treino of treinosDoAluno; track treino.id) {
+          <!-- Correção: track $index resolve o erro de chaves duplicadas/undefined -->
+          @for (treino of treinosDoAluno; track $index) {
           <div class="item-box">
             <div class="item-detalhe">
-              <h4>Treino #{{ treino.id }}</h4>
+              <h4>Treino #{{ treino.id || $index + 1 }}</h4>
               <p>{{ treino.exercicios?.length || treino.exerciciosRequests?.length || 0 }} Exercícios</p>
             </div>
             <div class="item-acoes">
@@ -84,17 +86,18 @@
         </div>
 
         <div class="grid-items">
-          @for (av of avaliacoesDoAluno; track av.atual.id) {
+          <!-- Correção: track $index e operador de navegação segura (?.) em todas as propriedades -->
+          @for (av of avaliacoesDoAluno; track $index) {
           <div class="item-box avaliacao-box">
             <div class="av-cabecalho">
-              <h4>{{ av.atual.data | date:'dd/MM/yyyy' }}</h4>
-              <span class="av-peso">{{ av.atual.pesoTotal }} kg</span>
+              <h4>{{ av?.atual?.data | date:'dd/MM/yyyy' }}</h4>
+              <span class="av-peso">{{ av?.atual?.pesoTotal || '--' }} kg</span>
             </div>
             <div class="av-metricas">
-              <div class="metrica"><span>IMC</span><strong>{{ av.atual.medidas?.imc | number:'1.1-2' }}</strong></div>
-              <div class="metrica"><span>Gordura</span><strong>{{ av.atual.percentualGordura | number:'1.1-2' }}%</strong></div>
-              <div class="metrica"><span>M. Magra</span><strong>{{ av.atual.medidas?.massaMagra | number:'1.1-2' }} kg</strong></div>
-              <div class="metrica"><span>M. Gorda</span><strong>{{ av.atual.medidas?.massaGorda | number:'1.1-2' }} kg</strong></div>
+              <div class="metrica"><span>IMC</span><strong>{{ (av?.atual?.medidas?.imc | number:'1.1-2') || '--' }}</strong></div>
+              <div class="metrica"><span>Gordura</span><strong>{{ (av?.atual?.percentualGordura | number:'1.1-2') || '--' }}%</strong></div>
+              <div class="metrica"><span>M. Magra</span><strong>{{ (av?.atual?.medidas?.massaMagra | number:'1.1-2') || '--' }} kg</strong></div>
+              <div class="metrica"><span>M. Gorda</span><strong>{{ (av?.atual?.medidas?.massaGorda | number:'1.1-2') || '--' }} kg</strong></div>
             </div>
           </div>
           } @empty {

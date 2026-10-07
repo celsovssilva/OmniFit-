@@ -26,10 +26,9 @@ public class AvaliacoesFisicasController {
         return avaliacoesFisicasService.update(request,alunoId);
     }
 
-    @GetMapping("/getUsersAvaliacoes")
-    public List<AvaliacoesFisicasResponse> avaliacoesFisicasResponseList(Authentication authentication){
-       User user = (User) authentication.getPrincipal();
-       return avaliacoesFisicasService.getForUserAvaliacao(user.getId());
+    @GetMapping("/getUsersAvaliacoes/{alunoId}")
+    public List<AvaliacoesFisicasResponse> getAvaliacoesDoAluno(@PathVariable Long alunoId) {
+        return avaliacoesFisicasService.getForUserAvaliacao(alunoId);
     }
 }
 

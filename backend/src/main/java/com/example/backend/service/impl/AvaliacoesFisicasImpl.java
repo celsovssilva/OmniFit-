@@ -22,12 +22,12 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
     private UserRepository userRepository;
     @Override
     public AvaliacoesFisicasResponse create(AvaliacoesFisicasRequest request, Long alunoId) {
-        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAluno_IdOrderByDataDesc(request.alunoId());
+        List<AvaliacoesFisicas> avaliacoesFisicas = avaliacoesFisicasRepository.findByAluno_IdOrderByDataDesc(alunoId);
         AvaliacoesFisicas avaliacoesAnteriores = null ;
         if (!avaliacoesFisicas.isEmpty()){
             avaliacoesAnteriores = avaliacoesFisicas.get(0);
         }
-        User aluno = userRepository.findById(request.alunoId())
+        User aluno = userRepository.findById(alunoId)
                 .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
 
 
