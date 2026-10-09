@@ -39,7 +39,7 @@ public class TreinoController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public void delete(Long id){
+    public void delete(@PathVariable Long id){
         treinoService.delete(id);
     }
 

@@ -39,8 +39,8 @@ export class PersonalServices {
     return this.http.put<any>(`${this.apiUrl}/treino/update/${treinoId}`, treinoData);
   }
 
-  removerTreino(treinoId: number): Observable<any> {
-    return this.http.delete<any>(`${this.apiUrl}/treino/delete/${treinoId}`);
+  removerTreino(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/treino/delete/${id}`);
   }
 
   uploadFicheiroTreino(treinoId: number, formData: FormData): Observable<any> {
