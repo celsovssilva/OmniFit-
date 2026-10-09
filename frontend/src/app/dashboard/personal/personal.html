@@ -88,14 +88,14 @@
           @for (av of avaliacoesDoAluno(); track $index) {
           <div class="item-box avaliacao-box">
             <div class="av-cabecalho">
-              <h4>{{ av?.atual?.data | date:'dd/MM/yyyy' }}</h4>
-              <span class="av-peso">{{ av?.atual?.pesoTotal || '--' }} kg</span>
+              <h4>{{ av.data | date:'dd/MM/yyyy' }}</h4>
+              <span class="av-peso">{{ av.pesoTotal || '--' }} kg</span>
             </div>
             <div class="av-metricas">
-              <div class="metrica"><span>IMC</span><strong>{{ (av?.atual?.medidas?.imc | number:'1.1-2') || '--' }}</strong></div>
-              <div class="metrica"><span>Gordura</span><strong>{{ (av?.atual?.percentualGordura | number:'1.1-2') || '--' }}%</strong></div>
-              <div class="metrica"><span>M. Magra</span><strong>{{ (av?.atual?.medidas?.massaMagra | number:'1.1-2') || '--' }} kg</strong></div>
-              <div class="metrica"><span>M. Gorda</span><strong>{{ (av?.atual?.medidas?.massaGorda | number:'1.1-2') || '--' }} kg</strong></div>
+              <div class="metrica"><span>IMC</span><strong>{{ (av.medidas.imc | number:'1.1-2') || '--' }}</strong></div>
+              <div class="metrica"><span>Gordura</span><strong>{{ (av.percentualGordura | number:'1.1-2') || '--' }}%</strong></div>
+              <div class="metrica"><span>M. Magra</span><strong>{{ (av.medidas.massaMagra | number:'1.1-2') || '--' }} kg</strong></div>
+              <div class="metrica"><span>M. Gorda</span><strong>{{ (av.medidas.massaGorda | number:'1.1-2') || '--' }} kg</strong></div>
             </div>
           </div>
           } @empty {
@@ -115,9 +115,7 @@
   </main>
 </div>
 
-<!-- ================= MODAIS ================= -->
 
-<!-- MODAL ALUNO -->
 @if (mostrarModalAluno()) {
 <div class="modal-backdrop">
   <div class="modal-box">
@@ -223,19 +221,25 @@
       </div>
 
       <div class="form-section">
-        <h4>Perímetros / Circunferências (cm) - Opcional</h4>
+        <h4>Perímetros / Circunferências (cm)</h4>
         <div class="form-grid-4">
           <div class="form-group"><label>Tórax</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.torax"></div>
           <div class="form-group"><label>Cintura</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.cintura"></div>
           <div class="form-group"><label>Abdómen</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.abdomen"></div>
           <div class="form-group"><label>Quadril</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.quadril"></div>
+          <div class="form-group"><label>Braço Dir.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.bracoDireito"></div>
+          <div class="form-group"><label>Braço Esq.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.bracoEsquerdo"></div>
+          <div class="form-group"><label>Coxa Dir.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.coxaDireita"></div>
+          <div class="form-group"><label>Coxa Esq.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.coxaEsquerda"></div>
+          <div class="form-group"><label>Panturrilha Dir.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.panturrilhaDireita"></div>
+          <div class="form-group"><label>Panturrilha Esq.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.panturrilhaEsquerda"></div>
         </div>
       </div>
 
     </div>
     <div class="modal-acoes">
       <button class="btn-ghost" (click)="mostrarModalAvaliacao.set(false)">Cancelar</button>
-      <button class="btn-primary" [disabled]="aGuardar()" (click)="salvarNovaAvaliacao()">Calcular & Guardar</button>
+      <button class="btn-primary" [disabled]="aGuardar() || !avaliacaoValida()" (click)="salvarNovaAvaliacao()">Calcular & Guardar</button>
     </div>
   </div>
 </div>

@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PersonalServices } from '../../services/personal.services';
+import {AvaliacaoForm, AvaliacaoResponse, novaAvaliacaoVazia, paraRequest} from '../../models/avaliacoes.models';
 
 @Component({
   selector: 'app-personal',
@@ -11,11 +12,12 @@ import { PersonalServices } from '../../services/personal.services';
   styleUrls: ['./personal.css']
 })
 export class PersonalComponent implements OnInit {
-  // Estados lidos pelo template (signals)
+
   meusAlunos = signal<any[]>([]);
   alunoSelecionado = signal<any>(null);
   treinosDoAluno = signal<any[]>([]);
-  avaliacoesDoAluno = signal<any[]>([]);
+  avaliacoesDoAluno = signal<AvaliacaoResponse[]>([]);
+  novaAvaliacao: AvaliacaoForm = novaAvaliacaoVazia();
 
   carregando = signal(false);
   aGuardar = signal(false);
@@ -25,7 +27,7 @@ export class PersonalComponent implements OnInit {
   mostrarModalTreino = signal(false);
   mostrarModalAvaliacao = signal(false);
 
-  // Formulários (ngModel): continuam como propriedades normais
+
   novoAluno = {
     nome: '', email: '', senha: '', idade: null as number | null, sexo: 'MASCULINO',
     tipoPerfil: 'ALUNO', peculiaridades: ''
@@ -34,14 +36,16 @@ export class PersonalComponent implements OnInit {
   novoTreino = { exerciciosRequests: [] as any[] };
   exercicioTemp = { exercicio: '', series: null as number | null, repeticoes: null as number | null };
 
-  novaAvaliacao: any = this.resetarFormAvaliacao();
+
 
   constructor(private personalService: PersonalServices) {}
 
   ngOnInit() {
     this.carregarAlunos();
   }
-
+  avaliacaoValida(): boolean {
+    return paraRequest(this.novaAvaliacao) !== null;
+  }
   mostrarMensagem(tipo: 'sucesso' | 'erro', texto: string) {
     this.mensagem.set({ tipo, texto });
     setTimeout(() => this.mensagem.set({ tipo: '', texto: '' }), 4000);
@@ -179,8 +183,13 @@ export class PersonalComponent implements OnInit {
   }
 
   salvarNovaAvaliacao() {
+    const request = paraRequest(this.novaAvaliacao);
+    if (!request) {
+      this.mostrarMensagem('erro', 'Preencha todos os campos da avaliação.');
+      return;
+    }
     this.aGuardar.set(true);
-    this.personalService.criarAvaliacao(this.alunoSelecionado().id, this.novaAvaliacao).subscribe({
+    this.personalService.criarAvaliacao(this.alunoSelecionado().id, request).subscribe({
       next: () => {
         this.mostrarMensagem('sucesso', 'Avaliação Física registada e calculada!');
         this.mostrarModalAvaliacao.set(false);
