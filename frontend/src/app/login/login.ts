@@ -25,11 +25,9 @@ export class Login {
 
     this.authService.login(dados).subscribe({
       next: (resposta) => {
-        console.log('resposta do java:', resposta)
         if (resposta.token) {
           localStorage.getItem('token-jwt')
           localStorage.setItem('token_jwt', resposta.token);
-          alert('Login bem-sucedido! Token guardado.');
           if(resposta.tipoPerfil === "PERSONAL"){
             this.router.navigate(['/personal'])
           } else if (resposta.tipoPerfil === "NUTRI"){
