@@ -1,9 +1,9 @@
 <!-- SISTEMA DE NOTIFICAÇÕES (TOASTS) -->
-@if (mensagem.texto) {
-<div class="toast-container" [ngClass]="mensagem.tipo">
+@if (mensagem().texto) {
+<div class="toast-container" [ngClass]="mensagem().tipo">
   <div class="toast-content">
-    <span class="toast-icon">{{ mensagem.tipo === 'sucesso' ? '✅' : '⚠️' }}</span>
-    <p>{{ mensagem.texto }}</p>
+    <span class="toast-icon">{{ mensagem().tipo === 'sucesso' ? '✅' : '⚠️' }}</span>
+    <p>{{ mensagem().texto }}</p>
   </div>
 </div>
 }
@@ -16,14 +16,14 @@
       <button class="btn-primary" (click)="abrirModalAluno()">+ Novo Aluno</button>
     </div>
 
-    @if (carregando) {
+    @if (carregando()) {
     <div class="loading-state">A carregar dados...</div>
     }
 
     <ul class="aluno-list">
       <!-- Usar $index previne erros caso o aluno não tenha ID no momento -->
-      @for (aluno of meusAlunos; track $index) {
-      <li [class.selecionado]="alunoSelecionado?.id === aluno.id" (click)="selecionarAluno(aluno)">
+      @for (aluno of meusAlunos(); track $index) {
+      <li [class.selecionado]="alunoSelecionado()?.id === aluno.id" (click)="selecionarAluno(aluno)">
         <div class="aluno-avatar">{{ aluno.nome.charAt(0) | uppercase }}</div>
         <div class="aluno-info">
           <strong>{{ aluno.nome }}</strong>
@@ -38,16 +38,16 @@
 
   <!-- PAINEL PRINCIPAL -->
   <main class="main-content">
-    @if (alunoSelecionado) {
+    @if (alunoSelecionado(); as alunoAtual) {
     <header class="aluno-header">
       <div class="perfil-info">
-        <h1>{{ alunoSelecionado.nome }}</h1>
-        <p>{{ alunoSelecionado.email }}</p>
-        @if (alunoSelecionado.peculiaridades) {
-        <div class="badge-peculiaridade">Nota: {{ alunoSelecionado.peculiaridades }}</div>
+        <h1>{{ alunoAtual.nome }}</h1>
+        <p>{{ alunoAtual.email }}</p>
+        @if (alunoAtual.peculiaridades) {
+        <div class="badge-peculiaridade">Nota: {{ alunoAtual.peculiaridades }}</div>
         }
       </div>
-      <button class="btn-danger-outline" (click)="removerAluno(alunoSelecionado.id)">Remover Aluno</button>
+      <button class="btn-danger-outline" (click)="removerAluno(alunoAtual.id)">Remover Aluno</button>
     </header>
 
     <div class="dashboard-grid">
@@ -56,12 +56,11 @@
       <section class="dashboard-card">
         <div class="card-header">
           <h3>Treinos Prescritos</h3>
-          <button class="btn-secondary" (click)="mostrarModalTreino = true">+ Criar Treino</button>
+          <button class="btn-secondary" (click)="mostrarModalTreino.set(true)">+ Criar Treino</button>
         </div>
 
         <div class="grid-items">
-          <!-- Correção: track $index resolve o erro de chaves duplicadas/undefined -->
-          @for (treino of treinosDoAluno; track $index) {
+          @for (treino of treinosDoAluno(); track $index) {
           <div class="item-box">
             <div class="item-detalhe">
               <h4>Treino #{{ treino.id || $index + 1 }}</h4>
@@ -82,12 +81,11 @@
       <section class="dashboard-card">
         <div class="card-header">
           <h3>Avaliações Físicas (Pollock 7)</h3>
-          <button class="btn-secondary" (click)="mostrarModalAvaliacao = true">+ Nova Avaliação</button>
+          <button class="btn-secondary" (click)="mostrarModalAvaliacao.set(true)">+ Nova Avaliação</button>
         </div>
 
         <div class="grid-items">
-          <!-- Correção: track $index e operador de navegação segura (?.) em todas as propriedades -->
-          @for (av of avaliacoesDoAluno; track $index) {
+          @for (av of avaliacoesDoAluno(); track $index) {
           <div class="item-box avaliacao-box">
             <div class="av-cabecalho">
               <h4>{{ av?.atual?.data | date:'dd/MM/yyyy' }}</h4>
@@ -120,7 +118,7 @@
 <!-- ================= MODAIS ================= -->
 
 <!-- MODAL ALUNO -->
-@if (mostrarModalAluno) {
+@if (mostrarModalAluno()) {
 <div class="modal-backdrop">
   <div class="modal-box">
     <h3>Registar Novo Aluno</h3>
@@ -155,8 +153,8 @@
         <textarea name="peculiaridades" [(ngModel)]="novoAluno.peculiaridades" rows="2" placeholder="Ex: Dor no joelho direito"></textarea>
       </div>
       <div class="modal-acoes">
-        <button type="button" class="btn-ghost" (click)="mostrarModalAluno = false">Cancelar</button>
-        <button type="submit" class="btn-primary" [disabled]="alunoForm.invalid || aGuardar">Guardar Aluno</button>
+        <button type="button" class="btn-ghost" (click)="mostrarModalAluno.set(false)">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="alunoForm.invalid || aGuardar()">Guardar Aluno</button>
       </div>
     </form>
   </div>
@@ -164,10 +162,10 @@
 }
 
 <!-- MODAL TREINO -->
-@if (mostrarModalTreino) {
+@if (mostrarModalTreino()) {
 <div class="modal-backdrop">
   <div class="modal-box modal-lg">
-    <h3>Novo Treino para {{ alunoSelecionado?.nome }}</h3>
+    <h3>Novo Treino para {{ alunoSelecionado()?.nome }}</h3>
 
     <div class="exercicio-builder">
       <input type="text" placeholder="Ex: Supino Reto" [(ngModel)]="exercicioTemp.exercicio">
@@ -188,15 +186,15 @@
     </div>
 
     <div class="modal-acoes">
-      <button class="btn-ghost" (click)="mostrarModalTreino = false">Cancelar</button>
-      <button class="btn-primary" [disabled]="novoTreino.exerciciosRequests.length === 0 || aGuardar" (click)="salvarNovoTreino()">Guardar Treino</button>
+      <button class="btn-ghost" (click)="mostrarModalTreino.set(false)">Cancelar</button>
+      <button class="btn-primary" [disabled]="novoTreino.exerciciosRequests.length === 0 || aGuardar()" (click)="salvarNovoTreino()">Guardar Treino</button>
     </div>
   </div>
 </div>
 }
 
 <!-- MODAL AVALIAÇÃO -->
-@if (mostrarModalAvaliacao) {
+@if (mostrarModalAvaliacao()) {
 <div class="modal-backdrop">
   <div class="modal-box modal-xl">
     <h3>Avaliação Física (Pollock 7)</h3>
@@ -236,8 +234,8 @@
 
     </div>
     <div class="modal-acoes">
-      <button class="btn-ghost" (click)="mostrarModalAvaliacao = false">Cancelar</button>
-      <button class="btn-primary" [disabled]="aGuardar" (click)="salvarNovaAvaliacao()">Calcular & Guardar</button>
+      <button class="btn-ghost" (click)="mostrarModalAvaliacao.set(false)">Cancelar</button>
+      <button class="btn-primary" [disabled]="aGuardar()" (click)="salvarNovaAvaliacao()">Calcular & Guardar</button>
     </div>
   </div>
 </div>

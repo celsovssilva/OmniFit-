@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PersonalServices } from '../../services/personal.services';
@@ -11,27 +11,28 @@ import { PersonalServices } from '../../services/personal.services';
   styleUrls: ['./personal.css']
 })
 export class PersonalComponent implements OnInit {
-  meusAlunos: any[] = [];
-  alunoSelecionado: any = null;
-  treinosDoAluno: any[] = [];
-  avaliacoesDoAluno: any[] = [];
+  // Estados lidos pelo template (signals)
+  meusAlunos = signal<any[]>([]);
+  alunoSelecionado = signal<any>(null);
+  treinosDoAluno = signal<any[]>([]);
+  avaliacoesDoAluno = signal<any[]>([]);
 
-  carregando = false;
-  mostrarModalAluno = false;
-  mostrarModalTreino = false;
-  mostrarModalAvaliacao = false;
+  carregando = signal(false);
+  aGuardar = signal(false);
+  mensagem = signal<{ tipo: string; texto: string }>({ tipo: '', texto: '' });
 
-  // Variáveis exigidas pelo HTML
-  aGuardar = false;
-  mensagem = { tipo: '', texto: '' };
+  mostrarModalAluno = signal(false);
+  mostrarModalTreino = signal(false);
+  mostrarModalAvaliacao = signal(false);
 
+  // Formulários (ngModel): continuam como propriedades normais
   novoAluno = {
-    nome: '', email: '', senha: '', idade: null, sexo: 'MASCULINO',
+    nome: '', email: '', senha: '', idade: null as number | null, sexo: 'MASCULINO',
     tipoPerfil: 'ALUNO', peculiaridades: ''
   };
 
   novoTreino = { exerciciosRequests: [] as any[] };
-  exercicioTemp = { exercicio: '', series: null, repeticoes: null };
+  exercicioTemp = { exercicio: '', series: null as number | null, repeticoes: null as number | null };
 
   novaAvaliacao: any = this.resetarFormAvaliacao();
 
@@ -42,58 +43,58 @@ export class PersonalComponent implements OnInit {
   }
 
   mostrarMensagem(tipo: 'sucesso' | 'erro', texto: string) {
-    this.mensagem = { tipo, texto };
-    setTimeout(() => this.mensagem = { tipo: '', texto: '' }, 4000);
+    this.mensagem.set({ tipo, texto });
+    setTimeout(() => this.mensagem.set({ tipo: '', texto: '' }), 4000);
   }
 
   carregarAlunos() {
-    this.carregando = true;
+    this.carregando.set(true);
     this.personalService.getMeusAlunos().subscribe({
       next: (dados) => {
-        this.meusAlunos = dados;
-        this.carregando = false;
+        this.meusAlunos.set(dados);
+        this.carregando.set(false);
       },
       error: () => {
         this.mostrarMensagem('erro', 'Falha ao carregar a lista de alunos.');
-        this.carregando = false;
+        this.carregando.set(false);
       }
     });
   }
+
   abrirModalAluno() {
-    this.mostrarModalAluno = true;
     this.novoAluno = { nome: '', email: '', senha: '', idade: null, sexo: 'MASCULINO', tipoPerfil: 'ALUNO', peculiaridades: '' };
+    this.mostrarModalAluno.set(true);
   }
 
   selecionarAluno(aluno: any) {
-    this.alunoSelecionado = aluno;
+    this.alunoSelecionado.set(aluno);
     this.carregarTreinos(aluno.id);
     this.carregarAvaliacoes(aluno.id);
   }
+
   salvarNovoAluno() {
     if (!this.novoAluno.email.includes('@')) {
       this.mostrarMensagem('erro', 'Por favor, insira um e-mail válido.');
       return;
     }
 
-    this.aGuardar = true;
+    this.aGuardar.set(true);
     this.personalService.criarAluno(this.novoAluno).subscribe({
       next: () => {
         this.finalizarSalvamentoAluno();
       },
       error: (erro) => {
-        console.warn("Aviso: O backend reportou erro na resposta, mas o aluno costuma ser salvo no banco.", erro);
-
+        console.warn('Aviso: O backend reportou erro na resposta, mas o aluno costuma ser salvo no banco.', erro);
         this.finalizarSalvamentoAluno();
       }
     });
   }
 
-
   private finalizarSalvamentoAluno() {
     this.mostrarMensagem('sucesso', 'Ação concluída!');
-    this.mostrarModalAluno = false;
+    this.mostrarModalAluno.set(false);
     this.carregarAlunos();
-    this.aGuardar = false;
+    this.aGuardar.set(false);
 
     this.novoAluno = { nome: '', email: '', senha: '', idade: null, sexo: 'MASCULINO', tipoPerfil: 'ALUNO', peculiaridades: '' };
   }
@@ -102,23 +103,26 @@ export class PersonalComponent implements OnInit {
     if (confirm('Remover este aluno definitivamente?')) {
       this.personalService.removerAluno(id).subscribe({
         next: () => {
-          this.alunoSelecionado = null;
+          this.alunoSelecionado.set(null);
+          this.treinosDoAluno.set([]);
+          this.avaliacoesDoAluno.set([]);
           this.mostrarMensagem('sucesso', 'Aluno removido.');
           this.carregarAlunos();
-        }
+        },
+        error: () => this.mostrarMensagem('erro', 'Erro ao remover aluno.')
       });
     }
   }
 
   carregarTreinos(alunoId: number) {
     this.personalService.getTreinosDoAluno(alunoId).subscribe({
-      next: (dados) => this.treinosDoAluno = dados,
+      next: (dados) => this.treinosDoAluno.set(dados),
       error: () => this.mostrarMensagem('erro', 'Erro ao carregar treinos.')
     });
   }
 
   adicionarExercicioAoTreino() {
-    if(this.exercicioTemp.exercicio && this.exercicioTemp.series && this.exercicioTemp.repeticoes) {
+    if (this.exercicioTemp.exercicio && this.exercicioTemp.series && this.exercicioTemp.repeticoes) {
       this.novoTreino.exerciciosRequests.push({ ...this.exercicioTemp });
       this.exercicioTemp = { exercicio: '', series: null, repeticoes: null };
     }
@@ -129,22 +133,22 @@ export class PersonalComponent implements OnInit {
   }
 
   salvarNovoTreino() {
-    this.aGuardar = true;
+    this.aGuardar.set(true);
     const payload = {
-      alunoId: this.alunoSelecionado.id,
+      alunoId: this.alunoSelecionado().id,
       exerciciosRequests: this.novoTreino.exerciciosRequests
     };
 
     this.personalService.criarTreino(payload).subscribe({
       next: () => {
         this.mostrarMensagem('sucesso', 'Treino prescrito e guardado!');
-        this.mostrarModalTreino = false;
+        this.mostrarModalTreino.set(false);
         this.novoTreino.exerciciosRequests = [];
-        this.carregarTreinos(this.alunoSelecionado.id);
-        this.aGuardar = false;
+        this.carregarTreinos(this.alunoSelecionado().id);
+        this.aGuardar.set(false);
       },
       error: () => {
-        this.aGuardar = false;
+        this.aGuardar.set(false);
         this.mostrarMensagem('erro', 'Falha ao prescrever treino.');
       }
     });
@@ -153,7 +157,8 @@ export class PersonalComponent implements OnInit {
   excluirTreino(treinoId: number) {
     if (confirm('Excluir este treino?')) {
       this.personalService.removerTreino(treinoId).subscribe({
-        next: () => this.carregarTreinos(this.alunoSelecionado.id)
+        next: () => this.carregarTreinos(this.alunoSelecionado().id),
+        error: () => this.mostrarMensagem('erro', 'Erro ao excluir treino.')
       });
     }
   }
@@ -168,23 +173,23 @@ export class PersonalComponent implements OnInit {
 
   carregarAvaliacoes(alunoId: number) {
     this.personalService.getAvaliacoes(alunoId).subscribe({
-      next: (dados) => this.avaliacoesDoAluno = dados,
+      next: (dados) => this.avaliacoesDoAluno.set(dados),
       error: () => this.mostrarMensagem('erro', 'Erro ao carregar avaliações.')
     });
   }
 
   salvarNovaAvaliacao() {
-    this.aGuardar = true;
-    this.personalService.criarAvaliacao(this.alunoSelecionado.id, this.novaAvaliacao).subscribe({
+    this.aGuardar.set(true);
+    this.personalService.criarAvaliacao(this.alunoSelecionado().id, this.novaAvaliacao).subscribe({
       next: () => {
         this.mostrarMensagem('sucesso', 'Avaliação Física registada e calculada!');
-        this.mostrarModalAvaliacao = false;
+        this.mostrarModalAvaliacao.set(false);
         this.novaAvaliacao = this.resetarFormAvaliacao();
-        this.carregarAvaliacoes(this.alunoSelecionado.id);
-        this.aGuardar = false;
+        this.carregarAvaliacoes(this.alunoSelecionado().id);
+        this.aGuardar.set(false);
       },
       error: () => {
-        this.aGuardar = false;
+        this.aGuardar.set(false);
         this.mostrarMensagem('erro', 'Erro ao salvar avaliação.');
       }
     });
