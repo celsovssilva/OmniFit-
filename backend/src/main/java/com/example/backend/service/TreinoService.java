@@ -15,4 +15,5 @@ public interface TreinoService {
     void delete(Long id);
     TreinoResponse updloadTreino(Long treinoId);
     byte[] downloadTreino(Long treinoId);
+    List<TreinoResponse> getTreino(Long userId);
 }

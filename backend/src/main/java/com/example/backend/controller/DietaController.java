@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.entity.User;
 import com.example.backend.request.DietaRequest;
 import com.example.backend.response.DietaResponse;
+import com.example.backend.response.TreinoResponse;
 import com.example.backend.service.DietaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -28,6 +29,10 @@ public class DietaController {
     @PutMapping("/update/{id}")
     public DietaResponse updateDieta(@RequestBody DietaRequest dietaRequest,@PathVariable Long id){
         return dietaService.update(dietaRequest,id);
+    }
+    @GetMapping("/getTreinoForUsers/{userId}")
+    public List<DietaResponse> getTreinosDoAluno(@PathVariable Long userId) {
+        return dietaService.getDieta(userId);
     }
 
     @GetMapping("/getDietaForUsers")

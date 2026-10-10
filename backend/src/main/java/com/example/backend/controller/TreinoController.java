@@ -58,5 +58,15 @@ public class TreinoController {
 
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
     }
+
+    @GetMapping("/getTreinoForUsers")
+    public List<TreinoResponse> getTreinos(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+
+        List<TreinoResponse> treinos = treinoService.getTreinoForUsers(user.getId());
+
+        return treinos;
+    }
+
 }
 

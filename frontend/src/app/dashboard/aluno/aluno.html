@@ -1,0 +1,40 @@
+<div class="container-aluno">
+
+  <!-- SESSÃO DE TREINOS -->
+  <section class="sessao-treinos">
+    <h2>Meus Treinos</h2>
+
+    <!-- Lógica de repetição para os treinos -->
+    @for (treino of treinosDoAluno; track treino.id) {
+    <div class="item-card">
+      <!-- Usamos o treino.id para gerar um título genérico já que não há 'nome' -->
+      <p><strong>Treino #{{ treino.id }}</strong></p>
+
+      <button (click)="baixarTreino(treino.id)">📥 Baixar Treino</button>
+    </div>
+    } @empty {
+    <p>Nenhum treino disponível no momento.</p>
+    }
+  </section>
+
+  <hr>
+
+  <!-- SESSÃO DE DIETAS -->
+  <section class="sessao-dietas">
+    <h2>Minhas Dietas</h2>
+
+    <!-- Lógica de repetição para as dietas -->
+    @for (dieta of dietasDoAluno; track dieta.id) {
+    <div class="item-card">
+      <!-- Substitua 'dieta.nome' pela propriedade correta que vem do seu backend -->
+      <p><strong>Dieta:</strong> {{ dieta.id}}</p>
+
+      <!-- Botão com a lógica de clique chamando a função -->
+      <button (click)="baixarDieta(dieta.id)">📥 Baixar Dieta</button>
+    </div>
+    } @empty {
+    <p>Nenhuma dieta disponível no momento.</p>
+    }
+  </section>
+
+</div>

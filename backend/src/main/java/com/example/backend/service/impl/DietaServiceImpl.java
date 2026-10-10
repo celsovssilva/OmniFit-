@@ -84,4 +84,11 @@ public class DietaServiceImpl implements DietaService {
                 .orElseThrow(()-> new RuntimeException("dieta não encontrada"));
         return  dieta.getArquivoPdf();
     }
+
+    @Override
+    public List<DietaResponse> getDieta(Long userId) {
+        List<DietaResponse> dieta = dietaRepository.findByAlunoIdId(userId)
+                .stream().map(DietaResponse::new).toList();
+        return dieta;
+    }
 }

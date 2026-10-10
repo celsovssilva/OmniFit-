@@ -126,4 +126,11 @@ public class TreinoServiceImpl implements TreinoService {
      return  treinos.getArquivoPdf();
 
     }
+
+    @Override
+    public List<TreinoResponse> getTreino(Long userId) {
+        List<TreinoResponse> treinoResponses  =treinoRepository.findByAlunoIdId(userId)
+                .stream().map(TreinoResponse::new).toList();
+        return  treinoResponses;
+    }
 }

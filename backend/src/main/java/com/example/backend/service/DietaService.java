@@ -2,6 +2,7 @@ package com.example.backend.service;
 
 import com.example.backend.request.DietaRequest;
 import com.example.backend.response.DietaResponse;
+import com.example.backend.response.TreinoResponse;
 
 import java.util.List;
 
@@ -12,4 +13,5 @@ public interface DietaService {
     void delete(Long id);
     DietaResponse updloadDieta(Long dietaId);
     byte[] downloadDieta(Long dietaId);
+    List<DietaResponse> getDieta(Long userId);
 }
