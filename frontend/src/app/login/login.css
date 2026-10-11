@@ -1,80 +1,160 @@
-/* Nova classe para ocupar a tela toda e centralizar o conteúdo */
-.login-wrapper {
+/* Reset básico para fontes e espaçamentos */
+* {
+  box-sizing: border-box;
+  font-family: 'Inter', 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+}
+
+/* Fundo da tela inteira: gradiente muito suave de azul claro para branco */
+.login-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-color: #121212;
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  color: #e0e0e0;
+  height: 100vh;
+  width: 100vw;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 100%);
 }
 
-.login-container {
-  background-color: #1e1e1e;
-  padding: 40px 30px;
-  border-radius: 8px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+/* O cartão de login: branco, arredondado e com sombra moderna */
+.login-card {
+  background-color: #ffffff;
+  padding: 40px 32px;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px rgba(0, 42, 106, 0.08); /* Sombra com leve tom azulado */
   width: 100%;
-  max-width: 360px;
-  box-sizing: border-box;
+  max-width: 420px;
+  animation: fadeIn 0.4s ease-out;
 }
 
-.login-container h2 {
-  margin-top: 0;
-  margin-bottom: 25px;
-  color: #ffffff;
-  font-size: 24px;
+.login-card h2 {
   text-align: center;
-  font-weight: 600;
+  color: #1e3a8a; /* Azul marinho escuro elegante */
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
-.login-container form div {
+.instrucao {
+  text-align: center;
+  color: #64748b; /* Cinza médio para leitura agradável */
+  font-size: 0.95rem;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* Container dos inputs */
+.input-group {
+  display: flex;
+  flex-direction: column;
   margin-bottom: 20px;
 }
 
-.login-container label {
-  display: block;
+.input-group label {
   margin-bottom: 8px;
-  font-size: 14px;
-  color: #a0a0a0;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
 }
 
-.login-container input {
-  width: 100%;
-  padding: 12px;
-  background-color: #2c2c2c;
-  border: 1px solid #3d3d3d;
-  border-radius: 6px;
-  color: #ffffff;
-  font-size: 16px;
-  box-sizing: border-box;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+.input-group input {
+  padding: 14px 16px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #334155;
+  transition: all 0.3s ease;
+  background-color: #f8fafc;
 }
 
-.login-container input:focus {
+/* Efeito ao clicar no input (foco) */
+.input-group input:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  border-color: #3b82f6; /* Azul vibrante */
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15); /* "Aura" azul */
 }
 
-.login-container button {
+/* Estilo para o campo de email bloqueado na etapa 3 */
+.input-group input[readonly] {
+  background-color: #e2e8f0;
+  color: #94a3b8;
+  border-color: #e2e8f0;
+  cursor: not-allowed;
+}
+
+/* ------------------------
+   BOTÕES E LINKS
+   ------------------------ */
+button {
   width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  background-color: #6366f1;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  font-size: 16px;
-  font-weight: bold;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.1s ease;
+  border: none;
+  transition: all 0.3s ease;
+  margin-bottom: 12px;
 }
 
-.login-container button:hover {
-  background-color: #4f46e5;
+/* Botão principal (Azul) */
+.btn-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+  box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
 }
 
-.login-container button:active {
-  transform: scale(0.98);
+.btn-primary:hover {
+  background-color: #1d4ed8; /* Azul mais escuro ao passar o mouse */
+  transform: translateY(-2px); /* Efeito de flutuar levemente */
+  box-shadow: 0 6px 12px rgba(37, 99, 235, 0.25);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Botão secundário (Branco com borda azul) */
+.btn-secondary {
+  background-color: transparent;
+  color: #2563eb;
+  border: 1.5px solid #2563eb;
+}
+
+.btn-secondary:hover {
+  background-color: #eff6ff; /* Fundo levemente azulado */
+}
+
+/* Link "Esqueceu a senha" */
+.link-texto {
+  display: block;
+  text-align: center;
+  color: #3b82f6;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 16px;
+  margin-bottom: 0;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.link-texto:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+/* Animação suave para quando as telas (login/recuperar) trocarem */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

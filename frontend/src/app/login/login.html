@@ -1,16 +1,104 @@
-<div class="login-wrapper">
-  <div class="login-container">
+<div class="login-container">
+  >
+  @if (etapaAtual === 'LOGIN') {
+  <div class="login-card">
     <h2>Entrar no Sistema</h2>
-    <form (ngSubmit)="fazerLogin()">
-      <div>
-        <label for="email">E-mail:</label>
-        <input type="email" name="email" id="email" [(ngModel)]="email">
-      </div>
-      <div>
-        <label for="password">Palavra-passe:</label>
-        <input type="password" name="password" id="password" [(ngModel)]="senha">
-      </div>
-      <button type="submit">Entrar</button>
-    </form>
+
+    <div class="input-group">
+      <label for="email">E-mail:</label>
+      <input
+        type="email"
+        id="email"
+        [(ngModel)]="email"
+        name="email"
+        placeholder="seu@email.com"
+      >
+    </div>
+
+    <div class="input-group">
+      <label for="senha">Palavra-passe:</label>
+      <input
+        type="password"
+        id="senha"
+        [(ngModel)]="senha"
+        name="senha"
+        placeholder="******"
+      >
+    </div>
+
+    <button class="btn-primary" (click)="fazerLogin()">Entrar</button>
+
+
+    <p class="link-texto" (click)="etapaAtual = 'ESQUECI_SENHA'">
+      Esqueceu a senha? Clique aqui
+    </p>
   </div>
+  }
+
+  @else if (etapaAtual === 'ESQUECI_SENHA') {
+  <div class="login-card">
+    <h2>Recuperar Senha</h2>
+    <p class="instrucao">Digite o e-mail da sua conta para receber um código de recuperação de 6 dígitos.</p>
+
+    <div class="input-group">
+      <label for="email-recuperacao">E-mail:</label>
+      <input
+        type="email"
+        id="email-recuperacao"
+        [(ngModel)]="emailRecuperacao"
+        name="emailRecuperacao"
+        placeholder="seu@email.com"
+      >
+    </div>
+
+    <button class="btn-primary" (click)="solicitarCodigo()">Enviar Código</button>
+
+
+    <button class="btn-secondary" (click)="etapaAtual = 'LOGIN'">Voltar ao Login</button>
+  </div>
+  }
+
+  @else if (etapaAtual === 'RESET_SENHA') {
+  <div class="login-card">
+    <h2>Nova Senha</h2>
+    <p class="instrucao">Enviamos um código para o seu e-mail. Digite-o abaixo junto com a sua nova senha.</p>
+
+    <div class="input-group">
+      <label for="email-confirmacao">E-mail:</label>
+      <input
+        type="email"
+        id="email-confirmacao"
+        [value]="emailRecuperacao"
+        readonly
+      >
+    </div>
+
+    <div class="input-group">
+      <label for="codigo">Código (6 dígitos):</label>
+      <input
+        type="text"
+        id="codigo"
+        [(ngModel)]="codigoPin"
+        name="codigoPin"
+        placeholder="Ex: 123456"
+      >
+    </div>
+
+    <div class="input-group">
+      <label for="nova-senha">Nova Senha:</label>
+      <input
+        type="password"
+        id="nova-senha"
+        [(ngModel)]="novaSenha"
+        name="novaSenha"
+        placeholder="******"
+      >
+    </div>
+
+    <button class="btn-primary" (click)="confirmarNovaSenha()">Salvar Nova Senha</button>
+
+    <button class="btn-secondary" (click)="etapaAtual = 'LOGIN'">Cancelar</button>
+  </div>
+  }
+
 </div>

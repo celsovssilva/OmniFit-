@@ -13,6 +13,10 @@ import { LoginRequest } from '../models/auth.models';
 export class Login {
   email = '';
   senha = '';
+  etapaAtual = 'LOGIN';
+  emailRecuperacao = '';
+  codigoPin = '';
+  novaSenha = '';
 
   constructor(
     private authService: AuthServices,
@@ -42,6 +46,45 @@ export class Login {
       },
       error: (erro) => {
         alert('E-mail ou palavra-passe incorretos.');
+      }
+    });
+  }
+  solicitarCodigo() {
+    this.authService.forgot({ email: this.emailRecuperacao }).subscribe({
+      next: (dados) => {
+        console.log('Resposta do backend:', dados);
+        this.etapaAtual = 'RESET_SENHA';
+      },
+      error: (erro) => {
+        console.error('O Angular reclamou do seguinte erro:', erro);
+
+        if (erro.status === 200) {
+          this.etapaAtual = 'RESET_SENHA';
+        } else {
+          alert('Erro! Abra o F12 e veja a aba Console.');
+        }
+      }
+    });
+  }
+  confirmarNovaSenha() {
+
+    const dadosReset = {
+      email: this.emailRecuperacao,
+      pin: this.codigoPin,
+      novaSenha: this.novaSenha
+    };
+
+    this.authService.reset(dadosReset).subscribe({
+      next: (resposta) => {
+        alert('Senha alterada com sucesso! Faça login com a sua nova senha.');
+
+        this.etapaAtual = 'LOGIN';
+
+        this.codigoPin = '';
+        this.novaSenha = '';
+      },
+      error: (erro) => {
+        alert('Erro ao redefinir a senha. Verifique se o código está correto e não expirou.');
       }
     });
   }
