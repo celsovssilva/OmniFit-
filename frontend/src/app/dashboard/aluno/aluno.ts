@@ -1,72 +1,66 @@
-import {Component, OnInit} from '@angular/core';
-import {CommonModule} from '@angular/common';
-import {FormsModule} from '@angular/forms';
-import {AlunoServices} from '../../services/aluno.services';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { AlunoServices } from '../../services/aluno.services';
+import { AuthServices } from '../../services/auth.services';
 
 @Component({
-  selector:'app-aluno',
-  standalone:true,
-  imports:[CommonModule,FormsModule],
-  templateUrl:'./aluno.html',
-  styleUrl:'./aluno.css'
+  selector: 'app-aluno',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './aluno.html',
+  styleUrl: './aluno.css'
 })
-export class Aluno implements OnInit{
+export class Aluno implements OnInit {
   treinosDoAluno: any[] = [];
   dietasDoAluno: any[] = [];
- constructor(private alunoService:AlunoServices) {}
+
+  constructor(
+    private alunoService: AlunoServices,
+    private authServices: AuthServices,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit() {
     this.alunoService.getTreinos().subscribe({
       next: (dados) => {
         console.log('TREINOS QUE CHEGARAM DO BACKEND:', dados);
         this.treinosDoAluno = dados;
+        this.cdr.markForCheck();
       },
-      error: (erro) => {
-        console.error('Erro ao buscar treinos:', erro);
-      }
-    })
+      error: (erro) => console.error('Erro ao buscar treinos:', erro)
+    });
+
     this.alunoService.getDietaForUsers().subscribe({
-      next: (dados2) => {
-        this.dietasDoAluno = dados2
+      next: (dados) => {
+        console.log('DIETAS QUE CHEGARAM DO BACKEND:', dados);
+        this.dietasDoAluno = dados;
+        this.cdr.markForCheck();
       },
-      error: (erro) => {
-        console.error('Erro ao buscar dietas:', erro);
-      }
-    })
-  }
-  baixarTreino(treinoId: number) {
-    this.alunoService.getDownloadTreino(treinoId).subscribe({
-      next: (dadosDoFicheiro) => {
-
-        const url = window.URL.createObjectURL(dadosDoFicheiro);
-        const link = document.createElement('a');
-        link.href= url;
-        link.download= `treino-${treinoId}.pdf`
-        link.click();
-        window.URL.revokeObjectURL(url);
-
-      },
-      error: (erro) => {
-        console.error('Erro ao baixar o treino:', erro);
-      }
+      error: (erro) => console.error('Erro ao buscar dietas:', erro)
     });
   }
 
-  baixarDieta(dietaId:number){
-   this.alunoService.getDownloadDieta(dietaId).subscribe({
-     next:(dadosArquivoDieta)=>{
-      const url = window.URL.createObjectURL(dadosArquivoDieta);
-      const link = document.createElement('a');
-      link.href= url;
-      link.download= `dieta-${dietaId}.pdf`
-       link.click();
-       window.URL.revokeObjectURL(url);
-     },
-     error: (erro) => {
-       console.error('Erro ao baixar o treino:', erro);
-     }
-   })
+  baixarTreino(treinoId: number) {
+    this.alunoService.getDownloadTreino(treinoId).subscribe({
+      next: (arquivo) => this.salvarArquivo(arquivo, `treino-${treinoId}.pdf`),
+      error: (erro) => console.error('Erro ao baixar o treino:', erro)
+    });
   }
 
+  baixarDieta(dietaId: number) {
+    this.alunoService.getDownloadDieta(dietaId).subscribe({
+      next: (arquivo) => this.salvarArquivo(arquivo, `dieta-${dietaId}.pdf`),
+      error: (erro) => console.error('Erro ao baixar a dieta:', erro)
+    });
+  }
 
+  private salvarArquivo(blob: Blob, nome: string) {
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = nome;
+    link.click();
+    window.URL.revokeObjectURL(url);
+  }
 }
