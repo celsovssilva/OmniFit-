@@ -1,9 +1,9 @@
 <!-- SISTEMA DE NOTIFICAÇÕES (TOASTS) -->
-@if (mensagem().texto) {
-<div class="toast-container" [ngClass]="mensagem().tipo">
+@if (mensagem.texto) {
+<div class="toast-container" [ngClass]="mensagem.tipo">
   <div class="toast-content">
-    <span class="toast-icon">{{ mensagem().tipo === 'sucesso' ? '✅' : '⚠️' }}</span>
-    <p>{{ mensagem().texto }}</p>
+    <span class="toast-icon">{{ mensagem.tipo === 'sucesso' ? '✅' : '⚠️' }}</span>
+    <p>{{ mensagem.texto }}</p>
   </div>
 </div>
 }
@@ -16,14 +16,13 @@
       <button class="btn-primary" (click)="abrirModalAluno()">+ Novo Aluno</button>
     </div>
 
-    @if (carregando()) {
+    @if (carregando) {
     <div class="loading-state">A carregar dados...</div>
     }
 
     <ul class="aluno-list">
-      <!-- Usar $index previne erros caso o aluno não tenha ID no momento -->
-      @for (aluno of meusAlunos(); track $index) {
-      <li [class.selecionado]="alunoSelecionado()?.id === aluno.id" (click)="selecionarAluno(aluno)">
+      @for (aluno of meusAlunos; track aluno.id) {
+      <li [class.selecionado]="alunoSelecionado?.id === aluno.id" (click)="selecionarAluno(aluno)">
         <div class="aluno-avatar">{{ aluno.nome.charAt(0) | uppercase }}</div>
         <div class="aluno-info">
           <strong>{{ aluno.nome }}</strong>
@@ -38,16 +37,19 @@
 
   <!-- PAINEL PRINCIPAL -->
   <main class="main-content">
-    @if (alunoSelecionado(); as alunoAtual) {
+    @if (alunoSelecionado) {
     <header class="aluno-header">
       <div class="perfil-info">
-        <h1>{{ alunoAtual.nome }}</h1>
-        <p>{{ alunoAtual.email }}</p>
-        @if (alunoAtual.peculiaridades) {
-        <div class="badge-peculiaridade">Nota: {{ alunoAtual.peculiaridades }}</div>
+        <h1>{{ alunoSelecionado.nome }}</h1>
+        <p>{{ alunoSelecionado.email }}</p>
+        @if (alunoSelecionado.peculiaridades) {
+        <div class="badge-peculiaridade">Nota: {{ alunoSelecionado.peculiaridades }}</div>
         }
       </div>
-      <button class="btn-danger-outline" (click)="removerAluno(alunoAtual.id)">Remover Aluno</button>
+      <div class="header-acoes">
+        <button class="btn-secondary" (click)="editarAluno(alunoSelecionado)">Editar Aluno</button>
+        <button class="btn-danger-outline" (click)="removerAluno(alunoSelecionado.id)">Remover Aluno</button>
+      </div>
     </header>
 
     <div class="dashboard-grid">
@@ -56,17 +58,31 @@
       <section class="dashboard-card">
         <div class="card-header">
           <h3>Treinos Prescritos</h3>
-          <button class="btn-secondary" (click)="mostrarModalTreino.set(true)">+ Criar Treino</button>
+          <button class="btn-secondary" (click)="abrirModalTreino()">+ Criar Treino</button>
         </div>
 
         <div class="grid-items">
-          @for (treino of treinosDoAluno(); track $index) {
+          @for (treino of treinosDoAluno; track treino.id) {
+          @let exercicios = treino.exerciciosRequests ?? treino.exercicios ?? [];
           <div class="item-box">
             <div class="item-detalhe">
-              <h4>Treino #{{ treino.id || $index + 1 }}</h4>
-              <p>{{ treino.exercicios?.length || treino.exerciciosRequests?.length || 0 }} Exercícios</p>
+              <h4>Treino #{{ treino.id }}</h4>
+              <p>{{ exercicios.length }} Exercícios</p>
             </div>
+
+            @if (exercicios.length) {
+            <ul class="exercicios-resumo">
+              @for (ex of exercicios; track $index) {
+              <li>
+                <strong>{{ ex.exercicio ?? ex.nome }}</strong>
+                <span>{{ ex.series }}x{{ ex.repeticoes }}</span>
+              </li>
+              }
+            </ul>
+            }
+
             <div class="item-acoes">
+              <button class="btn-icon" (click)="editarTreino(treino)">✏️ Editar</button>
               <button class="btn-icon" title="Gerar PDF na Base de Dados" (click)="gerarPdfTreino(treino.id)">⚙️ Gerar PDF</button>
               <button class="btn-icon text-danger" title="Excluir" (click)="excluirTreino(treino.id)">🗑️</button>
             </div>
@@ -81,21 +97,74 @@
       <section class="dashboard-card">
         <div class="card-header">
           <h3>Avaliações Físicas (Pollock 7)</h3>
-          <button class="btn-secondary" (click)="mostrarModalAvaliacao.set(true)">+ Nova Avaliação</button>
+          <button class="btn-secondary" (click)="abrirModalAvaliacao()">+ Nova Avaliação</button>
         </div>
 
         <div class="grid-items">
-          @for (av of avaliacoesDoAluno(); track $index) {
+          @for (av of avaliacoesDoAluno; track $index) {
+          @let a = av.atual ?? av;
+          @let c = av.comparacao ?? a.comparacao;
           <div class="item-box avaliacao-box">
             <div class="av-cabecalho">
-              <h4>{{ av.data | date:'dd/MM/yyyy' }}</h4>
-              <span class="av-peso">{{ av.pesoTotal || '--' }} kg</span>
+              <h4>{{ a.data | date:'dd/MM/yyyy' }}</h4>
+              <div>
+                <span class="av-peso">{{ a.pesoTotal }} kg</span>
+                @if (c) {
+                <small [class]="classeDelta(c.diferencaPeso, null)">{{ formatarDelta(c.diferencaPeso, ' kg') }}</small>
+                }
+              </div>
             </div>
+
             <div class="av-metricas">
-              <div class="metrica"><span>IMC</span><strong>{{ (av.medidas.imc | number:'1.1-2') || '--' }}</strong></div>
-              <div class="metrica"><span>Gordura</span><strong>{{ (av.percentualGordura | number:'1.1-2') || '--' }}%</strong></div>
-              <div class="metrica"><span>M. Magra</span><strong>{{ (av.medidas.massaMagra | number:'1.1-2') || '--' }} kg</strong></div>
-              <div class="metrica"><span>M. Gorda</span><strong>{{ (av.medidas.massaGorda | number:'1.1-2') || '--' }} kg</strong></div>
+              <div class="metrica">
+                <span>IMC</span>
+                <strong>{{ a.medidas?.imc | number:'1.1-2' }}</strong>
+                @if (c) {
+                <small [class]="classeDelta(c.diferencaImc, null)">{{ formatarDelta(c.diferencaImc) }}</small>
+                }
+              </div>
+              <div class="metrica">
+                <span>Gordura</span>
+                <strong>{{ a.percentualGordura | number:'1.1-2' }}%</strong>
+                @if (c) {
+                <small [class]="classeDelta(c.diferencaPercentualGordura, true)">{{ formatarDelta(c.diferencaPercentualGordura, '%') }}</small>
+                }
+              </div>
+              <div class="metrica">
+                <span>M. Magra</span>
+                <strong>{{ a.medidas?.massaMagra | number:'1.1-2' }} kg</strong>
+                @if (c) {
+                <small [class]="classeDelta(c.diferencaMassaMagra, false)">{{ formatarDelta(c.diferencaMassaMagra, ' kg') }}</small>
+                }
+              </div>
+              <div class="metrica">
+                <span>M. Gorda</span>
+                <strong>{{ a.medidas?.massaGorda | number:'1.1-2' }} kg</strong>
+                @if (c) {
+                <small [class]="classeDelta(c.diferencaMassaGorda, true)">{{ formatarDelta(c.diferencaMassaGorda, ' kg') }}</small>
+                }
+              </div>
+            </div>
+
+            @if (c) {
+            <details class="detalhes-comparacao">
+              <summary>Ver todas as diferenças</summary>
+              <div class="av-metricas">
+                @for (p of perimetros; track p.dif) {
+                <div class="metrica">
+                  <span>{{ p.rotulo }}</span>
+                  <strong>{{ a.medidas?.[p.medida] | number:'1.1-2' }} cm</strong>
+                  <small [class]="classeDelta(c[p.dif], null)">{{ formatarDelta(c[p.dif], ' cm') }}</small>
+                </div>
+                }
+              </div>
+            </details>
+            } @else {
+            <p class="sem-comparacao">Primeira avaliação, sem comparação.</p>
+            }
+
+            <div class="av-acoes">
+              <button class="btn-icon" (click)="editarAvaliacao(av)">✏️ Editar</button>
             </div>
           </div>
           } @empty {
@@ -115,11 +184,13 @@
   </main>
 </div>
 
+<!-- ================= MODAIS ================= -->
 
-@if (mostrarModalAluno()) {
+<!-- MODAL ALUNO (criar / editar) -->
+@if (mostrarModalAluno) {
 <div class="modal-backdrop">
   <div class="modal-box">
-    <h3>Registar Novo Aluno</h3>
+    <h3>{{ alunoEditandoId ? 'Editar Aluno' : 'Registar Novo Aluno' }}</h3>
     <form (ngSubmit)="salvarNovoAluno()" #alunoForm="ngForm">
       <div class="form-group">
         <label>Nome Completo</label>
@@ -132,7 +203,9 @@
       <div class="form-grid-2">
         <div class="form-group">
           <label>Palavra-passe</label>
-          <input type="password" name="senha" [(ngModel)]="novoAluno.senha" required minlength="6">
+          <input type="password" name="senha" [(ngModel)]="novoAluno.senha"
+                 [required]="!alunoEditandoId" [minlength]="alunoEditandoId ? 0 : 6"
+                 [placeholder]="alunoEditandoId ? 'Em branco = manter' : ''">
         </div>
         <div class="form-group">
           <label>Idade</label>
@@ -151,24 +224,30 @@
         <textarea name="peculiaridades" [(ngModel)]="novoAluno.peculiaridades" rows="2" placeholder="Ex: Dor no joelho direito"></textarea>
       </div>
       <div class="modal-acoes">
-        <button type="button" class="btn-ghost" (click)="mostrarModalAluno.set(false)">Cancelar</button>
-        <button type="submit" class="btn-primary" [disabled]="alunoForm.invalid || aGuardar()">Guardar Aluno</button>
+        <button type="button" class="btn-ghost" (click)="mostrarModalAluno = false">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="alunoForm.invalid || aGuardar">
+          {{ alunoEditandoId ? 'Guardar Alterações' : 'Guardar Aluno' }}
+        </button>
       </div>
     </form>
   </div>
 </div>
 }
 
-<!-- MODAL TREINO -->
-@if (mostrarModalTreino()) {
+<!-- MODAL TREINO (criar / editar, sempre para o aluno selecionado) -->
+@if (mostrarModalTreino) {
 <div class="modal-backdrop">
   <div class="modal-box modal-lg">
-    <h3>Novo Treino para {{ alunoSelecionado()?.nome }}</h3>
+    <h3>{{ treinoEditandoId ? 'Editar Treino #' + treinoEditandoId : 'Novo Treino' }}</h3>
+    <span class="destinatario">Para: {{ alunoSelecionado?.nome }}</span>
 
     <div class="exercicio-builder">
-      <input type="text" placeholder="Ex: Supino Reto" [(ngModel)]="exercicioTemp.exercicio">
-      <input type="number" placeholder="Séries" [(ngModel)]="exercicioTemp.series">
-      <input type="number" placeholder="Reps" [(ngModel)]="exercicioTemp.repeticoes">
+      <input type="text" placeholder="Ex: Supino Reto" [(ngModel)]="exercicioTemp.exercicio"
+             (keydown.enter)="adicionarExercicioAoTreino()">
+      <input type="number" placeholder="Séries" [(ngModel)]="exercicioTemp.series"
+             (keydown.enter)="adicionarExercicioAoTreino()">
+      <input type="number" placeholder="Reps" [(ngModel)]="exercicioTemp.repeticoes"
+             (keydown.enter)="adicionarExercicioAoTreino()">
       <button class="btn-secondary" (click)="adicionarExercicioAoTreino()">Adicionar</button>
     </div>
 
@@ -184,62 +263,64 @@
     </div>
 
     <div class="modal-acoes">
-      <button class="btn-ghost" (click)="mostrarModalTreino.set(false)">Cancelar</button>
-      <button class="btn-primary" [disabled]="novoTreino.exerciciosRequests.length === 0 || aGuardar()" (click)="salvarNovoTreino()">Guardar Treino</button>
+      <button class="btn-ghost" (click)="fecharModalTreino()">Cancelar</button>
+      <button class="btn-primary"
+              [disabled]="novoTreino.exerciciosRequests.length === 0 || aGuardar"
+              (click)="salvarNovoTreino()">
+        {{ treinoEditandoId ? 'Guardar Alterações' : 'Publicar Treino' }}
+      </button>
     </div>
   </div>
 </div>
 }
 
-<!-- MODAL AVALIAÇÃO -->
-@if (mostrarModalAvaliacao()) {
+<!-- MODAL AVALIAÇÃO (criar / editar) -->
+@if (mostrarModalAvaliacao) {
 <div class="modal-backdrop">
   <div class="modal-box modal-xl">
-    <h3>Avaliação Física (Pollock 7)</h3>
+    <h3>{{ avaliacaoEditandoId ? 'Editar Avaliação Física' : 'Avaliação Física (Pollock 7)' }}</h3>
     <div class="form-scroll-area">
 
       <div class="form-section">
         <h4>Dados Gerais</h4>
         <div class="form-grid-3">
           <div class="form-group"><label>Data</label><input type="date" [(ngModel)]="novaAvaliacao.data"></div>
-          <div class="form-group"><label>Peso (kg)</label><input type="number" [(ngModel)]="novaAvaliacao.pesoTotal"></div>
-          <div class="form-group"><label>Altura (m)</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.altura"></div>
+          <div class="form-group"><label>Peso (kg)</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.pesoTotal"></div>
+          <div class="form-group"><label>Altura (m)</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.altura"></div>
         </div>
       </div>
 
       <div class="form-section">
         <h4>Dobras Cutâneas (mm)</h4>
         <div class="form-grid-4">
-          <div class="form-group"><label>Peitoral</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraPeitoral"></div>
-          <div class="form-group"><label>Axilar Média</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraAxilarMedia"></div>
-          <div class="form-group"><label>Tríceps</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraTriceps"></div>
-          <div class="form-group"><label>Subescapular</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraSubescapular"></div>
-          <div class="form-group"><label>Abdominal</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraAbdominal"></div>
-          <div class="form-group"><label>Suprailíaca</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraSuprailiaca"></div>
-          <div class="form-group"><label>Coxa</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraCoxa"></div>
+          <div class="form-group"><label>Peitoral</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraPeitoral"></div>
+          <div class="form-group"><label>Axilar Média</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraAxilarMedia"></div>
+          <div class="form-group"><label>Tríceps</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraTriceps"></div>
+          <div class="form-group"><label>Subescapular</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraSubescapular"></div>
+          <div class="form-group"><label>Abdominal</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraAbdominal"></div>
+          <div class="form-group"><label>Suprailíaca</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraSuprailiaca"></div>
+          <div class="form-group"><label>Coxa</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraCoxa"></div>
         </div>
       </div>
 
       <div class="form-section">
-        <h4>Perímetros / Circunferências (cm)</h4>
+        <h4>Perímetros / Circunferências (cm) - Opcional</h4>
         <div class="form-grid-4">
-          <div class="form-group"><label>Tórax</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.torax"></div>
-          <div class="form-group"><label>Cintura</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.cintura"></div>
-          <div class="form-group"><label>Abdómen</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.abdomen"></div>
-          <div class="form-group"><label>Quadril</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.quadril"></div>
-          <div class="form-group"><label>Braço Dir.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.bracoDireito"></div>
-          <div class="form-group"><label>Braço Esq.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.bracoEsquerdo"></div>
-          <div class="form-group"><label>Coxa Dir.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.coxaDireita"></div>
-          <div class="form-group"><label>Coxa Esq.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.coxaEsquerda"></div>
-          <div class="form-group"><label>Panturrilha Dir.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.panturrilhaDireita"></div>
-          <div class="form-group"><label>Panturrilha Esq.</label><input type="number" [(ngModel)]="novaAvaliacao.medidas.panturrilhaEsquerda"></div>
+          @for (p of perimetros; track p.medida) {
+          <div class="form-group">
+            <label>{{ p.rotulo }}</label>
+            <input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas[p.medida]">
+          </div>
+          }
         </div>
       </div>
 
     </div>
     <div class="modal-acoes">
-      <button class="btn-ghost" (click)="mostrarModalAvaliacao.set(false)">Cancelar</button>
-      <button class="btn-primary" [disabled]="aGuardar() || !avaliacaoValida()" (click)="salvarNovaAvaliacao()">Calcular & Guardar</button>
+      <button class="btn-ghost" (click)="fecharModalAvaliacao()">Cancelar</button>
+      <button class="btn-primary" [disabled]="aGuardar" (click)="salvarNovaAvaliacao()">
+        {{ avaliacaoEditandoId ? 'Guardar Alterações' : 'Calcular & Guardar' }}
+      </button>
     </div>
   </div>
 </div>

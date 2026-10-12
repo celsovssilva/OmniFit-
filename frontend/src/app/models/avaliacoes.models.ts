@@ -72,22 +72,22 @@ export interface MedidasResponse extends MedidasRequest {
 
 
 export interface ComparacaoResponse {
-  pesoTotal: number;
-  altura: number;
-  percentualGordura: number;
-  massaMagra: number;
-  massaGorda: number;
-  imc: number;
-  torax: number;
-  cintura: number;
-  abdomen: number;
-  quadril: number;
-  bracoDireito: number;
-  bracoEsquerdo: number;
-  coxaDireita: number;
-  coxaEsquerda: number;
-  panturrilhaDireita: number;
-  panturrilhaEsquerda: number;
+  DiferencaPeso: number;
+  DiferencaAltura: number;
+  DiferencaPercentualGordura: number;
+  DiferencaMassaMagra: number;
+  DiferencaMassaGorda: number;
+  DiferencaImc: number;
+  DiferencaTorax: number;
+  DiferencaCintura: number;
+  DiferencaAbdomen: number;
+  DiferencaQuadril: number;
+  DiferencaBracoDireito: number;
+  DiferencaBracoEsquerdo: number;
+  DiferencaCoxaDireita: number;
+  DiferencaCoxaEsquerda: number;
+  DiferencaPanturrilhaDireita: number;
+  DiferencaPanturrilhaEsquerda: number;
 }
 
 

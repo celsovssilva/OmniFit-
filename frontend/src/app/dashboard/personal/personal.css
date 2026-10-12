@@ -96,3 +96,45 @@ input:focus, select:focus, textarea:focus { border-color: var(--primary); box-sh
 .toast-container.erro .toast-content { border-left-color: var(--danger); }
 .toast-icon { font-size: 1.2rem; }
 @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+/* --- ESTADOS (carregando, vazio, boas-vindas) --- */
+.loading-state, .empty-state { padding: 24px; text-align: center; color: var(--text-muted); }
+.text-muted { color: var(--text-muted); }
+.text-center { text-align: center; }
+.tela-boas-vindas { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text-muted); gap: 8px; }
+.tela-boas-vindas h2 { color: var(--text-main); }
+.icone-gigante { font-size: 4rem; }
+.form-scroll-area { max-height: 60vh; overflow-y: auto; padding-right: 4px; }
+.toast-content p { color: var(--text-main); }
+
+/* --- AÇÕES DO CABEÇALHO DO ALUNO --- */
+.header-acoes { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* --- TREINO: RESUMO DOS EXERCÍCIOS NO CARD --- */
+.exercicios-resumo { list-style: none; margin-top: 12px; border-top: 1px solid var(--border); }
+.exercicios-resumo li { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: var(--text-main); }
+.exercicios-resumo li span { color: var(--text-muted); white-space: nowrap; }
+
+/* --- MODAL DE TREINO: DESTINATÁRIO --- */
+.destinatario { display: inline-block; margin-bottom: 20px; padding: 6px 12px; background: #eff6ff; color: var(--primary-hover); border-radius: 20px; font-size: 0.85rem; font-weight: 500; }
+.exercicio-builder button { padding: 10px 16px; white-space: nowrap; }
+
+/* --- RESPONSIVO --- */
+@media (max-width: 900px) {
+  .dashboard-container { flex-direction: column; height: auto; min-height: 100vh; overflow: visible; }
+  .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 40vh; }
+  .main-content { padding: 20px; }
+  .form-grid-3, .form-grid-4 { grid-template-columns: 1fr 1fr; }
+  .grid-items { grid-template-columns: 1fr; }
+}
+
+/* --- COMPARAÇÃO ENTRE AVALIAÇÕES --- */
+.delta { font-size: 0.8rem; font-weight: 600; margin-top: 2px; display: block; }
+.delta.bom { color: var(--success); }
+.delta.ruim { color: var(--danger); }
+.delta.neutro { color: var(--text-muted); }
+.av-cabecalho .delta { text-align: right; }
+.av-acoes { margin-top: 16px; display: flex; justify-content: flex-end; }
+.detalhes-comparacao { margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
+.detalhes-comparacao summary { cursor: pointer; font-size: 0.85rem; font-weight: 500; color: var(--primary); margin-bottom: 12px; }
+.sem-comparacao { margin-top: 12px; font-size: 0.85rem; color: var(--text-muted); font-style: italic; }
