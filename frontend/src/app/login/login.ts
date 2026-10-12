@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
+
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthServices } from '../services/auth.services';
 import { LoginRequest } from '../models/auth.models';
+import { Component, ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-login',
@@ -20,7 +21,8 @@ export class Login {
 
   constructor(
     private authService: AuthServices,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   fazerLogin() {
@@ -54,12 +56,15 @@ export class Login {
       next: (dados) => {
         console.log('Resposta do backend:', dados);
         this.etapaAtual = 'RESET_SENHA';
+
+
+        this.cdr.detectChanges();
       },
       error: (erro) => {
         console.error('O Angular reclamou do seguinte erro:', erro);
-
         if (erro.status === 200) {
           this.etapaAtual = 'RESET_SENHA';
+          this.cdr.detectChanges(); // 👉 Coloque aqui também por garantia
         } else {
           alert('Erro! Abra o F12 e veja a aba Console.');
         }
