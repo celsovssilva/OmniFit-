@@ -10,4 +10,5 @@ public interface AvaliacoesFisicasService {
     AvaliacoesFisicasResponse create(AvaliacoesFisicasRequest request, Long alunoId);
     AvaliacoesFisicasResponse update(AvaliacoesFisicasRequest request,Long id);
     List<AvaliacoesFisicasResponse> getForUserAvaliacao(Long alunoId);
+    List<AvaliacoesFisicasResponse> getForUser(Long userId);
 }

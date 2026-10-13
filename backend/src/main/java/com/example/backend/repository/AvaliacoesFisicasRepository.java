@@ -11,5 +11,6 @@ import java.util.List;
 @Repository
 public interface AvaliacoesFisicasRepository extends JpaRepository<AvaliacoesFisicas,Long> {
     List<AvaliacoesFisicas> findByAluno_IdOrderByDataDesc(Long alunoId);
+    List<AvaliacoesFisicas> findByAlunoId(Long alunoId);
 
 }

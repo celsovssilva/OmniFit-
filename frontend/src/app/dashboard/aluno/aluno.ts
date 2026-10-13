@@ -14,6 +14,7 @@ import { AuthServices } from '../../services/auth.services';
 export class Aluno implements OnInit {
   treinosDoAluno: any[] = [];
   dietasDoAluno: any[] = [];
+  avaliacoesDoaluno: any[] = [];
 
   constructor(
     private alunoService: AlunoServices,
@@ -24,7 +25,6 @@ export class Aluno implements OnInit {
   ngOnInit() {
     this.alunoService.getTreinos().subscribe({
       next: (dados) => {
-        console.log('TREINOS QUE CHEGARAM DO BACKEND:', dados);
         this.treinosDoAluno = dados;
         this.cdr.markForCheck();
       },
@@ -39,6 +39,13 @@ export class Aluno implements OnInit {
       },
       error: (erro) => console.error('Erro ao buscar dietas:', erro)
     });
+    this.alunoService.getAvaliacoes().subscribe({
+      next:(dados) => {
+        this.avaliacoesDoaluno = dados;
+        this.cdr.markForCheck();
+      },
+      error: (erro) => console.error('Erro ao buscar avaliações:', erro)
+    })
   }
 
   baixarTreino(treinoId: number) {
@@ -62,5 +69,16 @@ export class Aluno implements OnInit {
     link.download = nome;
     link.click();
     window.URL.revokeObjectURL(url);
+  }
+  isPositivo(valor: number): boolean {
+    return valor > 0;
+  }
+  getAbs(valor: number): number {
+    return Math.abs(valor || 0);
+  }
+
+
+  toggleExpandir(av: any) {
+    av.expandido = !av.expandido;
   }
 }

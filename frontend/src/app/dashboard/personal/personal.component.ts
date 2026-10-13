@@ -17,7 +17,7 @@ export class PersonalComponent implements OnInit {
   treinosDoAluno: any[] = [];
   avaliacoesDoAluno: any[] = [];
 
-  // Comparação entre avaliações (usados no template)
+
   perimetros = PERIMETROS;
   formatarDelta = formatarDelta;
   classeDelta = classeDelta;
@@ -30,7 +30,6 @@ export class PersonalComponent implements OnInit {
   aGuardar = false;
   mensagem = { tipo: '', texto: '' };
 
-  // Controle de edição (null = criando)
   alunoEditandoId: number | null = null;
   treinoEditandoId: number | null = null;
   avaliacaoEditandoId: number | null = null;
@@ -60,7 +59,7 @@ export class PersonalComponent implements OnInit {
     }, 4000);
   }
 
-  // ================= ALUNOS =================
+
 
   carregarAlunos() {
     this.carregando = true;
@@ -160,7 +159,6 @@ export class PersonalComponent implements OnInit {
     }
   }
 
-  // ================= TREINOS =================
 
   carregarTreinos(alunoId: number) {
     this.personalService.getTreinosDoAluno(alunoId).subscribe({
@@ -210,7 +208,7 @@ export class PersonalComponent implements OnInit {
     this.novoTreino.exerciciosRequests.splice(index, 1);
   }
 
-  /** Cria ou atualiza o treino, sempre vinculado ao aluno selecionado. */
+
   salvarNovoTreino() {
     if (!this.alunoSelecionado) {
       this.mostrarMensagem('erro', 'Selecione um aluno antes de prescrever o treino.');
@@ -268,7 +266,7 @@ export class PersonalComponent implements OnInit {
     });
   }
 
-  // ================= AVALIAÇÕES =================
+
 
   carregarAvaliacoes(alunoId: number) {
     this.personalService.getAvaliacoes(alunoId).subscribe({
@@ -290,7 +288,6 @@ export class PersonalComponent implements OnInit {
     const atual = av.atual ?? av;
     const base = this.resetarFormAvaliacao();
 
-    // Copia só os campos do formulário (ignora imc, massaMagra etc. calculados pelo servidor)
     const medidas: any = {};
     for (const chave of Object.keys(base.medidas)) {
       medidas[chave] = atual.medidas?.[chave] ?? null;
@@ -338,7 +335,6 @@ export class PersonalComponent implements OnInit {
     });
   }
 
-  // ================= AUXILIARES =================
 
   private alunoVazio() {
     return {

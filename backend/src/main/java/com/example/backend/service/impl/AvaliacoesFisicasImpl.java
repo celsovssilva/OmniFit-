@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -122,6 +124,21 @@ public class AvaliacoesFisicasImpl implements AvaliacoesFisicasService {
 
         }
             return listaDeRespostas;
+    }
+
+    @Override
+    public List<AvaliacoesFisicasResponse> getForUser(Long alunoId) {
+        List<AvaliacoesFisicas> av = avaliacoesFisicasRepository.findByAlunoId(alunoId);
+        av.sort(Comparator.comparing(AvaliacoesFisicas::getData));
+        List<AvaliacoesFisicasResponse> responses = new ArrayList<>();
+        for(int i = 0; i< av.size(); i++){
+            AvaliacoesFisicas atual = av.get(i);
+                AvaliacoesFisicas anterior = (i>0) ? av.get(i-1) : null;
+                responses.add(new AvaliacoesFisicasResponse(atual,anterior));
+        }
+        Collections.reverse(responses);
+
+        return responses;
     }
 
     private void calcularComposicaoCorporal7Dobras(AvaliacoesFisicas avaliacao, int idade, String sexo) {

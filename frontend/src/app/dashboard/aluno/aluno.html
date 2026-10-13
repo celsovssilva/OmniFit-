@@ -1,40 +1,142 @@
 <div class="container-aluno">
 
-  <!-- SESSÃO DE TREINOS -->
   <section class="sessao-treinos">
     <h2>Meus Treinos</h2>
-
-    <!-- Lógica de repetição para os treinos -->
     @for (treino of treinosDoAluno; track treino.id) {
     <div class="item-card">
-      <!-- Usamos o treino.id para gerar um título genérico já que não há 'nome' -->
       <p><strong>Treino #{{ treino.id }}</strong></p>
-
       <button (click)="baixarTreino(treino.id)">📥 Baixar Treino</button>
     </div>
     } @empty {
-    <p>Nenhum treino disponível no momento.</p>
+    <p class="empty-msg">Nenhum treino disponível no momento.</p>
     }
   </section>
 
   <hr>
 
-  <!-- SESSÃO DE DIETAS -->
   <section class="sessao-dietas">
     <h2>Minhas Dietas</h2>
-
-    <!-- Lógica de repetição para as dietas -->
     @for (dieta of dietasDoAluno; track dieta.id) {
     <div class="item-card">
-      <!-- Substitua 'dieta.nome' pela propriedade correta que vem do seu backend -->
       <p><strong>Dieta:</strong> {{ dieta.id}}</p>
-
-      <!-- Botão com a lógica de clique chamando a função -->
       <button (click)="baixarDieta(dieta.id)">📥 Baixar Dieta</button>
     </div>
     } @empty {
-    <p>Nenhuma dieta disponível no momento.</p>
+    <p class="empty-msg">Nenhuma dieta disponível no momento.</p>
     }
+  </section>
+
+  <hr>
+
+  <section class="sessao-avaliacoes">
+    <h2>Minha Evolução Física 📈</h2>
+    <div class="cards-grid">
+      @for (av of avaliacoesDoaluno; track av.data) {
+      <div class="avaliacao-card-personal">
+
+        <div class="card-header-personal">
+          <span class="data-av">{{ av.data | date:'dd/MM/yyyy' }}</span>
+          <div class="peso-destaque">
+            <span class="peso-valor">{{ av.pesoTotal | number:'1.1-2' }} kg</span>
+            @if (av.comparacao && av.comparacao.pesoTotal !== 0) {
+            <span class="diff-neutra">
+                  {{ isPositivo(av.comparacao.pesoTotal) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.pesoTotal) | number:'1.1-2' }} kg
+                </span>
+            }
+          </div>
+        </div>
+
+        <div class="grid-metricas-personal">
+
+          <div class="col-metrica">
+            <span class="metrica-title">IMC</span>
+            <span class="metrica-val">{{ av.medidas.imc | number:'1.1-2' }}</span>
+            @if (av.comparacao && av.comparacao.imc !== 0) {
+            <span class="diff-neutra">
+                  {{ isPositivo(av.comparacao.imc) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.imc) | number:'1.1-2' }}
+                </span>
+            }
+          </div>
+
+          <div class="col-metrica">
+            <span class="metrica-title">GORDURA</span>
+            <span class="metrica-val">{{ av.percentualGordura | number:'1.1-2' }}%</span>
+            @if (av.comparacao && av.comparacao.percentualGordura !== 0) {
+            <span [class.diff-boa]="!isPositivo(av.comparacao.percentualGordura)" [class.diff-ruim]="isPositivo(av.comparacao.percentualGordura)">
+                  {{ isPositivo(av.comparacao.percentualGordura) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.percentualGordura) | number:'1.1-2' }}%
+                </span>
+            }
+          </div>
+
+          <div class="col-metrica">
+            <span class="metrica-title">M. MAGRA</span>
+            <span class="metrica-val">{{ av.medidas.massaMagra | number:'1.1-2' }} kg</span>
+            @if (av.comparacao && av.comparacao.massaMagra !== 0) {
+            <span [class.diff-boa]="isPositivo(av.comparacao.massaMagra)" [class.diff-ruim]="!isPositivo(av.comparacao.massaMagra)">
+                  {{ isPositivo(av.comparacao.massaMagra) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.massaMagra) | number:'1.1-2' }} kg
+                </span>
+            }
+          </div>
+
+          <div class="col-metrica">
+            <span class="metrica-title">M. GORDA</span>
+            <span class="metrica-val">{{ av.medidas.massaGorda | number:'1.1-2' }} kg</span>
+            @if (av.comparacao && av.comparacao.massaGorda !== 0) {
+            <span [class.diff-boa]="!isPositivo(av.comparacao.massaGorda)" [class.diff-ruim]="isPositivo(av.comparacao.massaGorda)">
+                  {{ isPositivo(av.comparacao.massaGorda) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.massaGorda) | number:'1.1-2' }} kg
+                </span>
+            }
+          </div>
+
+        </div>
+
+        @if (av.comparacao) {
+        <div class="toggle-link" (click)="toggleExpandir(av)">
+          {{ av.expandido ? '▼ Ocultar diferenças secundárias' : '▶ Ver todas as diferenças' }}
+        </div>
+        } @else {
+        <div class="sem-comparacao">
+          <em>Primeira avaliação, sem comparação.</em>
+        </div>
+        }
+
+        @if (av.expandido) {
+        <div class="medidas-secundarias">
+          <div class="medida-item">
+            <span class="medida-nome">Tórax:</span>
+            <span class="medida-val-mini">{{ av.medidas.torax | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.torax !== 0) {
+            <span class="diff-neutra" style="font-size: 0.75rem;">
+                    ({{ isPositivo(av.comparacao.torax) ? '+' : '-' }}{{ getAbs(av.comparacao.torax) | number:'1.1-2' }} cm)
+                  </span>
+            }
+          </div>
+          <div class="medida-item">
+            <span class="medida-nome">Cintura:</span>
+            <span class="medida-val-mini">{{ av.medidas.cintura | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.cintura !== 0) {
+            <span class="diff-neutra" style="font-size: 0.75rem;">
+                    ({{ isPositivo(av.comparacao.cintura) ? '+' : '-' }}{{ getAbs(av.comparacao.cintura) | number:'1.1-2' }} cm)
+                  </span>
+            }
+          </div>
+          <div class="medida-item">
+            <span class="medida-nome">Abdómen:</span>
+            <span class="medida-val-mini">{{ av.medidas.abdomen | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.abdomen !== 0) {
+            <span class="diff-neutra" style="font-size: 0.75rem;">
+                    ({{ isPositivo(av.comparacao.abdomen) ? '+' : '-' }}{{ getAbs(av.comparacao.abdomen) | number:'1.1-2' }} cm)
+                  </span>
+            }
+          </div>
+        </div>
+        }
+
+      </div>
+      } @empty {
+      <p class="empty-msg">Nenhuma avaliação física registada no momento.</p>
+      }
+    </div>
   </section>
 
 </div>

@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.entity.User;
 import com.example.backend.request.AvaliacoesFisicasRequest;
 import com.example.backend.response.AvaliacoesFisicasResponse;
+import com.example.backend.response.TreinoResponse;
 import com.example.backend.service.AvaliacoesFisicasService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -29,6 +30,14 @@ public class AvaliacoesFisicasController {
     @GetMapping("/getUsersAvaliacoes/{alunoId}")
     public List<AvaliacoesFisicasResponse> getAvaliacoesDoAluno(@PathVariable Long alunoId) {
         return avaliacoesFisicasService.getForUserAvaliacao(alunoId);
+    }
+    @GetMapping("/getAvaliacoesForUsers")
+    public List<AvaliacoesFisicasResponse> getAv(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+
+        List<AvaliacoesFisicasResponse> av = avaliacoesFisicasService.getForUser(user.getId());
+
+        return av;
     }
 }
 

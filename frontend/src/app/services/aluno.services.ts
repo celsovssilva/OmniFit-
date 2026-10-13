@@ -28,4 +28,7 @@ getDownloadDieta(dietaId:number):Observable<Blob>{
     return this.http.get(`${this.apiUrlDieta}/download/${dietaId}`,{responseType:'blob'});
 }
 
+  getAvaliacoes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrlAv}/getAvaliacoesForUsers`);
+  }
 }
