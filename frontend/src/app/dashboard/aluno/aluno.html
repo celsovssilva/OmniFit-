@@ -38,9 +38,9 @@
           <span class="data-av">{{ av.data | date:'dd/MM/yyyy' }}</span>
           <div class="peso-destaque">
             <span class="peso-valor">{{ av.pesoTotal | number:'1.1-2' }} kg</span>
-            @if (av.comparacao && av.comparacao.pesoTotal !== 0) {
+            @if (av.comparacao && av.comparacao.diferencaPeso !== 0) {
             <span class="diff-neutra">
-                  {{ isPositivo(av.comparacao.pesoTotal) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.pesoTotal) | number:'1.1-2' }} kg
+                  {{ isPositivo(av.comparacao.diferencaPeso) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaPeso) | number:'1.1-2' }} kg
                 </span>
             }
           </div>
@@ -51,9 +51,9 @@
           <div class="col-metrica">
             <span class="metrica-title">IMC</span>
             <span class="metrica-val">{{ av.medidas.imc | number:'1.1-2' }}</span>
-            @if (av.comparacao && av.comparacao.imc !== 0) {
+            @if (av.comparacao && av.comparacao.diferencaImc !== 0) {
             <span class="diff-neutra">
-                  {{ isPositivo(av.comparacao.imc) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.imc) | number:'1.1-2' }}
+                  {{ isPositivo(av.comparacao.diferencaImc) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaImc) | number:'1.1-2' }}
                 </span>
             }
           </div>
@@ -61,9 +61,9 @@
           <div class="col-metrica">
             <span class="metrica-title">GORDURA</span>
             <span class="metrica-val">{{ av.percentualGordura | number:'1.1-2' }}%</span>
-            @if (av.comparacao && av.comparacao.percentualGordura !== 0) {
-            <span [class.diff-boa]="!isPositivo(av.comparacao.percentualGordura)" [class.diff-ruim]="isPositivo(av.comparacao.percentualGordura)">
-                  {{ isPositivo(av.comparacao.percentualGordura) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.percentualGordura) | number:'1.1-2' }}%
+            @if (av.comparacao && av.comparacao.diferencaPercentualGordura !== 0) {
+            <span [class.diff-boa]="!isPositivo(av.comparacao.diferencaPercentualGordura)" [class.diff-ruim]="isPositivo(av.comparacao.diferencaPercentualGordura)">
+                  {{ isPositivo(av.comparacao.diferencaPercentualGordura) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaPercentualGordura) | number:'1.1-2' }}%
                 </span>
             }
           </div>
@@ -71,9 +71,9 @@
           <div class="col-metrica">
             <span class="metrica-title">M. MAGRA</span>
             <span class="metrica-val">{{ av.medidas.massaMagra | number:'1.1-2' }} kg</span>
-            @if (av.comparacao && av.comparacao.massaMagra !== 0) {
-            <span [class.diff-boa]="isPositivo(av.comparacao.massaMagra)" [class.diff-ruim]="!isPositivo(av.comparacao.massaMagra)">
-                  {{ isPositivo(av.comparacao.massaMagra) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.massaMagra) | number:'1.1-2' }} kg
+            @if (av.comparacao && av.comparacao.diferencaMassaMagra !== 0) {
+            <span [class.diff-boa]="isPositivo(av.comparacao.diferencaMassaMagra)" [class.diff-ruim]="!isPositivo(av.comparacao.diferencaMassaMagra)">
+                  {{ isPositivo(av.comparacao.diferencaMassaMagra) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaMassaMagra) | number:'1.1-2' }} kg
                 </span>
             }
           </div>
@@ -81,9 +81,9 @@
           <div class="col-metrica">
             <span class="metrica-title">M. GORDA</span>
             <span class="metrica-val">{{ av.medidas.massaGorda | number:'1.1-2' }} kg</span>
-            @if (av.comparacao && av.comparacao.massaGorda !== 0) {
-            <span [class.diff-boa]="!isPositivo(av.comparacao.massaGorda)" [class.diff-ruim]="isPositivo(av.comparacao.massaGorda)">
-                  {{ isPositivo(av.comparacao.massaGorda) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.massaGorda) | number:'1.1-2' }} kg
+            @if (av.comparacao && av.comparacao.diferencaMassaGorda !== 0) {
+            <span [class.diff-boa]="!isPositivo(av.comparacao.diferencaMassaGorda)" [class.diff-ruim]="isPositivo(av.comparacao.diferencaMassaGorda)">
+                  {{ isPositivo(av.comparacao.diferencaMassaGorda) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaMassaGorda) | number:'1.1-2' }} kg
                 </span>
             }
           </div>
@@ -101,34 +101,88 @@
         }
 
         @if (av.expandido) {
-        <div class="medidas-secundarias">
-          <div class="medida-item">
-            <span class="medida-nome">Tórax:</span>
-            <span class="medida-val-mini">{{ av.medidas.torax | number:'1.1-2' }} cm</span>
-            @if (av.comparacao && av.comparacao.torax !== 0) {
-            <span class="diff-neutra" style="font-size: 0.75rem;">
-                    ({{ isPositivo(av.comparacao.torax) ? '+' : '-' }}{{ getAbs(av.comparacao.torax) | number:'1.1-2' }} cm)
-                  </span>
+        <div class="grid-metricas-personal grid-secundaria">
+
+          <div class="col-metrica">
+            <span class="metrica-title">TÓRAX</span>
+            <span class="metrica-val">{{ av.medidas.torax | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.diferencaTorax !== 0) {
+            <span class="diff-neutra">{{ isPositivo(av.comparacao.diferencaTorax) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaTorax) | number:'1.1-2' }} cm</span>
             }
           </div>
-          <div class="medida-item">
-            <span class="medida-nome">Cintura:</span>
-            <span class="medida-val-mini">{{ av.medidas.cintura | number:'1.1-2' }} cm</span>
-            @if (av.comparacao && av.comparacao.cintura !== 0) {
-            <span class="diff-neutra" style="font-size: 0.75rem;">
-                    ({{ isPositivo(av.comparacao.cintura) ? '+' : '-' }}{{ getAbs(av.comparacao.cintura) | number:'1.1-2' }} cm)
-                  </span>
+
+          <div class="col-metrica">
+            <span class="metrica-title">CINTURA</span>
+            <span class="metrica-val">{{ av.medidas.cintura | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.diferencaCintura !== 0) {
+            <span class="diff-neutra">{{ isPositivo(av.comparacao.diferencaCintura) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaCintura) | number:'1.1-2' }} cm</span>
             }
           </div>
-          <div class="medida-item">
-            <span class="medida-nome">Abdómen:</span>
-            <span class="medida-val-mini">{{ av.medidas.abdomen | number:'1.1-2' }} cm</span>
-            @if (av.comparacao && av.comparacao.abdomen !== 0) {
-            <span class="diff-neutra" style="font-size: 0.75rem;">
-                    ({{ isPositivo(av.comparacao.abdomen) ? '+' : '-' }}{{ getAbs(av.comparacao.abdomen) | number:'1.1-2' }} cm)
-                  </span>
+
+          <div class="col-metrica">
+            <span class="metrica-title">ABDÓMEN</span>
+            <span class="metrica-val">{{ av.medidas.abdomen | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.diferencaAbdomen !== 0) {
+            <span class="diff-neutra">{{ isPositivo(av.comparacao.diferencaAbdomen) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaAbdomen) | number:'1.1-2' }} cm</span>
             }
           </div>
+
+          <div class="col-metrica">
+            <span class="metrica-title">QUADRIL</span>
+            <span class="metrica-val">{{ av.medidas.quadril | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.diferencaQuadril !== 0) {
+            <span class="diff-neutra">{{ isPositivo(av.comparacao.diferencaQuadril) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaQuadril) | number:'1.1-2' }} cm</span>
+            }
+          </div>
+
+          <div class="col-metrica">
+            <span class="metrica-title">BRAÇO DIR.</span>
+            <span class="metrica-val">{{ av.medidas.bracoDireito | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.diferencaBracoDireito !== 0) {
+            <span class="diff-neutra">{{ isPositivo(av.comparacao.diferencaBracoDireito) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaBracoDireito) | number:'1.1-2' }} cm</span>
+            }
+          </div>
+
+          <div class="col-metrica">
+            <span class="metrica-title">BRAÇO ESQ.</span>
+            <span class="metrica-val">{{ av.medidas.bracoEsquerdo | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.diferencaBracoEsquerdo !== 0) {
+            <span class="diff-neutra">{{ isPositivo(av.comparacao.diferencaBracoEsquerdo) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaBracoEsquerdo) | number:'1.1-2' }} cm</span>
+            }
+          </div>
+
+          <div class="col-metrica">
+            <span class="metrica-title">COXA DIR.</span>
+            <span class="metrica-val">{{ av.medidas.coxaDireita | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.diferencaCoxaDireita !== 0) {
+            <span class="diff-neutra">{{ isPositivo(av.comparacao.diferencaCoxaDireita) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaCoxaDireita) | number:'1.1-2' }} cm</span>
+            }
+          </div>
+
+          <div class="col-metrica">
+            <span class="metrica-title">COXA ESQ.</span>
+            <span class="metrica-val">{{ av.medidas.coxaEsquerda | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.diferencaCoxaEsquerda !== 0) {
+            <span class="diff-neutra">{{ isPositivo(av.comparacao.diferencaCoxaEsquerda) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaCoxaEsquerda) | number:'1.1-2' }} cm</span>
+            }
+          </div>
+
+          <div class="col-metrica">
+            <span class="metrica-title">PANTURRILHA DIR.</span>
+            <span class="metrica-val">{{ av.medidas.panturrilhaDireita | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.diferencaPanturrilhaDireita !== 0) {
+            <span class="diff-neutra">{{ isPositivo(av.comparacao.diferencaPanturrilhaDireita) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaPanturrilhaDireita) | number:'1.1-2' }} cm</span>
+            }
+          </div>
+
+          <div class="col-metrica">
+            <span class="metrica-title">PANTURRILHA ESQ.</span>
+            <span class="metrica-val">{{ av.medidas.panturrilhaEsquerda | number:'1.1-2' }} cm</span>
+            @if (av.comparacao && av.comparacao.diferencaPanturrilhaEsquerda !== 0) {
+            <span class="diff-neutra">{{ isPositivo(av.comparacao.diferencaPanturrilhaEsquerda) ? '▲ +' : '▼ -' }}{{ getAbs(av.comparacao.diferencaPanturrilhaEsquerda) | number:'1.1-2' }} cm</span>
+            }
+          </div>
+
         </div>
         }
 

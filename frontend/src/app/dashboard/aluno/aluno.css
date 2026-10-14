@@ -127,6 +127,11 @@ hr {
   margin-bottom: 20px;
 }
 
+.grid-secundaria {
+  margin-top: 20px;
+  padding-top: 20px;
+}
+
 .col-metrica {
   display: flex;
   flex-direction: column;
@@ -182,37 +187,6 @@ hr {
 .sem-comparacao {
   color: #94a3b8;
   font-size: 0.85rem;
-}
-
-.medidas-secundarias {
-  margin-top: 20px;
-  padding-top: 20px;
-  border-top: 1px dashed #e2e8f0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.medida-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: #f8fafc;
-  padding: 6px 12px;
-  border-radius: 20px;
-  border: 1px solid #e2e8f0;
-}
-
-.medida-nome {
-  color: #64748b;
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
-.medida-val-mini {
-  color: #0f172a;
-  font-size: 0.9rem;
-  font-weight: 600;
 }
 
 @media (max-width: 650px) {
