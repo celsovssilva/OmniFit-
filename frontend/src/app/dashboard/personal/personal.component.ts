@@ -313,8 +313,9 @@ export class PersonalComponent implements OnInit {
     const editando = this.avaliacaoEditandoId !== null;
 
     const chamada = editando
-      ? this.personalService.atualizarAvaliacao(this.alunoSelecionado.id, {
-        id: this.avaliacaoEditandoId,
+
+      ? this.personalService.atualizarAvaliacao(this.avaliacaoEditandoId, {
+        alunoId: this.alunoSelecionado.id,
         ...this.novaAvaliacao
       })
       : this.personalService.criarAvaliacao(this.alunoSelecionado.id, this.novaAvaliacao);

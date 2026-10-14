@@ -22,9 +22,9 @@ public class AvaliacoesFisicasController {
         return avaliacoesFisicasService.create(request,alunoId);
     }
 
-    @PutMapping("/update/{alunoId}")
-    public AvaliacoesFisicasResponse updateAvaliacoes(@RequestBody AvaliacoesFisicasRequest request, @PathVariable Long alunoId){
-        return avaliacoesFisicasService.update(request,alunoId);
+    @PutMapping("/update/{id}")
+    public AvaliacoesFisicasResponse updateAvaliacoes(@RequestBody AvaliacoesFisicasRequest request, @PathVariable Long id){
+        return avaliacoesFisicasService.update(request,id);
     }
 
     @GetMapping("/getUsersAvaliacoes/{alunoId}")

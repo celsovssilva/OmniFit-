@@ -4,6 +4,7 @@ import com.example.backend.entity.AvaliacoesFisicas;
 import java.time.LocalDate;
 
 public record AvaliacoesFisicasResponse(
+        Long id,
         LocalDate data,
         Double pesoTotal,
         Double percentualGordura,
@@ -12,6 +13,7 @@ public record AvaliacoesFisicasResponse(
 ) {
     public AvaliacoesFisicasResponse(AvaliacoesFisicas atual, AvaliacoesFisicas anterior){
         this(
+                atual.getId(),
                 atual.getData(),
                 atual.getPesoTotal(),
                 atual.getPercentualGordura(),

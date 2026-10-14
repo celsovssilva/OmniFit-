@@ -61,7 +61,7 @@ public class SecurityConfig {
 
                     // Avaliações Físicas
                     req.requestMatchers(HttpMethod.POST,"/api/avaliacoesfisicas/create/{alunoId}").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
-                    req.requestMatchers(HttpMethod.PUT,"/api/avaliacoesfisicas/update/{alunoId}").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
+                    req.requestMatchers(HttpMethod.PUT,"/api/avaliacoesfisicas/update/{id}").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
                     req.requestMatchers(HttpMethod.GET,"/api/avaliacoesfisicas/getUsersAvaliacoes/{alunoId}").authenticated();
                     req.requestMatchers(HttpMethod.GET,"/api/avaliacoesfisicas/getAvaliacoesForUsers").authenticated();
 

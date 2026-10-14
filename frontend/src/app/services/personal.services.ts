@@ -56,7 +56,7 @@ export class PersonalServices {
     return this.http.post<any>(`${this.apiUrl}/avaliacoesfisicas/create/${alunoId}`, dadosAvaliacao);
   }
 
-  atualizarAvaliacao(alunoId: number, dadosAvaliacao: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/avaliacoesfisicas/update/${alunoId}`, dadosAvaliacao);
+  atualizarAvaliacao(id: number | null, dadosAvaliacao: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/avaliacoesfisicas/update/${id}`, dadosAvaliacao);
   }
 }
