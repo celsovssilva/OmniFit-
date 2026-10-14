@@ -1,0 +1,217 @@
+<!-- Toast de Mensagem (Sucesso/Erro) -->
+<div *ngIf="mensagem.texto" class="toast-mensagem" [ngClass]="mensagem.tipo">
+  {{ mensagem.texto }}
+</div>
+
+<div class="nutri-container">
+  <!-- SIDEBAR: Lista de Alunos -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Meus Pacientes</h2>
+      <button class="btn-primario-sm" (click)="abrirModalAluno()">+ Novo</button>
+    </div>
+
+    <div *ngIf="carregando" class="loading-texto">A carregar pacientes...</div>
+
+    <ul class="lista-alunos" *ngIf="!carregando">
+      <li *ngFor="let aluno of meusAlunos"
+          (click)="selecionarAluno(aluno)"
+          [class.ativo]="alunoSelecionado?.id === aluno.id">
+        <div class="aluno-info">
+          <strong>{{ aluno.nome }}</strong>
+          <small>{{ aluno.email }}</small>
+        </div>
+        <button class="btn-icon danger" (click)="removerAluno(aluno.id); $event.stopPropagation()" title="Remover Aluno">
+          🗑️
+        </button>
+      </li>
+      <li *ngIf="meusAlunos.length === 0" class="empty-msg-sidebar">
+        Nenhum paciente registado.
+      </li>
+    </ul>
+  </aside>
+
+  <!-- PAINEL PRINCIPAL -->
+  <main class="main-content" *ngIf="alunoSelecionado; else semAluno">
+    <header class="header-paciente">
+      <div>
+        <h1>{{ alunoSelecionado.nome }}</h1>
+        <p class="subtitle">{{ alunoSelecionado.idade }} anos | {{ alunoSelecionado.sexo }}</p>
+        <p class="subtitle" *ngIf="alunoSelecionado.peculiaridades">
+          <strong>Atenção:</strong> {{ alunoSelecionado.peculiaridades }}
+        </p>
+      </div>
+      <button class="btn-secundario" (click)="editarAluno(alunoSelecionado)">Editar Dados</button>
+    </header>
+
+    <div class="conteudo-grid">
+      <!-- SESSÃO: PLANOS ALIMENTARES -->
+      <section class="sessao-card">
+        <div class="sessao-header">
+          <h2>Dietas Prescritas</h2>
+          <button class="btn-primario" (click)="abrirModalDieta()">+ Nova Dieta</button>
+        </div>
+
+        <div class="cards-list">
+          <div *ngFor="let dieta of dietasDoAluno" class="item-card dieta-card">
+            <div class="info">
+              <h3>Orientações Gerais</h3>
+              <p>{{ dieta.descricao }}</p>
+            </div>
+            <div class="acoes">
+              <button class="btn-download" title="Baixar PDF">📥 PDF</button>
+            </div>
+          </div>
+          <p *ngIf="dietasDoAluno.length === 0" class="empty-msg">Nenhuma dieta registada para este paciente.</p>
+        </div>
+      </section>
+
+      <!-- SESSÃO: AVALIAÇÕES FÍSICAS -->
+      <section class="sessao-card">
+        <div class="sessao-header">
+          <h2>Avaliações Físicas</h2>
+          <button class="btn-primario" (click)="abrirModalAvaliacao()">+ Nova Avaliação</button>
+        </div>
+
+        <div class="cards-list">
+          <div *ngFor="let avaliacao of avaliacoesDoAluno" class="item-card avaliacao-card">
+            <div class="info">
+              <h3>Data: {{ avaliacao.data | date:'dd/MM/yyyy' }}</h3>
+              <p>Peso: <strong>{{ avaliacao.pesoTotal }} kg</strong></p>
+              <p *ngIf="avaliacao.percentualGordura">Gordura: <strong>{{ avaliacao.percentualGordura }}%</strong></p>
+            </div>
+            <div class="acoes">
+              <button class="btn-secundario" (click)="editarAvaliacao(avaliacao)">Editar</button>
+            </div>
+          </div>
+          <p *ngIf="avaliacoesDoAluno.length === 0" class="empty-msg">Nenhuma avaliação registada.</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <ng-template #semAluno>
+    <main class="main-content flex-center">
+      <div class="state-vazio">
+        <span class="icon-vazio">📋</span>
+        <p>Selecione um paciente na lista lateral para gerir as suas dietas e avaliações.</p>
+      </div>
+    </main>
+  </ng-template>
+</div>
+
+<!-- ================= MODAIS ================= -->
+
+<!-- MODAL: ALUNO -->
+<div class="modal-overlay" *ngIf="mostrarModalAluno">
+  <div class="modal-content">
+    <h2>{{ alunoEditandoId ? 'Editar Paciente' : 'Novo Paciente' }}</h2>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Nome *</label>
+        <input type="text" [(ngModel)]="novoAluno.nome" placeholder="Nome completo" />
+      </div>
+      <div class="form-group">
+        <label>E-mail *</label>
+        <input type="email" [(ngModel)]="novoAluno.email" placeholder="email@exemplo.com" />
+      </div>
+      <div class="form-group">
+        <label>Senha {{ alunoEditandoId ? '(Deixe em branco para manter)' : '*' }}</label>
+        <input type="password" [(ngModel)]="novoAluno.senha" placeholder="********" />
+      </div>
+      <div class="form-group">
+        <label>Idade</label>
+        <input type="number" [(ngModel)]="novoAluno.idade" placeholder="Ex: 25" />
+      </div>
+      <div class="form-group">
+        <label>Sexo</label>
+        <select [(ngModel)]="novoAluno.sexo">
+          <option value="MASCULINO">Masculino</option>
+          <option value="FEMININO">Feminino</option>
+        </select>
+      </div>
+      <div class="form-group col-span-2">
+        <label>Restrições / Peculiaridades</label>
+        <textarea [(ngModel)]="novoAluno.peculiaridades" rows="2" placeholder="Ex: Intolerante à lactose, alergia a amendoim..."></textarea>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancelar" (click)="mostrarModalAluno = false" [disabled]="aGuardar">Cancelar</button>
+      <button class="btn-salvar" (click)="salvarNovoAluno()" [disabled]="aGuardar">
+        {{ aGuardar ? 'A guardar...' : 'Guardar' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: DIETA -->
+<div class="modal-overlay" *ngIf="mostrarModalDieta">
+  <div class="modal-content modal-md">
+    <h2>Prescrever Nova Dieta</h2>
+
+    <div class="form-group">
+      <label>Orientações Gerais *</label>
+      <textarea [(ngModel)]="novaDieta.descricao" rows="5" placeholder="Descreva os objetivos, suplementação ou observações importantes..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Anexar Plano Alimentar (PDF/DOC)</label>
+      <div class="file-upload-wrapper">
+        <input type="file" (change)="onFileSelected($event)" accept=".pdf, .doc, .docx" />
+      </div>
+      <small class="hint">Opcional. Selecione o ficheiro para enviar o plano detalhado ao paciente.</small>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancelar" (click)="fecharModalDieta()" [disabled]="aGuardar">Cancelar</button>
+      <button class="btn-salvar" (click)="salvarNovaDieta()" [disabled]="aGuardar">
+        {{ aGuardar ? 'A guardar...' : 'Guardar Dieta' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: AVALIAÇÃO FÍSICA -->
+<div class="modal-overlay" *ngIf="mostrarModalAvaliacao">
+  <div class="modal-content modal-lg">
+    <h2>{{ avaliacaoEditandoId ? 'Editar Avaliação' : 'Nova Avaliação Física' }}</h2>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Data *</label>
+        <input type="date" [(ngModel)]="novaAvaliacao.data" />
+      </div>
+      <div class="form-group">
+        <label>Peso Total (kg) *</label>
+        <input type="number" [(ngModel)]="novaAvaliacao.pesoTotal" />
+      </div>
+
+      <!-- Dobras Cutâneas (Exemplo das principais) -->
+      <div class="form-group">
+        <label>Dobra Peitoral (mm)</label>
+        <input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraPeitoral" />
+      </div>
+      <div class="form-group">
+        <label>Dobra Abdominal (mm)</label>
+        <input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraAbdominal" />
+      </div>
+      <div class="form-group">
+        <label>Dobra Coxa (mm)</label>
+        <input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraCoxa" />
+      </div>
+      <div class="form-group">
+        <label>Dobra Tríceps (mm)</label>
+        <input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraTriceps" />
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancelar" (click)="fecharModalAvaliacao()" [disabled]="aGuardar">Cancelar</button>
+      <button class="btn-salvar" (click)="salvarNovaAvaliacao()" [disabled]="aGuardar">
+        {{ aGuardar ? 'A guardar...' : 'Guardar Avaliação' }}
+      </button>
+    </div>
+  </div>
+</div>

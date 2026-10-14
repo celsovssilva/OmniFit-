@@ -30,8 +30,8 @@ public class DietaController {
     public DietaResponse updateDieta(@RequestBody DietaRequest dietaRequest,@PathVariable Long id){
         return dietaService.update(dietaRequest,id);
     }
-    @GetMapping("/getTreinoForUsers/{userId}")
-    public List<DietaResponse> getTreinosDoAluno(@PathVariable Long userId) {
+    @GetMapping("/getDietaForUsers/{userId}")
+    public List<DietaResponse> getDietasDoAluno(@PathVariable Long userId) {
         return dietaService.getDieta(userId);
     }
 
