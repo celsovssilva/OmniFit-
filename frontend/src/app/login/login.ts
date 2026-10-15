@@ -34,6 +34,7 @@ export class Login {
         if (resposta.token) {
           localStorage.getItem('token-jwt')
           localStorage.setItem('token_jwt', resposta.token);
+          localStorage.setItem('tipo_perfil',resposta.tipoPerfil);
           if(resposta.tipoPerfil === "PERSONAL"){
             this.router.navigate(['/personal'])
           } else if (resposta.tipoPerfil === "NUTRI"){
@@ -92,5 +93,8 @@ export class Login {
         alert('Erro ao redefinir a senha. Verifique se o código está correto e não expirou.');
       }
     });
+  }
+  irParaCadastro() {
+    this.router.navigate(['/register']);
   }
 }

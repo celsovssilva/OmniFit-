@@ -156,5 +156,33 @@ button {
   to {
     opacity: 1;
     transform: translateY(0);
-  }
+  }}
+.cadastro-container {
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #e2e8f0;
+  text-align: center;
 }
+
+.cadastro-container p {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.btn-cadastrar {
+  width: 100%;
+  background-color: transparent;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+  padding: 10px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-cadastrar:hover {
+  background-color: #eff6ff;
+}
+
