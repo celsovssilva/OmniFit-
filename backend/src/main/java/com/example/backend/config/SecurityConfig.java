@@ -44,6 +44,7 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.DELETE, "/api/user/delete").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
                     req.requestMatchers(HttpMethod.GET,"/api/dieta/getDietaForUsers").authenticated();
 
+
                     // Treino
                     req.requestMatchers(HttpMethod.POST, "/api/treino/create").hasAnyRole("PERSONAL", "ADMIN");
                     req.requestMatchers(HttpMethod.PUT, "/api/treino/update/{id}").hasAnyRole("PERSONAL", "ADMIN");
@@ -51,7 +52,8 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.POST, "/api/treino/upload/{treinoId}").hasAnyRole("PERSONAL", "ADMIN");
                     req.requestMatchers(HttpMethod.GET, "/api/treino/getTreinoForUsers/{userId}").authenticated();
                     req.requestMatchers(HttpMethod.GET, "/api/treino/download/{treinoId}").authenticated();
-
+                    req.requestMatchers(HttpMethod.POST,"/api/treino/vincular/{alunoId}/{personalId}").hasAnyRole("PERSONAL", "ADMIN");
+                    req.requestMatchers(HttpMethod.GET,"/api/treino/buscar").hasAnyRole("PERSONAL","ADMIN");
                     // Dieta
                     req.requestMatchers(HttpMethod.POST, "/api/dieta/create").hasAnyRole("NUTRI", "ADMIN");
                     req.requestMatchers(HttpMethod.PUT, "/api/dieta/update/{id}").hasAnyRole("NUTRI", "ADMIN");
@@ -59,6 +61,9 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.POST, "/api/dieta/upload/{dietaId}").hasAnyRole("NUTRI", "ADMIN");
                     req.requestMatchers(HttpMethod.GET, "/api/dieta/getDietaForUsers/{userId}").authenticated();
                     req.requestMatchers(HttpMethod.GET, "/api/dieta/download/{dietaId}").authenticated();
+
+                    req.requestMatchers(HttpMethod.POST,"/api/dieta/vincular/{alunoId}/{nutriId}").hasAnyRole("NUTRI", "ADMIN");
+                    req.requestMatchers(HttpMethod.GET,"/api/dieta/buscar").hasAnyRole("NUTRI","ADMIN");
 
                     // Avaliações Físicas
                     req.requestMatchers(HttpMethod.POST,"/api/avaliacoesfisicas/create/{alunoId}").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");

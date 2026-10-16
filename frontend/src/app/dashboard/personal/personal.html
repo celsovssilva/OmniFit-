@@ -11,9 +11,12 @@
 <div class="dashboard-container">
   <!-- BARRA LATERAL: ALUNOS -->
   <aside class="sidebar">
-    <div class="sidebar-header">
+    <div class="sidebar-header" style="flex-direction: column; align-items: flex-start; gap: 12px;">
       <h2>Os Meus Alunos</h2>
-      <button class="btn-primary" (click)="abrirModalAluno()">+ Novo Aluno</button>
+      <div style="display: flex; gap: 8px; width: 100%;">
+        <button class="btn-primary" style="flex: 1;" (click)="abrirModalAluno()">+ Novo Aluno</button>
+        <button class="btn-secondary" style="flex: 1;" (click)="abrirModalVincular()">+ Vincular Aluno</button>
+      </div>
     </div>
 
     @if (carregando) {
@@ -185,6 +188,42 @@
 </div>
 
 <!-- ================= MODAIS ================= -->
+
+<!-- MODAL VINCULAR ALUNO -->
+@if (mostrarModalVincular) {
+<div class="modal-backdrop">
+  <div class="modal-box">
+    <h3>Vincular Aluno Existente</h3>
+    <p class="text-muted" style="margin-bottom: 20px; font-size: 0.9rem;">
+      Procure um aluno já registado no sistema através do seu e-mail para adicioná-lo à sua lista.
+    </p>
+
+    <div class="form-group" style="flex-direction: row; gap: 8px;">
+      <input type="email" [(ngModel)]="emailBusca" placeholder="exemplo@email.com" style="flex: 1;" (keydown.enter)="buscarAlunoPorEmail()">
+      <button class="btn-primary" (click)="buscarAlunoPorEmail()" [disabled]="carregando">
+        {{ carregando ? 'A procurar...' : 'Buscar' }}
+      </button>
+    </div>
+
+    @if (alunoEncontrado) {
+    <div class="form-section" style="margin-top: 24px;">
+      <h4 style="margin-bottom: 8px; border: none; color: var(--success);">✅ Aluno Encontrado!</h4>
+      <p style="margin: 0;"><strong>Nome:</strong> {{ alunoEncontrado.nome }}</p>
+      <p style="margin: 0;"><strong>Idade:</strong> {{ alunoEncontrado.idade }} anos</p>
+    </div>
+    }
+
+    <div class="modal-acoes">
+      <button type="button" class="btn-ghost" (click)="fecharModalVincular()">Cancelar</button>
+      <button type="button" class="btn-primary" style="background: var(--success);"
+              [disabled]="!alunoEncontrado || aGuardar"
+              (click)="vincularAlunoExistente()">
+        Confirmar Vínculo
+      </button>
+    </div>
+  </div>
+</div>
+}
 
 <!-- MODAL ALUNO (criar / editar) -->
 @if (mostrarModalAluno) {

@@ -68,7 +68,7 @@ public class TreinoController {
 
         return treinos;
     }
-    @PostMapping("/vincular/{alunoId}/{nutriId}")
+    @PostMapping("/vincular/{alunoId}/{personalId}")
     public UserResponse vinculo(@PathVariable Long alunoId, @PathVariable Long personalId){
         return  treinoService.vincularAluno(alunoId,personalId);
     }

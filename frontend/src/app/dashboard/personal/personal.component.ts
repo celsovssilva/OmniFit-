@@ -28,7 +28,7 @@ export class PersonalComponent implements OnInit {
   mostrarModalAvaliacao = false;
 
   aGuardar = false;
-  mensagem = { tipo: '', texto: '' };
+  mensagem = {tipo: '', texto: ''};
 
   alunoEditandoId: number | null = null;
   treinoEditandoId: number | null = null;
@@ -36,29 +36,32 @@ export class PersonalComponent implements OnInit {
 
   novoAluno = this.alunoVazio();
 
-  novoTreino = { exerciciosRequests: [] as any[] };
+  novoTreino = {exerciciosRequests: [] as any[]};
   exercicioTemp = this.exercicioVazio();
 
   novaAvaliacao: any = this.resetarFormAvaliacao();
+  mostrarModalVincular = false;
+  emailBusca = '';
+  alunoEncontrado: any = null;
 
   constructor(
     private personalService: PersonalServices,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+  }
 
   ngOnInit() {
     this.carregarAlunos();
   }
 
   mostrarMensagem(tipo: 'sucesso' | 'erro', texto: string) {
-    this.mensagem = { tipo, texto };
+    this.mensagem = {tipo, texto};
     this.cdr.markForCheck();
     setTimeout(() => {
-      this.mensagem = { tipo: '', texto: '' };
+      this.mensagem = {tipo: '', texto: ''};
       this.cdr.markForCheck();
     }, 4000);
   }
-
 
 
   carregarAlunos() {
@@ -122,7 +125,7 @@ export class PersonalComponent implements OnInit {
 
     let chamada;
     if (editando) {
-      const payload: any = { id: this.alunoEditandoId, ...this.novoAluno };
+      const payload: any = {id: this.alunoEditandoId, ...this.novoAluno};
       if (!payload.senha) delete payload.senha;
       chamada = this.personalService.atualizarAluno(payload);
     } else {
@@ -172,7 +175,7 @@ export class PersonalComponent implements OnInit {
 
   abrirModalTreino() {
     this.treinoEditandoId = null;
-    this.novoTreino = { exerciciosRequests: [] };
+    this.novoTreino = {exerciciosRequests: []};
     this.exercicioTemp = this.exercicioVazio();
     this.mostrarModalTreino = true;
   }
@@ -194,12 +197,12 @@ export class PersonalComponent implements OnInit {
   fecharModalTreino() {
     this.mostrarModalTreino = false;
     this.treinoEditandoId = null;
-    this.novoTreino = { exerciciosRequests: [] };
+    this.novoTreino = {exerciciosRequests: []};
   }
 
   adicionarExercicioAoTreino() {
     if (this.exercicioTemp.exercicio && this.exercicioTemp.series && this.exercicioTemp.repeticoes) {
-      this.novoTreino.exerciciosRequests.push({ ...this.exercicioTemp });
+      this.novoTreino.exerciciosRequests.push({...this.exercicioTemp});
       this.exercicioTemp = this.exercicioVazio();
     }
   }
@@ -265,7 +268,6 @@ export class PersonalComponent implements OnInit {
       error: () => this.mostrarMensagem('erro', 'Erro ao gerar PDF no servidor.')
     });
   }
-
 
 
   carregarAvaliacoes(alunoId: number) {
@@ -369,6 +371,65 @@ export class PersonalComponent implements OnInit {
         dobraSubescapular: null, dobraAbdominal: null, dobraSuprailiaca: null, dobraCoxa: null
       } as Record<string, number | null>
     };
+  }
+
+
+  abrirModalVincular() {
+    this.mostrarModalVincular = true;
+    this.emailBusca = '';
+    this.alunoEncontrado = null;
+  }
+
+  fecharModalVincular() {
+    this.mostrarModalVincular = false;
+    this.emailBusca = '';
+    this.alunoEncontrado = null;
+  }
+
+  buscarAlunoPorEmail() {
+    if (!this.emailBusca) {
+      this.mostrarMensagem('erro', 'Por favor, insira um e-mail válido.');
+      return;
+    }
+
+    this.carregando = true;
+    this.personalService.buscarAlunoPorEmail(this.emailBusca).subscribe({
+      next: (aluno) => {
+        this.alunoEncontrado = aluno;
+        this.carregando = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.alunoEncontrado = null;
+        this.carregando = false;
+        this.mostrarMensagem('erro', err.error?.message || 'Aluno não encontrado.');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  vincularAlunoExistente() {
+    if (!this.alunoEncontrado) return;
+
+    this.aGuardar = true;
+    const personalId = this.getProfissionalIdLogado(); // Usando o seu método existente!
+
+    this.personalService.vincularAluno(this.alunoEncontrado.id, personalId).subscribe({
+      next: () => {
+        this.mostrarMensagem('sucesso', 'Aluno vinculado com sucesso aos seus treinos!');
+        this.fecharModalVincular();
+        this.carregarAlunos(); // Atualiza a sua lista principal na hora!
+        this.aGuardar = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.mostrarMensagem('erro', 'Erro ao vincular o aluno.');
+        this.aGuardar = false;
+        this.cdr.markForCheck();
+      }
+    });
+
+
   }
 
   private getProfissionalIdLogado(): number {
