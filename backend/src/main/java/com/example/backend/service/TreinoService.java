@@ -3,6 +3,7 @@ package com.example.backend.service;
 import com.example.backend.entity.Treinos;
 import com.example.backend.request.TreinoRequest;
 import com.example.backend.response.TreinoResponse;
+import com.example.backend.response.UserResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -16,4 +17,6 @@ public interface TreinoService {
     TreinoResponse updloadTreino(Long treinoId);
     byte[] downloadTreino(Long treinoId);
     List<TreinoResponse> getTreino(Long userId);
+    UserResponse vincularAluno(Long alunoId, Long personalId);
+    UserResponse buscarAlunos(String email);
 }

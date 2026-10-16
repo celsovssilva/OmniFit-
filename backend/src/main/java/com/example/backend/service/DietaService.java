@@ -1,8 +1,9 @@
 package com.example.backend.service;
 
+import com.example.backend.entity.User;
 import com.example.backend.request.DietaRequest;
 import com.example.backend.response.DietaResponse;
-import com.example.backend.response.TreinoResponse;
+import com.example.backend.response.UserResponse;
 
 import java.util.List;
 
@@ -14,4 +15,6 @@ public interface DietaService {
     DietaResponse updloadDieta(Long dietaId);
     byte[] downloadDieta(Long dietaId);
     List<DietaResponse> getDieta(Long userId);
+    UserResponse buscarAlunos(String email);
+    UserResponse vincularAluno(Long alunoId,Long nutriId);
 }

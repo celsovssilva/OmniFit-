@@ -1,11 +1,13 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.entity.Dieta;
+import com.example.backend.entity.TipoPerfil;
 import com.example.backend.entity.User;
 import com.example.backend.repository.DietaRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.request.DietaRequest;
 import com.example.backend.response.DietaResponse;
+import com.example.backend.response.UserResponse;
 import com.example.backend.service.DietaService;
 import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.openpdf.text.Document;
@@ -13,7 +15,7 @@ import org.openpdf.text.Phrase;
 import org.openpdf.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import javax.swing.text.*;
+
 import java.util.List;
 
 @Service
@@ -90,5 +92,23 @@ public class DietaServiceImpl implements DietaService {
         List<DietaResponse> dieta = dietaRepository.findByAlunoIdId(userId)
                 .stream().map(DietaResponse::new).toList();
         return dieta;
+    }
+
+    @Override
+    public UserResponse buscarAlunos(String email) {
+        User buscarUser = userRepository.findByEmail(email)
+                .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
+        if(buscarUser.getTipoPerfil() == TipoPerfil.NUTRI || buscarUser.getTipoPerfil() == TipoPerfil.PERSONAL){
+            throw new RuntimeException("somente alunos podem ser vinculados");
+    }
+        return new UserResponse(buscarUser);
+    }
+
+    @Override
+    public UserResponse vincularAluno(Long alunoId, Long nutriId) {
+        User user = userRepository.findById(alunoId)
+                .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
+        user.setNutriId(nutriId);
+        return new UserResponse( userRepository.save(user));
     }
 }

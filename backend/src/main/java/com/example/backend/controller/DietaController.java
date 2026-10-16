@@ -3,7 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.entity.User;
 import com.example.backend.request.DietaRequest;
 import com.example.backend.response.DietaResponse;
-import com.example.backend.response.TreinoResponse;
+import com.example.backend.response.UserResponse;
 import com.example.backend.service.DietaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -58,5 +58,13 @@ public class DietaController {
         headers.setContentDispositionFormData("attachment", "treino-" + dietaId + ".pdf");
 
         return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+    }
+    @PostMapping("/vincular/{alunoId}/{nutriId}")
+    public UserResponse vinculo(@PathVariable Long alunoId, @PathVariable Long nutriId){
+         return  dietaService.vincularAluno(alunoId,nutriId);
+    }
+    @GetMapping("/buscar")
+    public UserResponse buscarAlunoss(@RequestParam String email){
+        return dietaService.buscarAlunos(email);
     }
 }

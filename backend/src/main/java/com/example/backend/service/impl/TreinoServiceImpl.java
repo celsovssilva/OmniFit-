@@ -1,12 +1,14 @@
 package com.example.backend.service.impl;
 
 import com.example.backend.entity.Exercicios;
+import com.example.backend.entity.TipoPerfil;
 import com.example.backend.entity.Treinos;
 import com.example.backend.entity.User;
 import com.example.backend.repository.TreinoRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.request.TreinoRequest;
 import com.example.backend.response.TreinoResponse;
+import com.example.backend.response.UserResponse;
 import com.example.backend.service.TreinoService;
 import org.openpdf.text.Document;
 import org.openpdf.text.Phrase;
@@ -132,5 +134,21 @@ public class TreinoServiceImpl implements TreinoService {
         List<TreinoResponse> treinoResponses  =treinoRepository.findByAlunoIdId(userId)
                 .stream().map(TreinoResponse::new).toList();
         return  treinoResponses;
+    }
+    @Override
+    public UserResponse vincularAluno(Long alunoId, Long personalId) {
+        User user = userRepository.findById(alunoId)
+                .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
+        user.setPersonalId(personalId);
+        return new UserResponse( userRepository.save(user));
+    }
+    @Override
+    public UserResponse buscarAlunos(String email) {
+        User buscarUser = userRepository.findByEmail(email)
+                .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
+        if(buscarUser.getTipoPerfil() == TipoPerfil.NUTRI || buscarUser.getTipoPerfil() == TipoPerfil.PERSONAL){
+            throw new RuntimeException("somente alunos podem ser vinculados");
+        }
+        return new UserResponse(buscarUser);
     }
 }

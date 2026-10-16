@@ -3,6 +3,7 @@ package com.example.backend.controller;
 import com.example.backend.entity.User;
 import com.example.backend.request.TreinoRequest;
 import com.example.backend.response.TreinoResponse;
+import com.example.backend.response.UserResponse;
 import com.example.backend.service.TreinoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,14 @@ public class TreinoController {
         List<TreinoResponse> treinos = treinoService.getTreinoForUsers(user.getId());
 
         return treinos;
+    }
+    @PostMapping("/vincular/{alunoId}/{nutriId}")
+    public UserResponse vinculo(@PathVariable Long alunoId, @PathVariable Long personalId){
+        return  treinoService.vincularAluno(alunoId,personalId);
+    }
+    @GetMapping("/buscar")
+    public UserResponse buscarAlunoss(@RequestParam String email){
+        return treinoService.buscarAlunos(email);
     }
 
 }

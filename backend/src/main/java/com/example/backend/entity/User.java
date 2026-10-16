@@ -35,6 +35,7 @@ public class User implements UserDetails {
     private StatusConta statusConta;
     private Long personalId;
     private Long alunoId;
+    private Long nutriId;
     private String codigoRedefinicao;
     private LocalDateTime expiracaoCodigo;
     private String sexo;
