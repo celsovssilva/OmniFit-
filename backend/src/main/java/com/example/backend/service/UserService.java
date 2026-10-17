@@ -18,5 +18,6 @@ public interface UserService {
     LoginResponse login(LoginRequest loginRequest);
      ResetSenhaResponse forgotPassword(ResetSenhaRequest request);
      ResetSenhaResponse resetPassword(ResetSenhaRequest request);
-     UserResponse createProfissionalUser(UserRequest request);;
+     UserResponse createProfissionalUser(UserRequest request);
+    List<UserResponse> getUserForNutri(Long nutriId);
 }

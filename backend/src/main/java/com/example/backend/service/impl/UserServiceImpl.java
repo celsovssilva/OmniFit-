@@ -98,6 +98,13 @@ public class UserServiceImpl implements UserService {
      List<User> alunos = userRepository.findByPersonalId(user.getId());
         return alunos.stream().map(UserResponse::new).toList();
     }
+    @Override
+    public List<UserResponse> getUserForNutri(Long nutriId) {
+        User user = userRepository.findById(nutriId).orElseThrow(()-> new RuntimeException("nutri não encontrado"));
+        List<User> alunos = userRepository.findByPersonalId(user.getId());
+        return alunos.stream().map(UserResponse::new).toList();
+    }
+
 
     @Override
     public void deleteUser(Long userId) {

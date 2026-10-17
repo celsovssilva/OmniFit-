@@ -53,6 +53,11 @@ public class UserController {
         User user = (User) authentication.getPrincipal();
         return userService.getUserForPersonal(user.getId());
     }
+    @GetMapping("/getUsersForNutri")
+    public List<UserResponse> getUserForNutri(Authentication authentication){
+        User user = (User) authentication.getPrincipal();
+        return userService.getUserForPersonal(user.getId());
+    }
 
     @DeleteMapping("/delete")
     public void deleteUsers(@RequestBody Map<String, Long> payload){

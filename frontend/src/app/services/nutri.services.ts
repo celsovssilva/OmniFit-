@@ -12,7 +12,7 @@ export class NutriServices{
 
   constructor(private http:HttpClient) {}
   getMeusAlunos(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/dieta/getDietaForUsers`);
+    return this.http.get<any[]>(`${this.apiUrl}/user/getUsersForNutri`);
   }
 
   criarAluno(alunoData: any): Observable<any> {

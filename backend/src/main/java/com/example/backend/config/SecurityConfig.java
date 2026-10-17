@@ -42,7 +42,7 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.PUT, "/api/user/update").authenticated();
                     req.requestMatchers(HttpMethod.GET, "/api/user/getUsersForPersonal").hasAnyRole("PERSONAL", "ADMIN");
                     req.requestMatchers(HttpMethod.DELETE, "/api/user/delete").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
-                    req.requestMatchers(HttpMethod.GET,"/api/dieta/getDietaForUsers").authenticated();
+                    req.requestMatchers(HttpMethod.GET,"/api/dieta/getDietaForUsers").hasAnyRole("NUTRI","ADMIN");
 
 
                     // Treino
@@ -60,6 +60,7 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.DELETE, "/api/dieta/delete/{id}").hasAnyRole("NUTRI", "ADMIN");
                     req.requestMatchers(HttpMethod.POST, "/api/dieta/upload/{dietaId}").hasAnyRole("NUTRI", "ADMIN");
                     req.requestMatchers(HttpMethod.GET, "/api/dieta/getDietaForUsers/{userId}").authenticated();
+                    req.requestMatchers(HttpMethod.GET, "/api/dieta/getDietaForUsers").authenticated();
                     req.requestMatchers(HttpMethod.GET, "/api/dieta/download/{dietaId}").authenticated();
 
                     req.requestMatchers(HttpMethod.POST,"/api/dieta/vincular/{alunoId}/{nutriId}").hasAnyRole("NUTRI", "ADMIN");
