@@ -6,9 +6,12 @@
 <div class="nutri-container">
   <!-- SIDEBAR: Lista de Alunos -->
   <aside class="sidebar">
-    <div class="sidebar-header">
+    <div class="sidebar-header" style="flex-direction: column; align-items: flex-start; gap: 12px;">
       <h2>Meus Pacientes</h2>
-      <button class="btn-primario-sm" (click)="abrirModalAluno()">+ Novo</button>
+      <div style="display: flex; gap: 8px; width: 100%;">
+        <button class="btn-primario-sm" style="flex: 1;" (click)="abrirModalAluno()">+ Novo</button>
+        <button class="btn-secundario" style="flex: 1; padding: 0.5rem; font-size: 0.85rem;" (click)="abrirModalVincular()">+ Vincular</button>
+      </div>
     </div>
 
     <div *ngIf="carregando" class="loading-texto">A carregar pacientes...</div>
@@ -78,7 +81,7 @@
             <div class="info">
               <h3>Data: {{ avaliacao.data | date:'dd/MM/yyyy' }}</h3>
               <p>Peso: <strong>{{ avaliacao.pesoTotal }} kg</strong></p>
-              <p *ngIf="avaliacao.percentualGordura">Gordura: <strong>{{ avaliacao.percentualGordura }}%</strong></p>
+              <p *ngIf="avaliacao.percentualGordura">Gordura: <strong>{{ avaliacao.percentualGordura | number:'1.1-2' }}%</strong></p>
             </div>
             <div class="acoes">
               <button class="btn-secundario" (click)="editarAvaliacao(avaliacao)">Editar</button>
@@ -101,6 +104,41 @@
 </div>
 
 <!-- ================= MODAIS ================= -->
+
+<!-- MODAL: VINCULAR ALUNO -->
+<div class="modal-overlay" *ngIf="mostrarModalVincular">
+  <div class="modal-content">
+    <h2>Vincular Paciente Existente</h2>
+    <p style="margin-bottom: 20px; font-size: 0.9rem; color: #666;">
+      Procure um paciente já registado no sistema através do seu e-mail para adicioná-lo à sua lista.
+    </p>
+
+    <div class="form-group" style="display: flex; gap: 8px; flex-direction: row; align-items: flex-end;">
+      <div style="flex: 1;">
+        <label>E-mail do Paciente</label>
+        <input type="email" [(ngModel)]="emailBusca" placeholder="exemplo@email.com" (keydown.enter)="buscarAlunoPorEmail()">
+      </div>
+      <button class="btn-primario" (click)="buscarAlunoPorEmail()" [disabled]="carregando" style="height: 42px;">
+        {{ carregando ? 'A procurar...' : 'Buscar' }}
+      </button>
+    </div>
+
+    <div *ngIf="alunoEncontrado" style="margin-top: 20px; padding: 15px; background: #e6f8ec; border: 1px solid #c3e6cb; border-radius: 8px;">
+      <h4 style="margin-bottom: 8px; color: #155724; border: none; font-size: 1rem;">✅ Paciente Encontrado!</h4>
+      <p style="margin: 0; color: #155724;"><strong>Nome:</strong> {{ alunoEncontrado.nome }}</p>
+      <p style="margin: 0; color: #155724;"><strong>Idade:</strong> {{ alunoEncontrado.idade }} anos</p>
+    </div>
+
+    <div class="modal-actions" style="margin-top: 24px;">
+      <button class="btn-cancelar" (click)="fecharModalVincular()">Cancelar</button>
+      <button class="btn-salvar" style="background-color: #28a745; border-color: #28a745;"
+              [disabled]="!alunoEncontrado || aGuardar"
+              (click)="vincularAlunoExistente()">
+        Confirmar Vínculo
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- MODAL: ALUNO -->
 <div class="modal-overlay" *ngIf="mostrarModalAluno">
@@ -173,41 +211,53 @@
   </div>
 </div>
 
-<!-- MODAL: AVALIAÇÃO FÍSICA -->
+<!-- MODAL: AVALIAÇÃO FÍSICA (Estrutura Completa Atualizada) -->
 <div class="modal-overlay" *ngIf="mostrarModalAvaliacao">
-  <div class="modal-content modal-lg">
-    <h2>{{ avaliacaoEditandoId ? 'Editar Avaliação' : 'Nova Avaliação Física' }}</h2>
+  <div class="modal-content" style="max-width: 850px; padding: 32px;">
+    <h2 style="margin-bottom: 24px;">{{ avaliacaoEditandoId ? 'Editar Avaliação Física' : 'Nova Avaliação Física' }}</h2>
 
-    <div class="form-grid">
-      <div class="form-group">
-        <label>Data *</label>
-        <input type="date" [(ngModel)]="novaAvaliacao.data" />
-      </div>
-      <div class="form-group">
-        <label>Peso Total (kg) *</label>
-        <input type="number" [(ngModel)]="novaAvaliacao.pesoTotal" />
+    <!-- Área com scroll interno para caber tudo -->
+    <div style="max-height: 60vh; overflow-y: auto; padding-right: 12px;">
+
+      <!-- 1. DADOS GERAIS -->
+      <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
+        <h4 style="margin-bottom: 16px; font-size: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Dados Gerais</h4>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+          <div class="form-group"><label>Data</label><input type="date" [(ngModel)]="novaAvaliacao.data"></div>
+          <div class="form-group"><label>Peso (kg)</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.pesoTotal"></div>
+          <div class="form-group"><label>Altura (m)</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.altura"></div>
+        </div>
       </div>
 
-      <!-- Dobras Cutâneas (Exemplo das principais) -->
-      <div class="form-group">
-        <label>Dobra Peitoral (mm)</label>
-        <input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraPeitoral" />
+      <!-- 2. DOBRAS CUTÂNEAS -->
+      <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
+        <h4 style="margin-bottom: 16px; font-size: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Dobras Cutâneas (mm)</h4>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+          <div class="form-group"><label>Peitoral</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraPeitoral"></div>
+          <div class="form-group"><label>Axilar Média</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraAxilarMedia"></div>
+          <div class="form-group"><label>Tríceps</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraTriceps"></div>
+          <div class="form-group"><label>Subescapular</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraSubescapular"></div>
+          <div class="form-group"><label>Abdominal</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraAbdominal"></div>
+          <div class="form-group"><label>Suprailíaca</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraSuprailiaca"></div>
+          <div class="form-group"><label>Coxa</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraCoxa"></div>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Dobra Abdominal (mm)</label>
-        <input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraAbdominal" />
+
+      <!-- 3. PERÍMETROS / CIRCUNFERÊNCIAS -->
+      <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
+        <h4 style="margin-bottom: 16px; font-size: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Perímetros / Circunferências (cm) - Opcional</h4>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+          <div class="form-group" *ngFor="let p of perimetros">
+            <label>{{ p.rotulo }}</label>
+            <input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas[p.medida]">
+          </div>
+        </div>
       </div>
-      <div class="form-group">
-        <label>Dobra Coxa (mm)</label>
-        <input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraCoxa" />
-      </div>
-      <div class="form-group">
-        <label>Dobra Tríceps (mm)</label>
-        <input type="number" [(ngModel)]="novaAvaliacao.medidas.dobraTriceps" />
-      </div>
+
     </div>
 
-    <div class="modal-actions">
+    <!-- BOTÕES DO MODAL -->
+    <div class="modal-actions" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
       <button class="btn-cancelar" (click)="fecharModalAvaliacao()" [disabled]="aGuardar">Cancelar</button>
       <button class="btn-salvar" (click)="salvarNovaAvaliacao()" [disabled]="aGuardar">
         {{ aGuardar ? 'A guardar...' : 'Guardar Avaliação' }}

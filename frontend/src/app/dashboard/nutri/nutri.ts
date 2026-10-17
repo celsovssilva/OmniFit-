@@ -18,28 +18,31 @@ export class Nutri implements OnInit {
   aGuardar = false;
   mensagem = { tipo: '', texto: '' };
 
-
   meusAlunos: any[] = [];
   alunoSelecionado: any = null;
   novoAluno = this.alunoVazio();
   mostrarModalAluno = false;
   alunoEditandoId: number | null = null;
+
   avaliacoesDoAluno: any[] = [];
   novaAvaliacao: any = this.resetarFormAvaliacao();
   mostrarModalAvaliacao = false;
   avaliacaoEditandoId: number | null = null;
 
-
   perimetros = PERIMETROS;
   formatarDelta = formatarDelta;
   classeDelta = classeDelta;
-
 
   dietasDoAluno: DietaResponse[] = [];
   novaDieta: Partial<DietaRequest> = { descricao: '' };
   mostrarModalDieta = false;
   dietaEditandoId: number | null = null;
   ficheiroSelecionado: File | null = null;
+
+
+  mostrarModalVincular = false;
+  emailBusca = '';
+  alunoEncontrado: any = null;
 
   constructor(
     private nutriService: NutriServices,
@@ -69,7 +72,6 @@ export class Nutri implements OnInit {
       next: (dados) => {
         this.meusAlunos = dados;
         this.carregando = false;
-
 
         if (this.alunoSelecionado) {
           this.alunoSelecionado = dados.find((a: any) => a.id === this.alunoSelecionado.id) ?? null;
@@ -127,14 +129,14 @@ export class Nutri implements OnInit {
     if (editando) {
       const payload: any = { id: this.alunoEditandoId, ...this.novoAluno };
       if (!payload.senha) delete payload.senha;
-      chamada = this.nutriService.atualizarAluno(payload); // Corrigido para nutriService
+      chamada = this.nutriService.atualizarAluno(payload);
     } else {
-      chamada = this.nutriService.criarAluno(this.novoAluno); // Corrigido para nutriService
+      chamada = this.nutriService.criarAluno(this.novoAluno);
     }
 
     chamada.subscribe({
       next: () => {
-        this.mostrarMensagem('sucesso', editando ? 'Aluno atualizado!' : 'Aluno adicionado com sucesso!');
+        this.mostrarMensagem('sucesso', editando ? 'Paciente atualizado!' : 'Paciente adicionado com sucesso!');
         this.mostrarModalAluno = false;
         this.alunoEditandoId = null;
         this.carregarAlunos();
@@ -150,24 +152,91 @@ export class Nutri implements OnInit {
   }
 
   removerAluno(id: number) {
-    if (confirm('Remover este aluno definitivamente?')) {
-      this.nutriService.removerAluno(id).subscribe({ // Corrigido para nutriService
+    if (confirm('Remover este paciente definitivamente?')) {
+      this.nutriService.removerAluno(id).subscribe({
         next: () => {
           this.alunoSelecionado = null;
-          this.mostrarMensagem('sucesso', 'Aluno removido.');
+          this.mostrarMensagem('sucesso', 'Paciente removido.');
           this.carregarAlunos();
         },
-        error: () => this.mostrarMensagem('erro', 'Erro ao remover aluno.')
+        error: () => this.mostrarMensagem('erro', 'Erro ao remover paciente.')
       });
     }
   }
 
+
+  abrirModalVincular() {
+    this.mostrarModalVincular = true;
+    this.emailBusca = '';
+    this.alunoEncontrado = null;
+  }
+
+  fecharModalVincular() {
+    this.mostrarModalVincular = false;
+    this.emailBusca = '';
+    this.alunoEncontrado = null;
+  }
+
+  buscarAlunoPorEmail() {
+    if (!this.emailBusca) {
+      this.mostrarMensagem('erro', 'Por favor, insira um e-mail válido.');
+      return;
+    }
+
+    this.carregando = true;
+    this.nutriService.buscarAlunoPorEmail(this.emailBusca).subscribe({
+      next: (aluno) => {
+        this.alunoEncontrado = aluno;
+        this.carregando = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        this.alunoEncontrado = null;
+        this.carregando = false;
+        this.mostrarMensagem('erro', err.error?.message || 'Paciente não encontrado.');
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
+  vincularAlunoExistente() {
+    if (!this.alunoEncontrado) return;
+
+    this.aGuardar = true;
+    const nutriId = 1; // Ajuste para pegar o ID do profissional logado no futuro
+
+    this.nutriService.vincularAluno(this.alunoEncontrado.id, nutriId).subscribe({
+      next: () => {
+        this.mostrarMensagem('sucesso', 'Paciente vinculado com sucesso!');
+        this.fecharModalVincular();
+        this.carregarAlunos();
+        this.aGuardar = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.mostrarMensagem('erro', 'Erro ao vincular o paciente.');
+        this.aGuardar = false;
+        this.cdr.markForCheck();
+      }
+    });
+  }
+
   resetarFormAvaliacao() {
-    return { data: '', pesoTotal: null, medidas: {} };
+    return {
+      data: new Date().toISOString().split('T')[0],
+      pesoTotal: null as number | null,
+      medidas: {
+        altura: null, torax: null, abdomen: null, cintura: null, quadril: null,
+        bracoDireito: null, bracoEsquerdo: null, coxaDireita: null, coxaEsquerda: null,
+        panturrilhaDireita: null, panturrilhaEsquerda: null,
+        dobraPeitoral: null, dobraAxilarMedia: null, dobraTriceps: null,
+        dobraSubescapular: null, dobraAbdominal: null, dobraSuprailiaca: null, dobraCoxa: null
+      } as Record<string, number | null>
+    };
   }
 
   carregarAvaliacoes(alunoId: number) {
-    this.nutriService.getAvaliacoes(alunoId).subscribe({ // Corrigido para nutriService
+    this.nutriService.getAvaliacoes(alunoId).subscribe({
       next: (dados) => {
         this.avaliacoesDoAluno = dados;
         this.cdr.markForCheck();
@@ -211,11 +280,11 @@ export class Nutri implements OnInit {
     const editando = this.avaliacaoEditandoId !== null;
 
     const chamada = editando
-      ? this.nutriService.atualizarAvaliacao(this.avaliacaoEditandoId, { // Corrigido para nutriService
+      ? this.nutriService.atualizarAvaliacao(this.avaliacaoEditandoId, {
         alunoId: this.alunoSelecionado.id,
         ...this.novaAvaliacao
       })
-      : this.nutriService.criarAvaliacao(this.alunoSelecionado.id, this.novaAvaliacao); // Corrigido para nutriService
+      : this.nutriService.criarAvaliacao(this.alunoSelecionado.id, this.novaAvaliacao);
 
     chamada.subscribe({
       next: () => {
@@ -232,7 +301,6 @@ export class Nutri implements OnInit {
       }
     });
   }
-
 
   carregarDietas(alunoId: number) {
     this.nutriService.getDietasDoAluno(alunoId).subscribe({
@@ -271,18 +339,14 @@ export class Nutri implements OnInit {
 
     this.aGuardar = true;
 
-
     const request: { alunoId: any; profissionalId: number; descricao: string } = {
       alunoId: this.alunoSelecionado.id,
       profissionalId: 1,
       descricao: this.novaDieta.descricao
     };
 
-
     this.nutriService.criarDieta(request).subscribe({
       next: (resposta) => {
-
-
         if (this.ficheiroSelecionado && resposta.id) {
           const formData = new FormData();
           formData.append('file', this.ficheiroSelecionado);
@@ -296,7 +360,6 @@ export class Nutri implements OnInit {
             }
           });
         } else {
-
           this.finalizarSalvamentoDieta();
         }
       },
