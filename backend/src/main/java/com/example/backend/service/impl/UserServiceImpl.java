@@ -58,7 +58,14 @@ public class UserServiceImpl implements UserService {
 
         if(user.tipoPerfil() == TipoPerfil.ALUNO){
             u.setPeculiaridades(user.peculiaridades());
-            u.setPersonalId(email.getId());
+            if (email.getTipoPerfil() == TipoPerfil.PERSONAL) {
+                u.setPersonalId(email.getId());
+
+            }
+            else if (email.getTipoPerfil() == TipoPerfil.NUTRI) {
+                u.setNutriId(email.getId());
+
+            }
 
         }
         if(user.tipoPerfil() == TipoPerfil.ADMIN|| user.tipoPerfil() ==TipoPerfil.PERSONAL || user.tipoPerfil() == TipoPerfil.NUTRI){
@@ -101,7 +108,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponse> getUserForNutri(Long nutriId) {
         User user = userRepository.findById(nutriId).orElseThrow(()-> new RuntimeException("nutri não encontrado"));
-        List<User> alunos = userRepository.findByPersonalId(user.getId());
+        List<User> alunos = userRepository.findByNutriId(user.getId());
         return alunos.stream().map(UserResponse::new).toList();
     }
 

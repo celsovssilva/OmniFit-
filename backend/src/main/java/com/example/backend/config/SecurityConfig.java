@@ -42,7 +42,7 @@ public class SecurityConfig {
                     req.requestMatchers(HttpMethod.PUT, "/api/user/update").authenticated();
                     req.requestMatchers(HttpMethod.GET, "/api/user/getUsersForPersonal").hasAnyRole("PERSONAL", "ADMIN");
                     req.requestMatchers(HttpMethod.DELETE, "/api/user/delete").hasAnyRole("PERSONAL", "NUTRI", "ADMIN");
-                    req.requestMatchers(HttpMethod.GET,"/api/dieta/getDietaForUsers").hasAnyRole("NUTRI","ADMIN");
+                    req.requestMatchers(HttpMethod.GET,"/api/dieta/getUsersForNutri").hasAnyRole("NUTRI","ADMIN");
 
 
                     // Treino

@@ -14,6 +14,7 @@ import org.openpdf.text.Document;
 import org.openpdf.text.Phrase;
 import org.openpdf.text.pdf.PdfWriter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -106,9 +107,12 @@ public class DietaServiceImpl implements DietaService {
 
     @Override
     public UserResponse vincularAluno(Long alunoId, Long nutriId) {
-        User user = userRepository.findById(alunoId)
-                .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
-        user.setNutriId(nutriId);
-        return new UserResponse( userRepository.save(user));
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        User logado = (User) authentication.getPrincipal();
+
+        User aluno = userRepository.findById(alunoId)
+                .orElseThrow(() -> new RuntimeException("aluno não encontrado"));
+        aluno.setPersonalId(logado.getId());
+        return new UserResponse(userRepository.save(aluno));
     }
 }

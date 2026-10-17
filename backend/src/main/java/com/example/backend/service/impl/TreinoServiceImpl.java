@@ -177,10 +177,13 @@ public class TreinoServiceImpl implements TreinoService {
     }
     @Override
     public UserResponse vincularAluno(Long alunoId, Long personalId) {
-        User user = userRepository.findById(alunoId)
-                .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
-        user.setPersonalId(personalId);
-        return new UserResponse( userRepository.save(user));
+        var authentication = SecurityContextHolder.getContext().getAuthentication();
+        User logado = (User) authentication.getPrincipal();
+
+        User aluno = userRepository.findById(alunoId)
+                .orElseThrow(() -> new RuntimeException("aluno não encontrado"));
+        aluno.setPersonalId(logado.getId());
+        return new UserResponse(userRepository.save(aluno));
     }
     @Override
     public UserResponse buscarAlunos(String email) {
