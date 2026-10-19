@@ -44,17 +44,25 @@ export class NutriServices{
     return this.http.post<any>(`${this.apiUrl}/dieta/upload/${dietaId}`, formData);
   }
 
-  criarDieta(dados: { alunoId: any; profissionalId: number; descricao: string }): Observable<DietaResponse> {
-    return this.http.post<DietaResponse>(`${this.apiUrl}/dieta/create`, dados);
-  }
+
   buscarAlunoPorEmail(email: string): Observable<any> {
     const params = new HttpParams().set('email', email);
     return this.http.get<any>(`${this.apiUrl}/buscar`, { params });
   }
 
-  vincularAluno(alunoId: number, nutriId: number): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/vincular/${alunoId}/${nutriId}`, {});
+
+  criarDieta(dados: { alunoId: any; descricao: string }) {
+    return this.http.post<any>(`${this.apiUrl}/dieta/create`, dados);
   }
+
+
+  vincularAluno(alunoId: number) {
+    return this.http.post<any>(`${this.apiUrl}/dieta/vincular/${alunoId}`, {});
+  }
+  removerDieta(id: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/dieta/delete/${id}`);
+  }
+
 
 }
 

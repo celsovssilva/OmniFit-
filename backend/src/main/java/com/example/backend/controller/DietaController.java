@@ -67,4 +67,6 @@ public class DietaController {
     public UserResponse buscarAlunoss(@RequestParam String email){
         return dietaService.buscarAlunos(email);
     }
+
+
 }

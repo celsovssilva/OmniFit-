@@ -39,7 +39,6 @@ export class Nutri implements OnInit {
   dietaEditandoId: number | null = null;
   ficheiroSelecionado: File | null = null;
 
-
   mostrarModalVincular = false;
   emailBusca = '';
   alunoEncontrado: any = null;
@@ -164,7 +163,6 @@ export class Nutri implements OnInit {
     }
   }
 
-
   abrirModalVincular() {
     this.mostrarModalVincular = true;
     this.emailBusca = '';
@@ -203,9 +201,10 @@ export class Nutri implements OnInit {
     if (!this.alunoEncontrado) return;
 
     this.aGuardar = true;
-    const nutriId = 1; // Ajuste para pegar o ID do profissional logado no futuro
 
-    this.nutriService.vincularAluno(this.alunoEncontrado.id, nutriId).subscribe({
+
+    // @ts-ignore
+    this.nutriService.vincularAluno(this.alunoEncontrado.id).subscribe({
       next: () => {
         this.mostrarMensagem('sucesso', 'Paciente vinculado com sucesso!');
         this.fecharModalVincular();
@@ -339,9 +338,9 @@ export class Nutri implements OnInit {
 
     this.aGuardar = true;
 
-    const request: { alunoId: any; profissionalId: number; descricao: string } = {
+
+    const request: { alunoId: any; descricao: string } = {
       alunoId: this.alunoSelecionado.id,
-      profissionalId: 1,
       descricao: this.novaDieta.descricao
     };
 
@@ -377,5 +376,16 @@ export class Nutri implements OnInit {
     this.carregarDietas(this.alunoSelecionado.id);
     this.fecharModalDieta();
     this.cdr.markForCheck();
+  }
+  excluirDieta(dietaId: number) {
+    if (confirm('Tem a certeza que deseja excluir esta dieta?')) {
+      this.nutriService.removerDieta(dietaId).subscribe({
+        next: () => {
+          this.mostrarMensagem('sucesso', 'Dieta excluída com sucesso.');
+          this.carregarDietas(this.alunoSelecionado.id); // Atualiza a lista no ecrã
+        },
+        error: () => this.mostrarMensagem('erro', 'Erro ao excluir a dieta.')
+      });
+    }
   }
 }

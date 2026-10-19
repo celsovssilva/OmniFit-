@@ -56,7 +56,7 @@ public class UserController {
     @GetMapping("/getUsersForNutri")
     public List<UserResponse> getUserForNutri(Authentication authentication){
         User user = (User) authentication.getPrincipal();
-        return userService.getUserForPersonal(user.getId());
+        return userService.getUserForNutri(user.getId());
     }
 
     @DeleteMapping("/delete")

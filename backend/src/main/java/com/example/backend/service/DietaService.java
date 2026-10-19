@@ -17,4 +17,5 @@ public interface DietaService {
     List<DietaResponse> getDieta(Long userId);
     UserResponse buscarAlunos(String email);
     UserResponse vincularAluno(Long alunoId,Long nutriId);
+
 }

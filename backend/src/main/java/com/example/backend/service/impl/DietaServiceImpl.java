@@ -2,6 +2,7 @@ package com.example.backend.service.impl;
 
 import com.example.backend.entity.Dieta;
 import com.example.backend.entity.TipoPerfil;
+import com.example.backend.entity.Treinos;
 import com.example.backend.entity.User;
 import com.example.backend.repository.DietaRepository;
 import com.example.backend.repository.UserRepository;
@@ -115,4 +116,5 @@ public class DietaServiceImpl implements DietaService {
         aluno.setPersonalId(logado.getId());
         return new UserResponse(userRepository.save(aluno));
     }
+
 }

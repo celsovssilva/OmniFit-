@@ -1,137 +1,208 @@
-<!-- Toast de Mensagem (Sucesso/Erro) -->
-<div *ngIf="mensagem.texto" class="toast-mensagem" [ngClass]="mensagem.tipo">
-  {{ mensagem.texto }}
+<!-- SISTEMA DE NOTIFICAÇÕES (TOASTS) -->
+@if (mensagem.texto) {
+<div class="toast-container" [ngClass]="mensagem.tipo">
+  <div class="toast-content">
+    <span class="toast-icon">{{ mensagem.tipo === 'sucesso' ? '✅' : '⚠️' }}</span>
+    <p>{{ mensagem.texto }}</p>
+  </div>
 </div>
+}
 
-<div class="nutri-container">
-  <!-- SIDEBAR: Lista de Alunos -->
+<div class="dashboard-container">
+  <!-- BARRA LATERAL: PACIENTES -->
   <aside class="sidebar">
     <div class="sidebar-header" style="flex-direction: column; align-items: flex-start; gap: 12px;">
       <h2>Meus Pacientes</h2>
       <div style="display: flex; gap: 8px; width: 100%;">
-        <button class="btn-primario-sm" style="flex: 1;" (click)="abrirModalAluno()">+ Novo</button>
-        <button class="btn-secundario" style="flex: 1; padding: 0.5rem; font-size: 0.85rem;" (click)="abrirModalVincular()">+ Vincular</button>
+        <button class="btn-primary" style="flex: 1;" (click)="abrirModalAluno()">+ Novo</button>
+        <button class="btn-secondary" style="flex: 1;" (click)="abrirModalVincular()">+ Vincular</button>
       </div>
     </div>
 
-    <div *ngIf="carregando" class="loading-texto">A carregar pacientes...</div>
+    @if (carregando) {
+    <div class="loading-state">A carregar dados...</div>
+    }
 
-    <ul class="lista-alunos" *ngIf="!carregando">
-      <li *ngFor="let aluno of meusAlunos"
-          (click)="selecionarAluno(aluno)"
-          [class.ativo]="alunoSelecionado?.id === aluno.id">
+    <ul class="aluno-list">
+      @for (aluno of meusAlunos; track aluno.id) {
+      <li [class.selecionado]="alunoSelecionado?.id === aluno.id" (click)="selecionarAluno(aluno)">
+        <div class="aluno-avatar">{{ aluno.nome.charAt(0) | uppercase }}</div>
         <div class="aluno-info">
           <strong>{{ aluno.nome }}</strong>
-          <small>{{ aluno.email }}</small>
+          <span>{{ aluno.idade }} anos • {{ aluno.sexo === 'MASCULINO' ? 'Masc' : 'Fem' }}</span>
         </div>
-        <button class="btn-icon danger" (click)="removerAluno(aluno.id); $event.stopPropagation()" title="Remover Aluno">
-          🗑️
-        </button>
       </li>
-      <li *ngIf="meusAlunos.length === 0" class="empty-msg-sidebar">
-        Nenhum paciente registado.
-      </li>
+      } @empty {
+      <div class="empty-state">Ainda não tem pacientes registados.</div>
+      }
     </ul>
   </aside>
 
   <!-- PAINEL PRINCIPAL -->
-  <main class="main-content" *ngIf="alunoSelecionado; else semAluno">
-    <header class="header-paciente">
-      <div>
+  <main class="main-content">
+    @if (alunoSelecionado) {
+    <header class="aluno-header">
+      <div class="perfil-info">
         <h1>{{ alunoSelecionado.nome }}</h1>
-        <p class="subtitle">{{ alunoSelecionado.idade }} anos | {{ alunoSelecionado.sexo }}</p>
-        <p class="subtitle" *ngIf="alunoSelecionado.peculiaridades">
-          <strong>Atenção:</strong> {{ alunoSelecionado.peculiaridades }}
-        </p>
+        <p>{{ alunoSelecionado.email }}</p>
+        @if (alunoSelecionado.peculiaridades) {
+        <div class="badge-peculiaridade">Nota: {{ alunoSelecionado.peculiaridades }}</div>
+        }
       </div>
-      <button class="btn-secundario" (click)="editarAluno(alunoSelecionado)">Editar Dados</button>
+      <div class="header-acoes">
+        <button class="btn-secondary" (click)="editarAluno(alunoSelecionado)">Editar Dados</button>
+        <button class="btn-danger-outline" (click)="removerAluno(alunoSelecionado.id)">Remover Paciente</button>
+      </div>
     </header>
 
-    <div class="conteudo-grid">
-      <!-- SESSÃO: PLANOS ALIMENTARES -->
-      <section class="sessao-card">
-        <div class="sessao-header">
-          <h2>Dietas Prescritas</h2>
-          <button class="btn-primario" (click)="abrirModalDieta()">+ Nova Dieta</button>
+    <div class="dashboard-grid">
+
+      <!-- SEÇÃO: DIETAS -->
+      <section class="dashboard-card">
+        <div class="card-header">
+          <h3>Dietas Prescritas</h3>
+          <button class="btn-secondary" (click)="abrirModalDieta()">+ Nova Dieta</button>
         </div>
 
-        <div class="cards-list">
-          <div *ngFor="let dieta of dietasDoAluno" class="item-card dieta-card">
-            <div class="info">
-              <h3>Orientações Gerais</h3>
-              <p>{{ dieta.descricao }}</p>
+        <div class="grid-items">
+          @for (dieta of dietasDoAluno; track dieta.id) {
+          <div class="item-box">
+            <div class="item-detalhe">
+              <h4>Dieta #{{ dieta.id }}</h4>
             </div>
-            <div class="acoes">
-              <button class="btn-download" title="Baixar PDF">📥 PDF</button>
+
+            <p style="font-size: 0.9rem; color: #4b5563; margin-top: 8px; white-space: pre-wrap;">
+              {{ dieta.descricao }}
+            </p>
+
+            <div class="item-acoes" style="margin-top: 12px; border-top: 1px solid #e5e7eb; padding-top: 12px;">
+              <button class="btn-icon" title="Excluir" (click)="excluirDieta(dieta.id)">🗑️ Excluir</button>
             </div>
           </div>
-          <p *ngIf="dietasDoAluno.length === 0" class="empty-msg">Nenhuma dieta registada para este paciente.</p>
+          } @empty {
+          <p class="text-muted">Nenhuma dieta prescrita para este paciente.</p>
+          }
         </div>
       </section>
 
-      <!-- SESSÃO: AVALIAÇÕES FÍSICAS -->
-      <section class="sessao-card">
-        <div class="sessao-header">
-          <h2>Avaliações Físicas</h2>
-          <button class="btn-primario" (click)="abrirModalAvaliacao()">+ Nova Avaliação</button>
+      <!-- SEÇÃO: AVALIAÇÕES -->
+      <section class="dashboard-card">
+        <div class="card-header">
+          <h3>Avaliações Físicas</h3>
+          <button class="btn-secondary" (click)="abrirModalAvaliacao()">+ Nova Avaliação</button>
         </div>
 
-        <div class="cards-list">
-          <div *ngFor="let avaliacao of avaliacoesDoAluno" class="item-card avaliacao-card">
-            <div class="info">
-              <h3>Data: {{ avaliacao.data | date:'dd/MM/yyyy' }}</h3>
-              <p>Peso: <strong>{{ avaliacao.pesoTotal }} kg</strong></p>
-              <p *ngIf="avaliacao.percentualGordura">Gordura: <strong>{{ avaliacao.percentualGordura | number:'1.1-2' }}%</strong></p>
+        <div class="grid-items">
+          @for (av of avaliacoesDoAluno; track $index) {
+          @let a = av.atual ?? av;
+          @let c = av.comparacao ?? a.comparacao;
+          <div class="item-box avaliacao-box">
+            <div class="av-cabecalho">
+              <h4>{{ a.data | date:'dd/MM/yyyy' }}</h4>
+              <div>
+                <span class="av-peso">{{ a.pesoTotal }} kg</span>
+                @if (c) {
+                <small [class]="classeDelta(c.diferencaPeso, null)">{{ formatarDelta(c.diferencaPeso, ' kg') }}</small>
+                }
+              </div>
             </div>
-            <div class="acoes">
-              <button class="btn-secundario" (click)="editarAvaliacao(avaliacao)">Editar</button>
+
+            <div class="av-metricas">
+              <div class="metrica">
+                <span>IMC</span>
+                <strong>{{ a.medidas?.imc | number:'1.1-2' }}</strong>
+                @if (c) {
+                <small [class]="classeDelta(c.diferencaImc, null)">{{ formatarDelta(c.diferencaImc) }}</small>
+                }
+              </div>
+              <div class="metrica">
+                <span>Gordura</span>
+                <strong>{{ a.percentualGordura | number:'1.1-2' }}%</strong>
+                @if (c) {
+                <small [class]="classeDelta(c.diferencaPercentualGordura, true)">{{ formatarDelta(c.diferencaPercentualGordura, '%') }}</small>
+                }
+              </div>
+              <div class="metrica">
+                <span>M. Magra</span>
+                <strong>{{ a.medidas?.massaMagra | number:'1.1-2' }} kg</strong>
+                @if (c) {
+                <small [class]="classeDelta(c.diferencaMassaMagra, false)">{{ formatarDelta(c.diferencaMassaMagra, ' kg') }}</small>
+                }
+              </div>
+              <div class="metrica">
+                <span>M. Gorda</span>
+                <strong>{{ a.medidas?.massaGorda | number:'1.1-2' }} kg</strong>
+                @if (c) {
+                <small [class]="classeDelta(c.diferencaMassaGorda, true)">{{ formatarDelta(c.diferencaMassaGorda, ' kg') }}</small>
+                }
+              </div>
+            </div>
+
+            @if (c) {
+            <details class="detalhes-comparacao">
+              <summary>Ver todas as diferenças</summary>
+              <div class="av-metricas">
+                @for (p of perimetros; track p.dif) {
+                <div class="metrica">
+                  <span>{{ p.rotulo }}</span>
+                  <strong>{{ a.medidas?.[p.medida] | number:'1.1-2' }} cm</strong>
+                  <small [class]="classeDelta(c[p.dif], null)">{{ formatarDelta(c[p.dif], ' cm') }}</small>
+                </div>
+                }
+              </div>
+            </details>
+            } @else {
+            <p class="sem-comparacao">Primeira avaliação, sem comparação.</p>
+            }
+
+            <div class="av-acoes">
+              <button class="btn-icon" (click)="editarAvaliacao(av)">✏️ Editar</button>
             </div>
           </div>
-          <p *ngIf="avaliacoesDoAluno.length === 0" class="empty-msg">Nenhuma avaliação registada.</p>
+          } @empty {
+          <p class="text-muted">Nenhuma avaliação registada.</p>
+          }
         </div>
       </section>
+
     </div>
+    } @else {
+    <div class="tela-boas-vindas">
+      <div class="icone-gigante">🥗</div>
+      <h2>Selecione um Paciente</h2>
+      <p>Escolha um paciente na lista lateral para gerir as suas avaliações e dietas.</p>
+    </div>
+    }
   </main>
-
-  <ng-template #semAluno>
-    <main class="main-content flex-center">
-      <div class="state-vazio">
-        <span class="icon-vazio">📋</span>
-        <p>Selecione um paciente na lista lateral para gerir as suas dietas e avaliações.</p>
-      </div>
-    </main>
-  </ng-template>
 </div>
 
-<!-- ================= MODAIS ================= -->
 
-<!-- MODAL: VINCULAR ALUNO -->
-<div class="modal-overlay" *ngIf="mostrarModalVincular">
-  <div class="modal-content">
-    <h2>Vincular Paciente Existente</h2>
-    <p style="margin-bottom: 20px; font-size: 0.9rem; color: #666;">
+@if (mostrarModalVincular) {
+<div class="modal-backdrop">
+  <div class="modal-box">
+    <h3>Vincular Paciente Existente</h3>
+    <p class="text-muted" style="margin-bottom: 20px; font-size: 0.9rem;">
       Procure um paciente já registado no sistema através do seu e-mail para adicioná-lo à sua lista.
     </p>
 
-    <div class="form-group" style="display: flex; gap: 8px; flex-direction: row; align-items: flex-end;">
-      <div style="flex: 1;">
-        <label>E-mail do Paciente</label>
-        <input type="email" [(ngModel)]="emailBusca" placeholder="exemplo@email.com" (keydown.enter)="buscarAlunoPorEmail()">
-      </div>
-      <button class="btn-primario" (click)="buscarAlunoPorEmail()" [disabled]="carregando" style="height: 42px;">
+    <div class="form-group" style="flex-direction: row; gap: 8px;">
+      <input type="email" [(ngModel)]="emailBusca" placeholder="exemplo@email.com" style="flex: 1;" (keydown.enter)="buscarAlunoPorEmail()">
+      <button class="btn-primary" (click)="buscarAlunoPorEmail()" [disabled]="carregando">
         {{ carregando ? 'A procurar...' : 'Buscar' }}
       </button>
     </div>
 
-    <div *ngIf="alunoEncontrado" style="margin-top: 20px; padding: 15px; background: #e6f8ec; border: 1px solid #c3e6cb; border-radius: 8px;">
-      <h4 style="margin-bottom: 8px; color: #155724; border: none; font-size: 1rem;">✅ Paciente Encontrado!</h4>
-      <p style="margin: 0; color: #155724;"><strong>Nome:</strong> {{ alunoEncontrado.nome }}</p>
-      <p style="margin: 0; color: #155724;"><strong>Idade:</strong> {{ alunoEncontrado.idade }} anos</p>
+    @if (alunoEncontrado) {
+    <div class="form-section" style="margin-top: 24px;">
+      <h4 style="margin-bottom: 8px; border: none; color: var(--success);">✅ Paciente Encontrado!</h4>
+      <p style="margin: 0;"><strong>Nome:</strong> {{ alunoEncontrado.nome }}</p>
+      <p style="margin: 0;"><strong>Idade:</strong> {{ alunoEncontrado.idade }} anos</p>
     </div>
+    }
 
-    <div class="modal-actions" style="margin-top: 24px;">
-      <button class="btn-cancelar" (click)="fecharModalVincular()">Cancelar</button>
-      <button class="btn-salvar" style="background-color: #28a745; border-color: #28a745;"
+    <div class="modal-acoes">
+      <button type="button" class="btn-ghost" (click)="fecharModalVincular()">Cancelar</button>
+      <button type="button" class="btn-primary" style="background: var(--success);"
               [disabled]="!alunoEncontrado || aGuardar"
               (click)="vincularAlunoExistente()">
         Confirmar Vínculo
@@ -139,100 +210,107 @@
     </div>
   </div>
 </div>
+}
 
-<!-- MODAL: ALUNO -->
-<div class="modal-overlay" *ngIf="mostrarModalAluno">
-  <div class="modal-content">
-    <h2>{{ alunoEditandoId ? 'Editar Paciente' : 'Novo Paciente' }}</h2>
-
-    <div class="form-grid">
+<!-- MODAL ALUNO (criar / editar) -->
+@if (mostrarModalAluno) {
+<div class="modal-backdrop">
+  <div class="modal-box">
+    <h3>{{ alunoEditandoId ? 'Editar Paciente' : 'Registar Novo Paciente' }}</h3>
+    <form (ngSubmit)="salvarNovoAluno()" #alunoForm="ngForm">
       <div class="form-group">
-        <label>Nome *</label>
-        <input type="text" [(ngModel)]="novoAluno.nome" placeholder="Nome completo" />
+        <label>Nome Completo</label>
+        <input type="text" name="nome" [(ngModel)]="novoAluno.nome" required placeholder="Ex: João Silva">
       </div>
       <div class="form-group">
-        <label>E-mail *</label>
-        <input type="email" [(ngModel)]="novoAluno.email" placeholder="email@exemplo.com" />
+        <label>E-mail</label>
+        <input type="email" name="email" [(ngModel)]="novoAluno.email" required placeholder="joao@email.com">
       </div>
-      <div class="form-group">
-        <label>Senha {{ alunoEditandoId ? '(Deixe em branco para manter)' : '*' }}</label>
-        <input type="password" [(ngModel)]="novoAluno.senha" placeholder="********" />
-      </div>
-      <div class="form-group">
-        <label>Idade</label>
-        <input type="number" [(ngModel)]="novoAluno.idade" placeholder="Ex: 25" />
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Palavra-passe</label>
+          <input type="password" name="senha" [(ngModel)]="novoAluno.senha"
+                 [required]="!alunoEditandoId" [minlength]="alunoEditandoId ? 0 : 6"
+                 [placeholder]="alunoEditandoId ? 'Em branco = manter' : ''">
+        </div>
+        <div class="form-group">
+          <label>Idade</label>
+          <input type="number" name="idade" [(ngModel)]="novoAluno.idade" required>
+        </div>
       </div>
       <div class="form-group">
         <label>Sexo</label>
-        <select [(ngModel)]="novoAluno.sexo">
+        <select name="sexo" [(ngModel)]="novoAluno.sexo">
           <option value="MASCULINO">Masculino</option>
           <option value="FEMININO">Feminino</option>
         </select>
       </div>
-      <div class="form-group col-span-2">
-        <label>Restrições / Peculiaridades</label>
-        <textarea [(ngModel)]="novoAluno.peculiaridades" rows="2" placeholder="Ex: Intolerante à lactose, alergia a amendoim..."></textarea>
+      <div class="form-group">
+        <label>Peculiaridades / Restrições </label>
+        <textarea name="peculiaridades" [(ngModel)]="novoAluno.peculiaridades" rows="2" placeholder="Ex: Intolerante à lactose..."></textarea>
       </div>
-    </div>
-
-    <div class="modal-actions">
-      <button class="btn-cancelar" (click)="mostrarModalAluno = false" [disabled]="aGuardar">Cancelar</button>
-      <button class="btn-salvar" (click)="salvarNovoAluno()" [disabled]="aGuardar">
-        {{ aGuardar ? 'A guardar...' : 'Guardar' }}
-      </button>
-    </div>
+      <div class="modal-acoes">
+        <button type="button" class="btn-ghost" (click)="mostrarModalAluno = false">Cancelar</button>
+        <button type="submit" class="btn-primary" [disabled]="alunoForm.invalid || aGuardar">
+          {{ alunoEditandoId ? 'Guardar Alterações' : 'Guardar Paciente' }}
+        </button>
+      </div>
+    </form>
   </div>
 </div>
+}
 
-<!-- MODAL: DIETA -->
-<div class="modal-overlay" *ngIf="mostrarModalDieta">
-  <div class="modal-content modal-md">
-    <h2>Prescrever Nova Dieta</h2>
+<!-- MODAL DIETA -->
+@if (mostrarModalDieta) {
+<div class="modal-backdrop">
+  <div class="modal-box modal-md">
+    <h3>Prescrever Nova Dieta</h3>
+    <span class="destinatario" style="display: block; margin-bottom: 15px; color: #6b7280;">
+      Para: {{ alunoSelecionado?.nome }}
+    </span>
 
     <div class="form-group">
       <label>Orientações Gerais *</label>
-      <textarea [(ngModel)]="novaDieta.descricao" rows="5" placeholder="Descreva os objetivos, suplementação ou observações importantes..."></textarea>
+      <textarea [(ngModel)]="novaDieta.descricao" rows="5" placeholder="Descreva os objetivos, suplementação ou observações importantes..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db;"></textarea>
     </div>
 
-    <div class="form-group">
+    <div class="form-group" style="margin-top: 15px;">
       <label>Anexar Plano Alimentar (PDF/DOC)</label>
-      <div class="file-upload-wrapper">
-        <input type="file" (change)="onFileSelected($event)" accept=".pdf, .doc, .docx" />
+      <div style="margin-top: 5px;">
+        <input type="file" (change)="onFileSelected($event)" accept=".pdf, .doc, .docx" style="font-size: 0.9rem;" />
       </div>
-      <small class="hint">Opcional. Selecione o ficheiro para enviar o plano detalhado ao paciente.</small>
+      <small class="text-muted" style="display: block; margin-top: 5px;"> Selecione o ficheiro para enviar o plano detalhado ao paciente.</small>
     </div>
 
-    <div class="modal-actions">
-      <button class="btn-cancelar" (click)="fecharModalDieta()" [disabled]="aGuardar">Cancelar</button>
-      <button class="btn-salvar" (click)="salvarNovaDieta()" [disabled]="aGuardar">
+    <div class="modal-acoes" style="margin-top: 24px;">
+      <button class="btn-ghost" (click)="fecharModalDieta()" [disabled]="aGuardar">Cancelar</button>
+      <button class="btn-primary" (click)="salvarNovaDieta()" [disabled]="!novaDieta.descricao || aGuardar">
         {{ aGuardar ? 'A guardar...' : 'Guardar Dieta' }}
       </button>
     </div>
   </div>
 </div>
+}
 
-<!-- MODAL: AVALIAÇÃO FÍSICA (Estrutura Completa Atualizada) -->
-<div class="modal-overlay" *ngIf="mostrarModalAvaliacao">
-  <div class="modal-content" style="max-width: 850px; padding: 32px;">
-    <h2 style="margin-bottom: 24px;">{{ avaliacaoEditandoId ? 'Editar Avaliação Física' : 'Nova Avaliação Física' }}</h2>
+<!-- MODAL AVALIAÇÃO (criar / editar) -->
+@if (mostrarModalAvaliacao) {
+<div class="modal-backdrop">
+  <div class="modal-box modal-xl">
+    <h3>{{ avaliacaoEditandoId ? 'Editar Avaliação Física' : 'Avaliação Física ' }}</h3>
+    <div class="form-scroll-area">
 
-    <!-- Área com scroll interno para caber tudo -->
-    <div style="max-height: 60vh; overflow-y: auto; padding-right: 12px;">
-
-      <!-- 1. DADOS GERAIS -->
-      <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
-        <h4 style="margin-bottom: 16px; font-size: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Dados Gerais</h4>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+      <div class="form-section">
+        <h4>Dados Gerais</h4>
+        <div class="form-grid-3">
           <div class="form-group"><label>Data</label><input type="date" [(ngModel)]="novaAvaliacao.data"></div>
           <div class="form-group"><label>Peso (kg)</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.pesoTotal"></div>
           <div class="form-group"><label>Altura (m)</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.altura"></div>
         </div>
       </div>
 
-      <!-- 2. DOBRAS CUTÂNEAS -->
-      <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 24px;">
-        <h4 style="margin-bottom: 16px; font-size: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Dobras Cutâneas (mm)</h4>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+      <div class="form-section">
+        <h4>Dobras Cutâneas (mm)</h4>
+        <div class="form-grid-4">
           <div class="form-group"><label>Peitoral</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraPeitoral"></div>
           <div class="form-group"><label>Axilar Média</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraAxilarMedia"></div>
           <div class="form-group"><label>Tríceps</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraTriceps"></div>
@@ -243,25 +321,25 @@
         </div>
       </div>
 
-      <!-- 3. PERÍMETROS / CIRCUNFERÊNCIAS -->
-      <div style="background: #f8fafc; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
-        <h4 style="margin-bottom: 16px; font-size: 1rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px;">Perímetros / Circunferências (cm) - Opcional</h4>
-        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
-          <div class="form-group" *ngFor="let p of perimetros">
+      <div class="form-section">
+        <h4>Perímetros / Circunferências (cm) - Opcional</h4>
+        <div class="form-grid-4">
+          @for (p of perimetros; track p.medida) {
+          <div class="form-group">
             <label>{{ p.rotulo }}</label>
             <input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas[p.medida]">
           </div>
+          }
         </div>
       </div>
 
     </div>
-
-    <!-- BOTÕES DO MODAL -->
-    <div class="modal-actions" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-      <button class="btn-cancelar" (click)="fecharModalAvaliacao()" [disabled]="aGuardar">Cancelar</button>
-      <button class="btn-salvar" (click)="salvarNovaAvaliacao()" [disabled]="aGuardar">
-        {{ aGuardar ? 'A guardar...' : 'Guardar Avaliação' }}
+    <div class="modal-acoes">
+      <button class="btn-ghost" (click)="fecharModalAvaliacao()">Cancelar</button>
+      <button class="btn-primary" [disabled]="aGuardar" (click)="salvarNovaAvaliacao()">
+        {{ avaliacaoEditandoId ? 'Guardar Alterações' : 'Calcular & Guardar' }}
       </button>
     </div>
   </div>
 </div>
+}
