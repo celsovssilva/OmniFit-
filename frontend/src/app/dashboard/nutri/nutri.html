@@ -66,17 +66,27 @@
 
         <div class="grid-items">
           @for (dieta of dietasDoAluno; track dieta.id) {
-          <div class="item-box">
-            <div class="item-detalhe">
-              <h4>Dieta #{{ dieta.id }}</h4>
+          @let itens = $any(dieta).refeicoesRequests ?? $any(dieta).refeicoes ?? [];
+          <div class="item-box" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px;">
+
+            <div style="border-bottom: 1px solid #f1f5f9; padding-bottom: 12px; margin-bottom: 16px;">
+              <h4 style="color: #0f172a; font-size: 1.15rem; margin: 0 0 4px 0;">Dieta #{{ dieta.id }}</h4>
+              <p style="color: #475569; margin: 0; font-size: 0.95rem;">{{ itens.length }} Alimentos</p>
             </div>
 
-            <p style="font-size: 0.9rem; color: #4b5563; margin-top: 8px; white-space: pre-wrap;">
-              {{ dieta.descricao }}
-            </p>
+            <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+              @for (item of itens; track $index) {
+              <li style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #f8fafc; padding-bottom: 8px;">
+                <strong style="color: #0f172a; font-size: 0.95rem;">{{ item.alimento ?? item.nome }}</strong>
+                <span style="color: #64748b; font-size: 0.9rem;">{{ item.quantidade }} <span *ngIf="item.horario">({{ item.horario }})</span></span>
+              </li>
+              }
+            </ul>
 
-            <div class="item-acoes" style="margin-top: 12px; border-top: 1px solid #e5e7eb; padding-top: 12px;">
-              <button class="btn-icon" title="Excluir" (click)="excluirDieta(dieta.id)">🗑️ Excluir</button>
+            <div class="item-acoes" style="margin-top: 24px; display: flex; gap: 8px;">
+              <button class="btn-secondary" style="display: flex; align-items: center; gap: 6px;" (click)="editarDieta(dieta)">✏️ Editar</button>
+              <button class="btn-secondary" style="display: flex; align-items: center; gap: 6px;" (click)="gerarPdfDieta(dieta.id)">⚙️ Gerar PDF</button>
+              <button class="btn-danger-outline" style="display: flex; align-items: center; justify-content: center; padding: 8px 12px;" (click)="excluirDieta(dieta.id)">🗑️</button>
             </div>
           </div>
           } @empty {
@@ -85,7 +95,7 @@
         </div>
       </section>
 
-      <!-- SEÇÃO: AVALIAÇÕES -->
+      <!-- SEÇÃO: AVALIAÇÕES FÍSICAS -->
       <section class="dashboard-card">
         <div class="card-header">
           <h3>Avaliações Físicas</h3>
@@ -176,7 +186,9 @@
   </main>
 </div>
 
+<!-- ================= MODAIS ================= -->
 
+<!-- MODAL VINCULAR ALUNO -->
 @if (mostrarModalVincular) {
 <div class="modal-backdrop">
   <div class="modal-box">
@@ -194,7 +206,7 @@
 
     @if (alunoEncontrado) {
     <div class="form-section" style="margin-top: 24px;">
-      <h4 style="margin-bottom: 8px; border: none; color: var(--success);">✅ Paciente Encontrado!</h4>
+      <h4 style="margin-bottom: 8px; border: none; color: #10b981;">✅ Paciente Encontrado!</h4>
       <p style="margin: 0;"><strong>Nome:</strong> {{ alunoEncontrado.nome }}</p>
       <p style="margin: 0;"><strong>Idade:</strong> {{ alunoEncontrado.idade }} anos</p>
     </div>
@@ -202,7 +214,7 @@
 
     <div class="modal-acoes">
       <button type="button" class="btn-ghost" (click)="fecharModalVincular()">Cancelar</button>
-      <button type="button" class="btn-primary" style="background: var(--success);"
+      <button type="button" class="btn-primary" style="background: #10b981;"
               [disabled]="!alunoEncontrado || aGuardar"
               (click)="vincularAlunoExistente()">
         Confirmar Vínculo
@@ -246,7 +258,7 @@
         </select>
       </div>
       <div class="form-group">
-        <label>Peculiaridades / Restrições </label>
+        <label>Peculiaridades / Restrições (Opcional)</label>
         <textarea name="peculiaridades" [(ngModel)]="novoAluno.peculiaridades" rows="2" placeholder="Ex: Intolerante à lactose..."></textarea>
       </div>
       <div class="modal-acoes">
@@ -260,32 +272,51 @@
 </div>
 }
 
-<!-- MODAL DIETA -->
+<!-- MODAL DIETA (Construtor de Itens) -->
 @if (mostrarModalDieta) {
 <div class="modal-backdrop">
-  <div class="modal-box modal-md">
-    <h3>Prescrever Nova Dieta</h3>
-    <span class="destinatario" style="display: block; margin-bottom: 15px; color: #6b7280;">
-      Para: {{ alunoSelecionado?.nome }}
-    </span>
+  <div class="modal-box modal-lg">
+    <h3 style="color: #0f172a; font-size: 1.5rem; font-weight: 700; margin-bottom: 15px;">{{ dietaEditandoId ? 'Editar Dieta' : 'Nova Dieta' }}</h3>
 
-    <div class="form-group">
-      <label>Orientações Gerais *</label>
-      <textarea [(ngModel)]="novaDieta.descricao" rows="5" placeholder="Descreva os objetivos, suplementação ou observações importantes..." style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #d1d5db;"></textarea>
+    <div style="margin-bottom: 24px;">
+      <span style="background-color: #eff6ff; color: #2563eb; padding: 6px 16px; border-radius: 9999px; font-size: 0.85rem; font-weight: 600;">
+        Para: {{ alunoSelecionado?.nome | uppercase }}
+      </span>
     </div>
 
-    <div class="form-group" style="margin-top: 15px;">
-      <label>Anexar Plano Alimentar (PDF/DOC)</label>
-      <div style="margin-top: 5px;">
-        <input type="file" (change)="onFileSelected($event)" accept=".pdf, .doc, .docx" style="font-size: 0.9rem;" />
-      </div>
-      <small class="text-muted" style="display: block; margin-top: 5px;"> Selecione o ficheiro para enviar o plano detalhado ao paciente.</small>
+    <!-- Inputs Inline de Adicionar -->
+    <div style="display: flex; gap: 10px; margin-bottom: 16px;">
+      <input type="text" placeholder="Ex: Ovos Mexidos / Frango" [(ngModel)]="refeicaoTemp.alimento" style="flex: 2; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" (keydown.enter)="adicionarRefeicao()">
+      <input type="text" placeholder="Quantidade" [(ngModel)]="refeicaoTemp.quantidade" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" (keydown.enter)="adicionarRefeicao()">
+      <input type="time" placeholder="Hora" [(ngModel)]="refeicaoTemp.horario" style="flex: 1; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;" (keydown.enter)="adicionarRefeicao()">
+      <button style="background-color: #f1f5f9; color: #0f172a; border: none; border-radius: 6px; padding: 0 20px; font-weight: 600; cursor: pointer;" (click)="adicionarRefeicao()">Adicionar</button>
     </div>
 
-    <div class="modal-acoes" style="margin-top: 24px;">
-      <button class="btn-ghost" (click)="fecharModalDieta()" [disabled]="aGuardar">Cancelar</button>
-      <button class="btn-primary" (click)="salvarNovaDieta()" [disabled]="!novaDieta.descricao || aGuardar">
-        {{ aGuardar ? 'A guardar...' : 'Guardar Dieta' }}
+    <!-- Lista Temporária (Quadro Cinza) -->
+    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; min-height: 120px; padding: 20px;">
+      @if (novaDieta.refeicoesRequests.length === 0) {
+      <p style="text-align: center; color: #64748b; margin: 0; padding: 20px 0;">Nenhum alimento adicionado.</p>
+      }
+      <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+        @for (ref of novaDieta.refeicoesRequests; track $index) {
+        <li style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+          <span>
+            <strong style="color: #0f172a;">{{ ref.alimento }}</strong>
+            <span style="color: #64748b; margin-left: 10px;">{{ ref.quantidade }} <span *ngIf="ref.horario">({{ ref.horario }})</span></span>
+          </span>
+          <button style="background: none; border: none; color: #ef4444; font-weight: 600; cursor: pointer;" (click)="removerRefeicao($index)">Remover</button>
+        </li>
+        }
+      </ul>
+    </div>
+
+    <!-- Rodapé -->
+    <div class="modal-acoes" style="margin-top: 30px; border-top: 1px solid #e2e8f0; padding-top: 20px;">
+      <button class="btn-ghost" style="color: #64748b; font-weight: 600;" (click)="fecharModalDieta()">Cancelar</button>
+      <button style="background-color: #8ca3bc; color: white; border: none; border-radius: 6px; padding: 10px 24px; font-weight: 600; cursor: pointer;"
+              [disabled]="novaDieta.refeicoesRequests.length === 0 || aGuardar"
+              (click)="salvarNovaDieta()">
+        {{ dietaEditandoId ? 'Guardar Alterações' : 'Publicar Dieta' }}
       </button>
     </div>
   </div>
@@ -296,7 +327,7 @@
 @if (mostrarModalAvaliacao) {
 <div class="modal-backdrop">
   <div class="modal-box modal-xl">
-    <h3>{{ avaliacaoEditandoId ? 'Editar Avaliação Física' : 'Avaliação Física ' }}</h3>
+    <h3>{{ avaliacaoEditandoId ? 'Editar Avaliação Física' : 'Nova Avaliação Física' }}</h3>
     <div class="form-scroll-area">
 
       <div class="form-section">

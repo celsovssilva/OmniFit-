@@ -412,13 +412,13 @@ export class PersonalComponent implements OnInit {
     if (!this.alunoEncontrado) return;
 
     this.aGuardar = true;
-    const personalId = this.getProfissionalIdLogado(); // Usando o seu método existente!
+    const personalId = this.getProfissionalIdLogado();
 
     this.personalService.vincularAluno(this.alunoEncontrado.id, personalId).subscribe({
       next: () => {
         this.mostrarMensagem('sucesso', 'Aluno vinculado com sucesso aos seus treinos!');
         this.fecharModalVincular();
-        this.carregarAlunos(); // Atualiza a sua lista principal na hora!
+        this.carregarAlunos();
         this.aGuardar = false;
         this.cdr.markForCheck();
       },

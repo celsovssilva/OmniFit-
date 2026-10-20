@@ -28,6 +28,9 @@ export class NutriServices{
 
     return this.http.get<any[]>(`${this.apiUrl}/avaliacoesfisicas/getUsersAvaliacoes/${alunoId}`);
   }
+  atualizarDieta(dietaId: number, dietaData: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/treino/update/${dietaId}`, dietaData);
+  }
 
   criarAvaliacao(alunoId: number, dadosAvaliacao: any): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/avaliacoesfisicas/create/${alunoId}`, dadosAvaliacao);
@@ -51,9 +54,10 @@ export class NutriServices{
   }
 
 
-  criarDieta(dados: { alunoId: any; descricao: string }) {
-    return this.http.post<any>(`${this.apiUrl}/dieta/create`, dados);
+  criarDieta(dietaData: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/dieta/create`, dietaData);
   }
+
 
 
   vincularAluno(alunoId: number) {

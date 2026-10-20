@@ -17,6 +17,8 @@ export class Nutri implements OnInit {
   carregando = false;
   aGuardar = false;
   mensagem = { tipo: '', texto: '' };
+  novaDieta: { refeicoesRequests: any[] } = { refeicoesRequests: [] };
+  refeicaoTemp = { alimento: '', quantidade: '', horario: '' };
 
   meusAlunos: any[] = [];
   alunoSelecionado: any = null;
@@ -34,7 +36,6 @@ export class Nutri implements OnInit {
   classeDelta = classeDelta;
 
   dietasDoAluno: DietaResponse[] = [];
-  novaDieta: Partial<DietaRequest> = { descricao: '' };
   mostrarModalDieta = false;
   dietaEditandoId: number | null = null;
   ficheiroSelecionado: File | null = null;
@@ -313,7 +314,7 @@ export class Nutri implements OnInit {
 
   abrirModalDieta() {
     this.dietaEditandoId = null;
-    this.novaDieta = { descricao: '' };
+    this.novaDieta = { refeicoesRequests: [] };
     this.ficheiroSelecionado = null;
     this.mostrarModalDieta = true;
   }
@@ -329,38 +330,53 @@ export class Nutri implements OnInit {
       this.ficheiroSelecionado = file;
     }
   }
+  adicionarRefeicao() {
+    if (this.refeicaoTemp.alimento && this.refeicaoTemp.quantidade) {
+      this.novaDieta.refeicoesRequests.push({ ...this.refeicaoTemp });
+      this.refeicaoTemp = { alimento: '', quantidade: '', horario: '' };
+    } else {
+      this.mostrarMensagem('erro', 'Preencha pelo menos o Alimento e a Quantidade.');
+    }
+  }
+
+  removerRefeicao(index: number) {
+    this.novaDieta.refeicoesRequests.splice(index, 1);
+  }
+
+  editarDieta(dieta: any) {
+    const lista = dieta.refeicoes ?? dieta.refeicoesRequests ?? [];
+    this.dietaEditandoId = dieta.id;
+    this.novaDieta = {
+      refeicoesRequests: lista.map((r: any) => ({
+        alimento: r.alimento ?? r.nome ?? '',
+        quantidade: r.quantidade ?? '',
+        horario: r.horario ?? ''
+      }))
+    };
+    this.mostrarModalDieta = true;
+  }
 
   salvarNovaDieta() {
-    if (!this.novaDieta.descricao) {
-      this.mostrarMensagem('erro', 'A descrição da dieta é obrigatória.');
-      return;
-    }
-
     this.aGuardar = true;
+    const editando = this.dietaEditandoId !== null;
 
-
-    const request: { alunoId: any; descricao: string } = {
+    const payload = {
       alunoId: this.alunoSelecionado.id,
-      descricao: this.novaDieta.descricao
+      refeicoesRequests: this.novaDieta.refeicoesRequests
     };
 
-    this.nutriService.criarDieta(request).subscribe({
-      next: (resposta) => {
-        if (this.ficheiroSelecionado && resposta.id) {
-          const formData = new FormData();
-          formData.append('file', this.ficheiroSelecionado);
+    const chamada = editando
+      ? this.nutriService.atualizarDieta(this.dietaEditandoId!, payload)
+      : this.nutriService.criarDieta(payload);
 
-          this.nutriService.uploadFicheiroDieta(resposta.id, formData).subscribe({
-            next: () => this.finalizarSalvamentoDieta(),
-            error: () => {
-              this.aGuardar = false;
-              this.mostrarMensagem('erro', 'Dieta criada, mas erro ao anexar o PDF.');
-              this.cdr.markForCheck();
-            }
-          });
-        } else {
-          this.finalizarSalvamentoDieta();
-        }
+    chamada.subscribe({
+      next: () => {
+        this.mostrarMensagem('sucesso', editando ? 'Dieta atualizada!' : 'Dieta publicada com sucesso!');
+        this.carregarDietas(this.alunoSelecionado.id);
+        this.fecharModalDieta();
+        this.aGuardar = false;
+        this.novaDieta = { refeicoesRequests: [] }; // Reset
+        this.cdr.markForCheck();
       },
       error: () => {
         this.aGuardar = false;
@@ -368,6 +384,11 @@ export class Nutri implements OnInit {
         this.cdr.markForCheck();
       }
     });
+  }
+
+  gerarPdfDieta(dietaId: number) {
+    this.mostrarMensagem('sucesso', 'A gerar PDF da dieta...');
+
   }
 
   private finalizarSalvamentoDieta() {
@@ -382,7 +403,7 @@ export class Nutri implements OnInit {
       this.nutriService.removerDieta(dietaId).subscribe({
         next: () => {
           this.mostrarMensagem('sucesso', 'Dieta excluída com sucesso.');
-          this.carregarDietas(this.alunoSelecionado.id); // Atualiza a lista no ecrã
+          this.carregarDietas(this.alunoSelecionado.id);
         },
         error: () => this.mostrarMensagem('erro', 'Erro ao excluir a dieta.')
       });

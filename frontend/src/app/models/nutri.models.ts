@@ -10,4 +10,6 @@ export interface DietaResponse {
   alunoId: number;
   profissionalId: number;
   descricao: string;
+  refeicoes?: any[];
+  refeicoesRequests?: any[]
 }
