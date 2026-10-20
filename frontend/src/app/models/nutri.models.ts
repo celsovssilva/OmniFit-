@@ -1,7 +1,7 @@
 export interface DietaRequest {
   id:number;
   alunoId: number;
-  profissionalId: number;
+  nutriId: number;
   descricao: string;
 }
 

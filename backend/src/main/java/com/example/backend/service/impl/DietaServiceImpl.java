@@ -1,9 +1,6 @@
 package com.example.backend.service.impl;
 
-import com.example.backend.entity.Dieta;
-import com.example.backend.entity.TipoPerfil;
-import com.example.backend.entity.Treinos;
-import com.example.backend.entity.User;
+import com.example.backend.entity.*;
 import com.example.backend.repository.DietaRepository;
 import com.example.backend.repository.UserRepository;
 import com.example.backend.request.DietaRequest;
@@ -30,12 +27,24 @@ public class DietaServiceImpl implements DietaService {
     public DietaResponse create(DietaRequest request) {
         User aluno = userRepository.findById(request.alunoId())
                 .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
-        User nutri = userRepository.findById(request.profissionalId())
-                .orElseThrow(()-> new RuntimeException("nutri não encontrado"));
+
+        User personalLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User nutri = userRepository.findById(personalLogado.getId())
+                .orElseThrow(()-> new RuntimeException("nutri não encontrado no banco"));
         Dieta dieta = new Dieta();
         dieta.setAlunoId(aluno);
-        dieta.setProfissionalId(nutri);
-        dieta.setDescricao(request.descricao());
+        dieta.setNutrilId(nutri);
+
+        List<Refeicoes> refeicoes= request.refeicoesRequests().stream().map(refeicoesRequest ->{
+            Refeicoes re = new Refeicoes();
+            re.setAlimento(refeicoesRequest.alimento());
+            re.setQuantidade(refeicoesRequest.quantidade());
+            re.setHora(refeicoesRequest.hora());
+
+            return re;
+        }).toList();
+
+        dieta.setRefeicoes(refeicoes);
         return new DietaResponse(dietaRepository.save(dieta));
     }
 
@@ -43,13 +52,23 @@ public class DietaServiceImpl implements DietaService {
     public DietaResponse update(DietaRequest request, Long id) {
         User aluno = userRepository.findById(request.alunoId())
                 .orElseThrow(()-> new RuntimeException("aluno não encontrado"));
-        User nutri = userRepository.findById(request.profissionalId())
-                .orElseThrow(()-> new RuntimeException("nutri não encontrado"));
+        User personalLogado = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User nutri = userRepository.findById(personalLogado.getId())
+                .orElseThrow(()-> new RuntimeException("nutri não encontrado no banco"));
         Dieta dieta = dietaRepository.findById(id)
                 .orElseThrow(()-> new RuntimeException("dieta não encontrada"));
+
         dieta.setAlunoId(aluno);
-        dieta.setProfissionalId(nutri);
-        dieta.setDescricao(request.descricao());
+        dieta.setNutrilId(nutri);
+        List<Refeicoes> refeicoes= request.refeicoesRequests().stream().map(refeicoesRequest ->{
+            Refeicoes re = new Refeicoes();
+            re.setAlimento(refeicoesRequest.alimento());
+            re.setQuantidade(refeicoesRequest.quantidade());
+            re.setHora(refeicoesRequest.hora());
+
+            return re;
+        }).toList();
+        dieta.setRefeicoes(refeicoes);
         return new DietaResponse(dietaRepository.save(dieta));
     }
 
@@ -76,7 +95,7 @@ public class DietaServiceImpl implements DietaService {
         PdfWriter.getInstance(document,byteArrayOutputStream);
         document.open();
         document.add(new Phrase("\nDieta:" + dieta.getId()));
-        document.add(new Phrase("Descrição:" + dieta.getDescricao()));
+        document.add(new Phrase("Descrição:" + dieta.getRefeicoes()));
         document.close();
         dieta.setArquivoPdf(byteArrayOutputStream.toByteArray());
         return new DietaResponse(dietaRepository.save(dieta));
