@@ -341,19 +341,25 @@
 
       <div class="form-section">
         <h4>Dobras Cutâneas (mm)</h4>
+        <p class="text-muted" style="font-size: 0.85rem; margin: 0 0 12px;">
+          Homens: subescapular, tríceps (ou bíceps), suprailíaca e panturrilha.
+          Mulheres: axilar média, suprailíaca, coxa e panturrilha.
+        </p>
         <div class="form-grid-4">
           <div class="form-group"><label>Peitoral</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraPeitoral"></div>
           <div class="form-group"><label>Axilar Média</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraAxilarMedia"></div>
           <div class="form-group"><label>Tríceps</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraTriceps"></div>
+          <div class="form-group"><label>Bíceps (se não medir o tríceps)</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraBiceps"></div>
           <div class="form-group"><label>Subescapular</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraSubescapular"></div>
           <div class="form-group"><label>Abdominal</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraAbdominal"></div>
           <div class="form-group"><label>Suprailíaca</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraSuprailiaca"></div>
           <div class="form-group"><label>Coxa</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraCoxa"></div>
+          <div class="form-group"><label>Panturrilha</label><input type="number" step="any" [(ngModel)]="novaAvaliacao.medidas.dobraPanturrilha"></div>
         </div>
       </div>
 
       <div class="form-section">
-        <h4>Perímetros / Circunferências (cm) - Opcional</h4>
+        <h4>Perímetros / Circunferências (cm) </h4>
         <div class="form-grid-4">
           @for (p of perimetros; track p.medida) {
           <div class="form-group">

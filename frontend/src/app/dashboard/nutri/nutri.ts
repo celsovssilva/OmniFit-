@@ -2,7 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NutriServices } from '../../services/nutri.services';
-import { PERIMETROS, formatarDelta, classeDelta } from '../../utils/avaliacao.utils';
+import { PERIMETROS, formatarDelta, classeDelta, validarAvaliacao } from '../../utils/avaliacao.utils';
 import { DietaResponse, DietaRequest } from '../../models/nutri.models';
 
 @Component({
@@ -226,11 +226,12 @@ export class Nutri implements OnInit {
       data: new Date().toISOString().split('T')[0],
       pesoTotal: null as number | null,
       medidas: {
-        altura: null, torax: null, abdomen: null, cintura: null, quadril: null,
+        altura: null, peitoral: null, ombro: null, abdomen: null, cintura: null, quadril: null,
         bracoDireito: null, bracoEsquerdo: null, coxaDireita: null, coxaEsquerda: null,
         panturrilhaDireita: null, panturrilhaEsquerda: null,
         dobraPeitoral: null, dobraAxilarMedia: null, dobraTriceps: null,
-        dobraSubescapular: null, dobraAbdominal: null, dobraSuprailiaca: null, dobraCoxa: null
+        dobraSubescapular: null, dobraAbdominal: null, dobraSuprailiaca: null, dobraCoxa: null,
+        dobraPanturrilha: null, dobraBiceps: null
       } as Record<string, number | null>
     };
   }
@@ -276,6 +277,12 @@ export class Nutri implements OnInit {
   }
 
   salvarNovaAvaliacao() {
+    const erro = validarAvaliacao(this.novaAvaliacao, this.alunoSelecionado?.sexo);
+    if (erro) {
+      this.mostrarMensagem('erro', erro);
+      return;
+    }
+
     this.aGuardar = true;
     const editando = this.avaliacaoEditandoId !== null;
 

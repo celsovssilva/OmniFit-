@@ -19,23 +19,29 @@ public record AvaliacoesFisicasResponse(
                 atual.getPercentualGordura(),
                 new MedidasResponse(atual.getMedidas()),
                 anterior != null ? new ComparacaoResponse(
-                        atual.getPesoTotal() - anterior.getPesoTotal(),
-                        atual.getMedidas().getAltura() - anterior.getMedidas().getAltura(),
-                        atual.getPercentualGordura() - anterior.getPercentualGordura(),
-                        atual.getMedidas().getMassaMagra() - anterior.getMedidas().getMassaMagra(),
-                        atual.getMedidas().getMassaGorda() - anterior.getMedidas().getMassaGorda(),
-                        atual.getMedidas().getImc() - anterior.getMedidas().getImc(),
-                        atual.getMedidas().getTorax() - anterior.getMedidas().getTorax(),
-                        atual.getMedidas().getCintura() - anterior.getMedidas().getCintura(),
-                        atual.getMedidas().getAbdomen() - anterior.getMedidas().getAbdomen(),
-                        atual.getMedidas().getQuadril() - anterior.getMedidas().getQuadril(),
-                        atual.getMedidas().getBracoDireito() - anterior.getMedidas().getBracoDireito(),
-                        atual.getMedidas().getBracoEsquerdo() - anterior.getMedidas().getBracoEsquerdo(),
-                        atual.getMedidas().getCoxaDireita() - anterior.getMedidas().getCoxaDireita(),
-                        atual.getMedidas().getCoxaEsquerda() - anterior.getMedidas().getCoxaEsquerda(),
-                        atual.getMedidas().getPanturrilhaDireita() - anterior.getMedidas().getPanturrilhaDireita(),
-                        atual.getMedidas().getPanturrilhaEsquerda() - anterior.getMedidas().getPanturrilhaEsquerda()
+                        dif(atual.getPesoTotal(), anterior.getPesoTotal()),
+                        dif(atual.getMedidas().getAltura(), anterior.getMedidas().getAltura()),
+                        dif(atual.getPercentualGordura(), anterior.getPercentualGordura()),
+                        dif(atual.getMedidas().getMassaMagra(), anterior.getMedidas().getMassaMagra()),
+                        dif(atual.getMedidas().getMassaGorda(), anterior.getMedidas().getMassaGorda()),
+                        dif(atual.getMedidas().getImc(), anterior.getMedidas().getImc()),
+                        dif(atual.getMedidas().getPeitoral(), anterior.getMedidas().getPeitoral()),
+                        dif(atual.getMedidas().getOmbro(), anterior.getMedidas().getOmbro()),   // novo
+                        dif(atual.getMedidas().getCintura(), anterior.getMedidas().getCintura()),
+                        dif(atual.getMedidas().getAbdomen(), anterior.getMedidas().getAbdomen()),
+                        dif(atual.getMedidas().getQuadril(), anterior.getMedidas().getQuadril()),
+                        dif(atual.getMedidas().getBracoDireito(), anterior.getMedidas().getBracoDireito()),
+                        dif(atual.getMedidas().getBracoEsquerdo(), anterior.getMedidas().getBracoEsquerdo()),
+                        dif(atual.getMedidas().getCoxaDireita(), anterior.getMedidas().getCoxaDireita()),
+                        dif(atual.getMedidas().getCoxaEsquerda(), anterior.getMedidas().getCoxaEsquerda()),
+                        dif(atual.getMedidas().getPanturrilhaDireita(), anterior.getMedidas().getPanturrilhaDireita()),
+                        dif(atual.getMedidas().getPanturrilhaEsquerda(), anterior.getMedidas().getPanturrilhaEsquerda())
                 ) : null
         );
+    }
+
+
+    private static Double dif(Double atual, Double anterior) {
+        return (atual == null || anterior == null) ? null : atual - anterior;
     }
 }

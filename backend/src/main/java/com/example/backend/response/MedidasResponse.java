@@ -7,7 +7,8 @@ public record MedidasResponse(
         Double massaMagra,
         Double massaGorda,
         Double imc,
-        Double torax,
+        Double peitoral,
+        Double ombro,
         Double cintura,
         Double abdomen,
         Double quadril,
@@ -23,7 +24,9 @@ public record MedidasResponse(
         Double dobraSubescapular,
         Double dobraAbdominal,
         Double dobraSuprailiaca,
-        Double dobraCoxa
+        Double dobraCoxa,
+        Double dobraPanturrilha,
+        Double dobraBiceps
 ){
     public MedidasResponse(Medidas m){
         this(
@@ -31,7 +34,8 @@ public record MedidasResponse(
                 m.getMassaMagra(),
                 m.getMassaGorda(),
                 m.getImc(),
-                m.getTorax(),
+                m.getPeitoral(),
+                m.getOmbro(),
                 m.getCintura(),
                 m.getAbdomen(),
                 m.getQuadril(),
@@ -47,7 +51,9 @@ public record MedidasResponse(
                 m.getDobraSubescapular(),
                 m.getDobraAbdominal(),
                 m.getDobraSuprailiaca(),
-                m.getDobraCoxa()
+                m.getDobraCoxa(),
+                m.getDobraPanturrilha(),
+                m.getDobraBiceps()
         );
     }
 }

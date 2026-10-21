@@ -14,7 +14,8 @@ import lombok.Setter;
 public class Medidas {
     // Medidas gerais
     private Double altura;
-    private Double torax;
+    private Double peitoral;
+    private Double ombro;
     private Double cintura;
     private Double abdomen;
     private Double quadril;
@@ -33,6 +34,8 @@ public class Medidas {
     private Double dobraAbdominal;
     private Double dobraSuprailiaca;
     private Double dobraCoxa;
+    private Double dobraPanturrilha;
+    private Double dobraBiceps;
 
 
     private Double imc;

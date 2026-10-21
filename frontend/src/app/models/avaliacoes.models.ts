@@ -1,17 +1,20 @@
-
-
 export interface MedidasRequest {
   altura: number;
+
+
   dobraPeitoral: number;
   dobraAxilarMedia: number;
-  dobraTriceps: number;
+  dobraTriceps: number | null;
+  dobraBiceps: number | null;
   dobraSubescapular: number;
   dobraAbdominal: number;
   dobraSuprailiaca: number;
   dobraCoxa: number;
+  dobraPanturrilha: number;
 
 
-  torax: number;
+  peitoral: number;
+  ombro: number;
   cintura: number;
   abdomen: number;
   quadril: number;
@@ -22,7 +25,6 @@ export interface MedidasRequest {
   panturrilhaDireita: number;
   panturrilhaEsquerda: number;
 }
-
 
 export interface AvaliacaoRequest {
   alunoId?: number;
@@ -45,9 +47,10 @@ export function novaAvaliacaoVazia(): AvaliacaoForm {
     pesoTotal: null,
     medidas: {
       altura: null,
-      dobraPeitoral: null, dobraAxilarMedia: null, dobraTriceps: null,
+      dobraPeitoral: null, dobraAxilarMedia: null, dobraTriceps: null, dobraBiceps: null,
       dobraSubescapular: null, dobraAbdominal: null, dobraSuprailiaca: null, dobraCoxa: null,
-      torax: null, cintura: null, abdomen: null, quadril: null,
+      dobraPanturrilha: null,
+      peitoral: null, ombro: null, cintura: null, abdomen: null, quadril: null,
       bracoDireito: null, bracoEsquerdo: null, coxaDireita: null, coxaEsquerda: null,
       panturrilhaDireita: null, panturrilhaEsquerda: null
     }
@@ -56,13 +59,11 @@ export function novaAvaliacaoVazia(): AvaliacaoForm {
 
 
 export function paraRequest(form: AvaliacaoForm): AvaliacaoRequest | null {
-  const campos = [form.pesoTotal, ...Object.values(form.medidas)];
-  if (!form.data || campos.some(v => typeof v !== 'number')) {
+  if (!form.data || typeof form.pesoTotal !== 'number' || typeof form.medidas.altura !== 'number') {
     return null;
   }
   return form as AvaliacaoRequest;
 }
-
 
 export interface MedidasResponse extends MedidasRequest {
   massaMagra: number;
@@ -72,24 +73,24 @@ export interface MedidasResponse extends MedidasRequest {
 
 
 export interface ComparacaoResponse {
-  DiferencaPeso: number;
-  DiferencaAltura: number;
-  DiferencaPercentualGordura: number;
-  DiferencaMassaMagra: number;
-  DiferencaMassaGorda: number;
-  DiferencaImc: number;
-  DiferencaTorax: number;
-  DiferencaCintura: number;
-  DiferencaAbdomen: number;
-  DiferencaQuadril: number;
-  DiferencaBracoDireito: number;
-  DiferencaBracoEsquerdo: number;
-  DiferencaCoxaDireita: number;
-  DiferencaCoxaEsquerda: number;
-  DiferencaPanturrilhaDireita: number;
-  DiferencaPanturrilhaEsquerda: number;
+  diferencaPeso: number;
+  diferencaAltura: number;
+  diferencaPercentualGordura: number;
+  diferencaMassaMagra: number;
+  diferencaMassaGorda: number;
+  diferencaImc: number;
+  diferencaPeitoral: number;   // antes: DiferencaTorax
+  diferencaOmbro: number;      // novo
+  diferencaCintura: number;
+  diferencaAbdomen: number;
+  diferencaQuadril: number;
+  diferencaBracoDireito: number;
+  diferencaBracoEsquerdo: number;
+  diferencaCoxaDireita: number;
+  diferencaCoxaEsquerda: number;
+  diferencaPanturrilhaDireita: number;
+  diferencaPanturrilhaEsquerda: number;
 }
-
 
 export interface AvaliacaoResponse {
   data: string;

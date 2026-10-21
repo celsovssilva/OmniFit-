@@ -2,7 +2,8 @@ package com.example.backend.request;
 
 public record MedidasRequest (
         Double altura,
-        Double torax,
+        Double peitoral,
+        Double ombro,
         Double cintura,
         Double abdomen,
         Double quadril,
@@ -19,5 +20,7 @@ public record MedidasRequest (
         Double dobraSubescapular,
         Double dobraAbdominal,
         Double dobraSuprailiaca,
-        Double dobraCoxa
+        Double dobraCoxa,
+        Double dobraPanturrilha,
+        Double dobraBiceps
 ) {}
