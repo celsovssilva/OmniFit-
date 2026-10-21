@@ -202,19 +202,18 @@ export class Nutri implements OnInit {
     if (!this.alunoEncontrado) return;
 
     this.aGuardar = true;
+    const nutriId = this.getProfissionalIdLogado();
 
-
-    // @ts-ignore
-    this.nutriService.vincularAluno(this.alunoEncontrado.id).subscribe({
+    this.nutriService.vincularAluno(this.alunoEncontrado.id, nutriId).subscribe({
       next: () => {
-        this.mostrarMensagem('sucesso', 'Paciente vinculado com sucesso!');
+        this.mostrarMensagem('sucesso', 'Aluno vinculado com sucesso aos seus treinos!');
         this.fecharModalVincular();
         this.carregarAlunos();
         this.aGuardar = false;
         this.cdr.markForCheck();
       },
       error: () => {
-        this.mostrarMensagem('erro', 'Erro ao vincular o paciente.');
+        this.mostrarMensagem('erro', 'Erro ao vincular o aluno.');
         this.aGuardar = false;
         this.cdr.markForCheck();
       }
@@ -415,5 +414,8 @@ export class Nutri implements OnInit {
         error: () => this.mostrarMensagem('erro', 'Erro ao excluir a dieta.')
       });
     }
+  }
+  private getProfissionalIdLogado(): number {
+    return 1;
   }
 }

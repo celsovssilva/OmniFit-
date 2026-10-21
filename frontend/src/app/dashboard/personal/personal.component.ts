@@ -71,7 +71,7 @@ export class PersonalComponent implements OnInit {
         this.meusAlunos = dados;
         this.carregando = false;
         this.cdr.markForCheck();
-        // Mantém o aluno selecionado atualizado após editar
+
         if (this.alunoSelecionado) {
           this.alunoSelecionado =
             dados.find((a) => a.id === this.alunoSelecionado.id) ?? null;
@@ -97,7 +97,7 @@ export class PersonalComponent implements OnInit {
     this.novoAluno = {
       nome: aluno.nome ?? '',
       email: aluno.email ?? '',
-      senha: '', // vazio = não altera a senha
+      senha: '',
       idade: aluno.idade ?? null,
       sexo: aluno.sexo ?? 'MASCULINO',
       tipoPerfil: aluno.tipoPerfil ?? 'ALUNO',

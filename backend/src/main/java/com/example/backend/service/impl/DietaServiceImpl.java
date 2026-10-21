@@ -132,7 +132,7 @@ public class DietaServiceImpl implements DietaService {
 
         User aluno = userRepository.findById(alunoId)
                 .orElseThrow(() -> new RuntimeException("aluno não encontrado"));
-        aluno.setPersonalId(logado.getId());
+        aluno.setNutriId(logado.getId());
         return new UserResponse(userRepository.save(aluno));
     }
 

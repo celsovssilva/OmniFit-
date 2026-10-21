@@ -50,7 +50,7 @@ export class NutriServices{
 
   buscarAlunoPorEmail(email: string): Observable<any> {
     const params = new HttpParams().set('email', email);
-    return this.http.get<any>(`${this.apiUrl}/buscar`, { params });
+    return this.http.get<any>(`${this.apiUrl}/dieta/buscar`, { params });
   }
 
 
@@ -60,8 +60,8 @@ export class NutriServices{
 
 
 
-  vincularAluno(alunoId: number) {
-    return this.http.post<any>(`${this.apiUrl}/dieta/vincular/${alunoId}`, {});
+  vincularAluno(alunoId: number,nutriId:number) {
+    return this.http.post<any>(`${this.apiUrl}/dieta/vincular/${alunoId}/${nutriId}`, {});
   }
   removerDieta(id: number): Observable<any> {
     return this.http.delete<any>(`${this.apiUrl}/dieta/delete/${id}`);
