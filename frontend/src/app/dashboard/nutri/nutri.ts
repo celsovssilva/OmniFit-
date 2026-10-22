@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { NutriServices } from '../../services/nutri.services';
 import { PERIMETROS, formatarDelta, classeDelta, validarAvaliacao } from '../../utils/avaliacao.utils';
 import { DietaResponse, DietaRequest } from '../../models/nutri.models';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-nutri',
@@ -78,8 +79,7 @@ export class Nutri implements OnInit {
         }
         this.cdr.markForCheck();
       },
-      error: (e) => {
-        console.error(e);
+      error: () => {
         this.carregando = false;
         this.mostrarMensagem('erro', 'Erro ao carregar alunos.');
         this.cdr.markForCheck();
@@ -152,16 +152,27 @@ export class Nutri implements OnInit {
   }
 
   removerAluno(id: number) {
-    if (confirm('Remover este paciente definitivamente?')) {
-      this.nutriService.removerAluno(id).subscribe({
-        next: () => {
-          this.alunoSelecionado = null;
-          this.mostrarMensagem('sucesso', 'Paciente removido.');
-          this.carregarAlunos();
-        },
-        error: () => this.mostrarMensagem('erro', 'Erro ao remover paciente.')
-      });
-    }
+    Swal.fire({
+      title: 'Tem a certeza?',
+      text: 'Remover este paciente definitivamente?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sim, remover',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.nutriService.removerAluno(id).subscribe({
+          next: () => {
+            this.alunoSelecionado = null;
+            this.mostrarMensagem('sucesso', 'Paciente removido.');
+            this.carregarAlunos();
+          },
+          error: () => this.mostrarMensagem('erro', 'Erro ao remover paciente.')
+        });
+      }
+    });
   }
 
   abrirModalVincular() {
@@ -336,6 +347,7 @@ export class Nutri implements OnInit {
       this.ficheiroSelecionado = file;
     }
   }
+
   adicionarRefeicao() {
     if (this.refeicaoTemp.alimento && this.refeicaoTemp.quantidade) {
       this.novaDieta.refeicoesRequests.push({ ...this.refeicaoTemp });
@@ -381,7 +393,7 @@ export class Nutri implements OnInit {
         this.carregarDietas(this.alunoSelecionado.id);
         this.fecharModalDieta();
         this.aGuardar = false;
-        this.novaDieta = { refeicoesRequests: [] }; // Reset
+        this.novaDieta = { refeicoesRequests: [] };
         this.cdr.markForCheck();
       },
       error: () => {
@@ -394,12 +406,10 @@ export class Nutri implements OnInit {
 
   gerarPdfDieta(dietaId: number) {
     const formData = new FormData();
-    this.nutriService.uploadFicheiroDieta(dietaId,formData).subscribe({
+    this.nutriService.uploadFicheiroDieta(dietaId, formData).subscribe({
       next: () => this.mostrarMensagem('sucesso', 'PDF gerado e guardado na base de dados com sucesso!'),
       error: () => this.mostrarMensagem('erro', 'Erro ao gerar PDF no servidor.')
     });
-
-
   }
 
   private finalizarSalvamentoDieta() {
@@ -409,17 +419,30 @@ export class Nutri implements OnInit {
     this.fecharModalDieta();
     this.cdr.markForCheck();
   }
+
   excluirDieta(dietaId: number) {
-    if (confirm('Tem a certeza que deseja excluir esta dieta?')) {
-      this.nutriService.removerDieta(dietaId).subscribe({
-        next: () => {
-          this.mostrarMensagem('sucesso', 'Dieta excluída com sucesso.');
-          this.carregarDietas(this.alunoSelecionado.id);
-        },
-        error: () => this.mostrarMensagem('erro', 'Erro ao excluir a dieta.')
-      });
-    }
+    Swal.fire({
+      title: 'Tem a certeza?',
+      text: 'Deseja excluir esta dieta definitivamente?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sim, excluir',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.nutriService.removerDieta(dietaId).subscribe({
+          next: () => {
+            this.mostrarMensagem('sucesso', 'Dieta excluída com sucesso.');
+            this.carregarDietas(this.alunoSelecionado.id);
+          },
+          error: () => this.mostrarMensagem('erro', 'Erro ao excluir a dieta.')
+        });
+      }
+    });
   }
+
   private getProfissionalIdLogado(): number {
     return 1;
   }

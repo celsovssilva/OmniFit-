@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthServices } from '../services/auth.services';
 import { UserRequest } from '../models/auth.models';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-register',
@@ -44,12 +45,22 @@ export class Register {
 
     this.authService.createProfissional(dados).subscribe({
       next: (resposta) => {
-        alert('Conta criada com sucesso! Pode fazer login.');
-        this.router.navigate(['/login']);
+        Swal.fire({
+          icon: 'success',
+          title: 'Conta Criada!',
+          text: 'Conta criada com sucesso! Pode fazer login.',
+          confirmButtonColor: '#3085d6'
+        }).then(() => {
+          this.router.navigate(['/login']);
+        });
       },
       error: (erro) => {
-        console.error(erro);
-        alert('Erro ao criar conta. O e-mail já pode estar em uso.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Erro ao criar conta. O e-mail já pode estar em uso.',
+          confirmButtonColor: '#3085d6'
+        });
       }
     });
   }

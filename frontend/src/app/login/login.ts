@@ -1,9 +1,9 @@
-
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthServices } from '../services/auth.services';
 import { LoginRequest } from '../models/auth.models';
 import { Component, ChangeDetectorRef } from '@angular/core';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-login',
@@ -32,48 +32,52 @@ export class Login {
     this.authService.login(dados).subscribe({
       next: (resposta) => {
         if (resposta.token) {
-          localStorage.getItem('token-jwt')
           localStorage.setItem('token_jwt', resposta.token);
-          localStorage.setItem('tipo_perfil',resposta.tipoPerfil);
-          if(resposta.tipoPerfil === "PERSONAL"){
-            this.router.navigate(['/personal'])
-          } else if (resposta.tipoPerfil === "NUTRI"){
-            this.router.navigate(['/nutri'])
+          localStorage.setItem('tipo_perfil', resposta.tipoPerfil);
+
+          if (resposta.tipoPerfil === "PERSONAL") {
+            this.router.navigate(['/personal']);
+          } else if (resposta.tipoPerfil === "NUTRI") {
+            this.router.navigate(['/nutri']);
           } else {
-            this.router.navigate(['/aluno'])
+            this.router.navigate(['/aluno']);
           }
-
-
-
         }
       },
       error: (erro) => {
-        alert('E-mail ou palavra-passe incorretos.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Acesso Negado',
+          text: 'E-mail ou palavra-passe incorretos.',
+          confirmButtonColor: '#3085d6'
+        });
       }
     });
   }
+
   solicitarCodigo() {
     this.authService.forgot({ email: this.emailRecuperacao }).subscribe({
       next: (dados) => {
-        console.log('Resposta do backend:', dados);
         this.etapaAtual = 'RESET_SENHA';
-
-
         this.cdr.detectChanges();
       },
       error: (erro) => {
-        console.error('O Angular reclamou do seguinte erro:', erro);
         if (erro.status === 200) {
           this.etapaAtual = 'RESET_SENHA';
-          this.cdr.detectChanges(); // 👉 Coloque aqui também por garantia
+          this.cdr.detectChanges();
         } else {
-          alert('Erro! Abra o F12 e veja a aba Console.');
+          Swal.fire({
+            icon: 'error',
+            title: 'Erro na Recuperação',
+            text: 'Não foi possível solicitar o código. Verifique se o e-mail está correto.',
+            confirmButtonColor: '#3085d6'
+          });
         }
       }
     });
   }
-  confirmarNovaSenha() {
 
+  confirmarNovaSenha() {
     const dadosReset = {
       email: this.emailRecuperacao,
       pin: this.codigoPin,
@@ -82,18 +86,28 @@ export class Login {
 
     this.authService.reset(dadosReset).subscribe({
       next: (resposta) => {
-        alert('Senha alterada com sucesso! Faça login com a sua nova senha.');
+        Swal.fire({
+          icon: 'success',
+          title: 'Sucesso!',
+          text: 'Senha alterada com sucesso! Faça login com a sua nova senha.',
+          confirmButtonColor: '#3085d6'
+        });
 
         this.etapaAtual = 'LOGIN';
-
         this.codigoPin = '';
         this.novaSenha = '';
       },
       error: (erro) => {
-        alert('Erro ao redefinir a senha. Verifique se o código está correto e não expirou.');
+        Swal.fire({
+          icon: 'error',
+          title: 'Código Inválido',
+          text: 'Erro ao redefinir a senha. Verifique se o código está correto e não expirou.',
+          confirmButtonColor: '#3085d6'
+        });
       }
     });
   }
+
   irParaCadastro() {
     this.router.navigate(['/register']);
   }

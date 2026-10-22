@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PersonalServices } from '../../services/personal.services';
 import { PERIMETROS, formatarDelta, classeDelta, validarAvaliacao } from '../../utils/avaliacao.utils';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-personal',
@@ -16,7 +17,6 @@ export class PersonalComponent implements OnInit {
   alunoSelecionado: any = null;
   treinosDoAluno: any[] = [];
   avaliacoesDoAluno: any[] = [];
-
 
   perimetros = PERIMETROS;
   formatarDelta = formatarDelta;
@@ -47,8 +47,7 @@ export class PersonalComponent implements OnInit {
   constructor(
     private personalService: PersonalServices,
     private cdr: ChangeDetectorRef
-  ) {
-  }
+  ) {}
 
   ngOnInit() {
     this.carregarAlunos();
@@ -63,7 +62,6 @@ export class PersonalComponent implements OnInit {
     }, 4000);
   }
 
-
   carregarAlunos() {
     this.carregando = true;
     this.personalService.getMeusAlunos().subscribe({
@@ -73,12 +71,10 @@ export class PersonalComponent implements OnInit {
         this.cdr.markForCheck();
 
         if (this.alunoSelecionado) {
-          this.alunoSelecionado =
-            dados.find((a) => a.id === this.alunoSelecionado.id) ?? null;
+          this.alunoSelecionado = dados.find((a) => a.id === this.alunoSelecionado.id) ?? null;
         }
       },
-      error: (e) => {
-        console.error(e);
+      error: () => {
         this.carregando = false;
         this.cdr.markForCheck();
         this.mostrarMensagem('erro', 'Erro ao carregar alunos.');
@@ -150,18 +146,28 @@ export class PersonalComponent implements OnInit {
   }
 
   removerAluno(id: number) {
-    if (confirm('Remover este aluno definitivamente?')) {
-      this.personalService.removerAluno(id).subscribe({
-        next: () => {
-          this.alunoSelecionado = null;
-          this.mostrarMensagem('sucesso', 'Aluno removido.');
-          this.carregarAlunos();
-        },
-        error: () => this.mostrarMensagem('erro', 'Erro ao remover aluno.')
-      });
-    }
+    Swal.fire({
+      title: 'Tem a certeza?',
+      text: 'Remover este aluno definitivamente?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sim, remover',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.personalService.removerAluno(id).subscribe({
+          next: () => {
+            this.alunoSelecionado = null;
+            this.mostrarMensagem('sucesso', 'Aluno removido.');
+            this.carregarAlunos();
+          },
+          error: () => this.mostrarMensagem('erro', 'Erro ao remover aluno.')
+        });
+      }
+    });
   }
-
 
   carregarTreinos(alunoId: number) {
     this.personalService.getTreinosDoAluno(alunoId).subscribe({
@@ -211,7 +217,6 @@ export class PersonalComponent implements OnInit {
     this.novoTreino.exerciciosRequests.splice(index, 1);
   }
 
-
   salvarNovoTreino() {
     if (!this.alunoSelecionado) {
       this.mostrarMensagem('erro', 'Selecione um aluno antes de prescrever o treino.');
@@ -250,15 +255,26 @@ export class PersonalComponent implements OnInit {
   }
 
   excluirTreino(treinoId: number) {
-    if (confirm('Excluir este treino?')) {
-      this.personalService.removerTreino(treinoId).subscribe({
-        next: () => {
-          this.mostrarMensagem('sucesso', 'Treino excluído.');
-          this.carregarTreinos(this.alunoSelecionado.id);
-        },
-        error: () => this.mostrarMensagem('erro', 'Erro ao excluir treino.')
-      });
-    }
+    Swal.fire({
+      title: 'Excluir treino?',
+      text: 'Esta ação não pode ser revertida!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Sim, excluir',
+      cancelButtonText: 'Cancelar'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.personalService.removerTreino(treinoId).subscribe({
+          next: () => {
+            this.mostrarMensagem('sucesso', 'Treino excluído.');
+            this.carregarTreinos(this.alunoSelecionado.id);
+          },
+          error: () => this.mostrarMensagem('erro', 'Erro ao excluir treino.')
+        });
+      }
+    });
   }
 
   gerarPdfTreino(treinoId: number) {
@@ -268,7 +284,6 @@ export class PersonalComponent implements OnInit {
       error: () => this.mostrarMensagem('erro', 'Erro ao gerar PDF no servidor.')
     });
   }
-
 
   carregarAvaliacoes(alunoId: number) {
     this.personalService.getAvaliacoes(alunoId).subscribe({
@@ -321,7 +336,6 @@ export class PersonalComponent implements OnInit {
     const editando = this.avaliacaoEditandoId !== null;
 
     const chamada = editando
-
       ? this.personalService.atualizarAvaliacao(this.avaliacaoEditandoId, {
         alunoId: this.alunoSelecionado.id,
         ...this.novaAvaliacao
@@ -343,7 +357,6 @@ export class PersonalComponent implements OnInit {
       }
     });
   }
-
 
   private alunoVazio() {
     return {
@@ -379,7 +392,6 @@ export class PersonalComponent implements OnInit {
       } as Record<string, number | null>
     };
   }
-
 
   abrirModalVincular() {
     this.mostrarModalVincular = true;
@@ -435,8 +447,6 @@ export class PersonalComponent implements OnInit {
         this.cdr.markForCheck();
       }
     });
-
-
   }
 
   private getProfissionalIdLogado(): number {
