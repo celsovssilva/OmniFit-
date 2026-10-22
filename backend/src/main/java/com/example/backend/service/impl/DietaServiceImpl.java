@@ -74,7 +74,7 @@ public class DietaServiceImpl implements DietaService {
 
     @Override
     public List<DietaResponse> getDietaForUsers(Long userId) {
-         List<DietaResponse> dietaResponses = dietaRepository.findById(userId)
+         List<DietaResponse> dietaResponses = dietaRepository.findByAlunoIdId(userId)
                  .stream().map(DietaResponse::new).toList();
          return dietaResponses;
     }
@@ -89,14 +89,42 @@ public class DietaServiceImpl implements DietaService {
     @Override
     public DietaResponse updloadDieta(Long dietaId) {
         Dieta dieta = dietaRepository.findById(dietaId)
-                .orElseThrow(()-> new RuntimeException("dieta não encontrada"));
-       Document document = new Document();
+                .orElseThrow(() -> new RuntimeException("Dieta não encontrada"));
+
+        Document document = new Document();
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        PdfWriter.getInstance(document,byteArrayOutputStream);
-        document.open();
-        document.add(new Phrase("\nDieta:" + dieta.getId()));
-        document.add(new Phrase("Descrição:" + dieta.getRefeicoes()));
-        document.close();
+
+        try {
+            PdfWriter.getInstance(document, byteArrayOutputStream);
+            document.open();
+            document.add(new Phrase("=== PLANO ALIMENTAR (Dieta #" + dieta.getId() + ") ===\n\n"));
+
+            if (dieta.getAlunoId() != null) {
+                document.add(new Phrase("Aluno: " + dieta.getAlunoId().getNome() + "\n\n"));
+            }
+
+            document.add(new Phrase("Refeições:\n"));
+            document.add(new Phrase("--------------------------------------------------\n"));
+
+            if (dieta.getRefeicoes() != null && !dieta.getRefeicoes().isEmpty()) {
+                for (Refeicoes r : dieta.getRefeicoes()) {
+                    String horaStr = (r.getHora() != null) ? r.getHora().toString() : "Horário não informado";
+                    String linhaRefeicao = String.format("• [%s] %s - Quantidade: %s\n",
+                            horaStr,
+                            r.getAlimento(),
+                            r.getQuantidade());
+
+                    document.add(new Phrase(linhaRefeicao));
+                }
+            } else {
+                document.add(new Phrase("Nenhuma refeição cadastrada para esta dieta.\n"));
+            }
+
+            document.close();
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar PDF da dieta: " + e.getMessage());
+        }
+
         dieta.setArquivoPdf(byteArrayOutputStream.toByteArray());
         return new DietaResponse(dietaRepository.save(dieta));
     }

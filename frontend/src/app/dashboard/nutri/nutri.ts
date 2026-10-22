@@ -393,7 +393,12 @@ export class Nutri implements OnInit {
   }
 
   gerarPdfDieta(dietaId: number) {
-    this.mostrarMensagem('sucesso', 'A gerar PDF da dieta...');
+    const formData = new FormData();
+    this.nutriService.uploadFicheiroDieta(dietaId,formData).subscribe({
+      next: () => this.mostrarMensagem('sucesso', 'PDF gerado e guardado na base de dados com sucesso!'),
+      error: () => this.mostrarMensagem('erro', 'Erro ao gerar PDF no servidor.')
+    });
+
 
   }
 
